@@ -1,200 +1,225 @@
-# Startup Support Web Service - Member API 명세서
+# 🚀 소상공인 창업지원 웹서비스 (Startup Support Web Service)
 
-## 구현된 기능
+## 📋 프로젝트 개요
 
-### 1. 회원 관련 기능
+소상공인들의 창업을 지원하는 종합 웹서비스의 백엔드 API 서버입니다. 회원 관리, 게시판, 중고거래 마켓, 실시간 채팅, 신고 시스템 등의 기능을 제공합니다.
 
-#### 1-1. 아이디 중복 체크
-- **URL**: `GET /member/{userId}/chkId`
-- **설명**: 회원가입 시 아이디 중복 확인
-- **토큰 필요**: 없음
-- **응답**: 중복된 아이디 개수 (0: 사용 가능, 1: 중복)
+## 🎯 주요 기능
 
-#### 1-2. 회원가입
-- **URL**: `POST /member`
-- **설명**: 새 회원 등록
-- **토큰 필요**: 없음
-- **Request Body**:
-```json
-{
-  "userId": "test123",
-  "userName": "홍길동",
-  "userPw": "password123",
-  "userPhone": "010-1234-5678",
-  "userEmail": "test@email.com",
-  "userAddr": "서울시 강남구"
-}
+### 👤 회원 관리
+- ✅ 회원가입 / 로그인
+- ✅ JWT 토큰 기반 인증
+- ✅ 아이디/비밀번호 찾기 (이메일 발송)
+- ✅ 회원 정보 조회/수정
+- ✅ 비밀번호 변경
+- ✅ 회원 탈퇴
+
+### 📝 게시판 기능
+- ✅ 게시글 작성/조회/수정/삭제
+- ✅ 댓글 시스템 (대댓글 지원)
+- ✅ 첨부파일 업로드
+- ✅ 조회수 카운트
+
+### 🛒 중고거래 마켓
+- ✅ 판매/구매 게시글 관리
+- ✅ 상품 이미지 업로드
+- ✅ 내가 쓴 마켓글 조회
+
+### 💬 실시간 채팅
+- ✅ 1:1 채팅방 생성
+- ✅ 실시간 메시지 송수신
+- ✅ 채팅 내역 조회
+
+### 🚨 신고 시스템
+- ✅ 게시글/댓글 신고
+- ✅ 관리자 신고 처리
+- ✅ 신고 누적 시 계정 제재
+
+### 👨‍💼 관리자 기능
+- ✅ 신고 목록 조회
+- ✅ 신고 승인/거절 처리
+- ✅ 회원 제재 관리
+
+## 🛠 기술 스택
+
+### Backend
+- **Framework**: Spring Boot 3.4.6
+- **Security**: Spring Security + JWT
+- **Database**: Oracle 11g
+- **ORM**: MyBatis
+- **API Documentation**: Springfox Swagger 3.0.0
+- **Email**: Gmail SMTP
+
+### Frontend (예정)
+- **Framework**: React.js
+- **State Management**: Redux Toolkit
+- **UI Library**: Material-UI
+
+## 📁 프로젝트 구조
+
+```
+startup_web_service/
+├── src/main/java/kr/or/iei/
+│   ├── common/
+│   │   ├── SecurityConfig.java          # 보안 설정
+│   │   ├── SwaggerConfig.java           # API 문서 설정
+│   │   ├── service/
+│   │   │   └── EmailService.java        # 이메일 발송 서비스
+│   │   ├── annotation/
+│   │   │   ├── NoTokenCheck.java        # 토큰 검증 제외 어노테이션
+│   │   │   └── TokenRequired.java       # 토큰 검증 필수 어노테이션
+│   │   ├── dto/
+│   │   │   └── ResponseDTO.java         # 공통 응답 DTO
+│   │   ├── exception/
+│   │   │   ├── CommonException.java     # 공통 예외 클래스
+│   │   │   └── CommonExceptionHandler.java # 예외 처리 핸들러
+│   │   └── util/
+│   │       └── JwtUtils.java            # JWT 토큰 유틸리티
+│   ├── member/
+│   │   ├── controller/
+│   │   │   └── MemberController.java    # 회원 관리 API
+│   │   ├── model/
+│   │   │   ├── service/
+│   │   │   │   └── MemberService.java   # 회원 비즈니스 로직
+│   │   │   ├── dao/
+│   │   │   │   └── MemberDao.java       # 회원 데이터 접근
+│   │   │   └── dto/
+│   │   │       ├── Member.java          # 회원 DTO
+│   │   │       ├── LoginMember.java     # 로그인 회원 DTO
+│   │   │       ├── Post.java            # 게시글 DTO
+│   │   │       ├── Market.java          # 마켓글 DTO
+│   │   │       └── Report.java          # 신고 DTO
+│   └── StartupWebServiceApplication.java # 메인 애플리케이션 클래스
+├── src/main/resources/
+│   ├── application.properties           # 애플리케이션 설정
+│   └── mapper/
+│       └── member-mapper.xml            # SQL 쿼리 매핑
+└── pom.xml                              # Maven 의존성 관리
 ```
 
-#### 1-3. 로그인
-- **URL**: `POST /member/login`
-- **설명**: 회원 로그인 및 JWT 토큰 발급
-- **토큰 필요**: 없음
-- **Request Body**:
-```json
+## 🚀 시작하기
+
+### 필수 요구사항
+- Java 17 이상
+- Oracle Database 11g 이상
+- Maven 3.6 이상
+
+### 1. 데이터베이스 설정
+```sql
+-- Oracle 데이터베이스에 startup_support 사용자 생성
+CREATE USER startup_support IDENTIFIED BY 1234;
+GRANT CONNECT, RESOURCE TO startup_support;
+GRANT CREATE SESSION TO startup_support;
+GRANT UNLIMITED TABLESPACE TO startup_support;
+```
+
+### 2. 애플리케이션 설정
+`src/main/resources/application.properties` 파일에서 다음 설정을 확인/수정:
+
+```properties
+# 데이터베이스 연결 설정
+spring.datasource.url=jdbc:oracle:thin:@127.0.0.1:1521:xe
+spring.datasource.username=startup_support
+spring.datasource.password=1234
+
+# Gmail 이메일 설정 (비밀번호 찾기 기능용)
+spring.mail.username=your-email@gmail.com
+spring.mail.password=your-app-password
+```
+
+### 3. Gmail 앱 비밀번호 설정
+1. Gmail 2단계 인증 활성화
+2. 앱 비밀번호 생성 (16자리)
+3. `application.properties`에 앱 비밀번호 입력
+
+### 4. 애플리케이션 실행
+```bash
+# 프로젝트 루트 디렉토리에서
+mvn spring-boot:run
+```
+
+### 5. API 문서 확인
+- **Swagger UI**: http://localhost:9999/swagger-ui/
+- **API JSON**: http://localhost:9999/v2/api-docs
+
+## 📚 API 사용법
+
+### 인증이 필요하지 않은 API
+```bash
+# 회원가입
+POST /member
+{
+  "userId": "test123",
+  "userPw": "password123",
+  "userName": "홍길동",
+  "userPhone": "010-1234-5678",
+  "userEmail": "test@example.com",
+  "userAddr": "서울시 강남구"
+}
+
+# 로그인
+POST /member/login
 {
   "userId": "test123",
   "userPw": "password123"
 }
+
+# 아이디 찾기
+POST /member/findId?userEmail=test@example.com
+
+# 비밀번호 찾기
+POST /member/findPw?userId=test123&userEmail=test@example.com
 ```
 
-#### 1-4. 회원 정보 조회
-- **URL**: `GET /member/{userId}`
-- **설명**: 특정 회원의 정보 조회
-- **토큰 필요**: 있음
+### 인증이 필요한 API
+```bash
+# 1. 로그인하여 JWT 토큰 발급
+# 2. Swagger UI에서 Authorize 버튼 클릭
+# 3. Bearer [JWT_TOKEN] 형식으로 토큰 입력
+# 4. API 호출
 
-#### 1-5. 회원 정보 수정
-- **URL**: `PATCH /member`
-- **설명**: 회원 정보 수정 (이름, 전화번호, 이메일, 주소)
-- **토큰 필요**: 있음
-- **Request Body**:
-```json
+# 회원 정보 조회
+GET /member/{userId}
+
+# 비밀번호 변경
+PATCH /member/memberPw
 {
   "userId": "test123",
-  "userName": "김철수",
-  "userPhone": "010-9876-5432",
-  "userEmail": "new@email.com",
-  "userAddr": "부산시 해운대구"
+  "userPw": "newpassword123"
 }
+
+# 회원 탈퇴
+DELETE /member/{userId}
 ```
 
-#### 1-6. 비밀번호 확인
-- **URL**: `POST /member/checkPw`
-- **설명**: 현재 비밀번호 확인
-- **토큰 필요**: 있음
-- **Request Body**:
-```json
-{
-  "userId": "test123",
-  "userPw": "currentPassword"
-}
+## 🔧 개발 환경 설정
+
+### 테스트용 보안 설정
+개발 중 API 테스트를 위해 `SecurityConfig.java`에서 다음 주석을 해제:
+
+```java
+// 테스트용 허용 경로들 (필요시 주석 해제)
+.requestMatchers("/member/memberPw", "/member/*").permitAll()
 ```
 
-#### 1-7. 비밀번호 변경
-- **URL**: `PATCH /member/memberPw`
-- **설명**: 비밀번호 변경
-- **토큰 필요**: 있음
-- **Request Body**:
-```json
-{
-  "userId": "test123",
-  "userPw": "newPassword123"
-}
-```
+### 이메일 발송 테스트
+1. Gmail 앱 비밀번호 설정 완료
+2. 비밀번호 찾기 API 호출
+3. 실제 이메일 수신 확인
 
-#### 1-8. 아이디 찾기
-- **URL**: `POST /member/findId?userEmail={email}`
-- **설명**: 이메일로 아이디 찾기
-- **토큰 필요**: 없음
+## 🐛 주요 오류 및 해결방법
 
-#### 1-9. 비밀번호 찾기 (임시 비밀번호 발급)
-- **URL**: `POST /member/findPw?userId={userId}&userEmail={email}`
-- **설명**: 임시 비밀번호 발급
-- **토큰 필요**: 없음
+### 1. Gmail 인증 실패
+**오류**: `Authentication failed`
 
-#### 1-10. 회원 탈퇴
-- **URL**: `DELETE /member/{userId}`
-- **설명**: 회원 탈퇴
-- **토큰 필요**: 있음
+**해결**: 일반 비밀번호 대신 Gmail 앱 비밀번호 사용
 
-### 2. 내가 쓴 게시물 조회
+### 2. 403 Forbidden 오류
+**오류**: `Error: response status is 403`
 
-#### 2-1. 내가 쓴 게시글 조회
-- **URL**: `GET /member/{userId}/posts`
-- **설명**: 특정 회원이 작성한 게시글 목록 조회 (QNA, 자유게시판 등)
-- **토큰 필요**: 있음
+**해결**: JWT 토큰 인증 또는 테스트용 보안 설정 활성화
 
-#### 2-2. 내가 쓴 마켓글 조회
-- **URL**: `GET /member/{userId}/markets`
-- **설명**: 특정 회원이 작성한 마켓글(판매글) 목록 조회
-- **토큰 필요**: 있음
+### 3. Docket 클래스 찾을 수 없음
+**오류**: `java.lang.ClassNotFoundException: Docket`
 
-### 3. 관리자 기능
-
-#### 3-1. 신고 목록 조회
-- **URL**: `GET /member/admin/reports`
-- **설명**: 모든 신고 목록 조회 (관리자용)
-- **토큰 필요**: 있음 (관리자 권한)
-
-#### 3-2. 신고 처리
-- **URL**: `PATCH /member/admin/reports?action={approve|reject}`
-- **설명**: 신고 승인/거절 처리
-- **토큰 필요**: 있음 (관리자 권한)
-- **Request Body**:
-```json
-{
-  "reportId": "RPT001",
-  "reportStatus": "approved",
-  "adminId": "admin123"
-}
-```
-
-### 4. 토큰 관리
-
-#### 4-1. 토큰 갱신
-- **URL**: `POST /member/refresh`
-- **설명**: Access Token 갱신
-- **토큰 필요**: 없음 (Refresh Token 필요)
-- **Request Body**:
-```json
-{
-  "userId": "test123",
-  "userLevel": 4
-}
-```
-
-## 데이터베이스 테이블
-
-### t_users (회원 테이블)
-- user_id: 회원 아이디 (PK)
-- user_name: 회원 이름
-- user_pw: 암호화된 비밀번호
-- user_phone: 전화번호
-- user_email: 이메일
-- user_addr: 주소
-- user_level: 회원 등급 (4: 일반회원, 1: 관리자)
-- report_count: 신고 누적 횟수
-- ban_until: 이용 제한 기간
-
-### t_posts (게시글 테이블)
-- post_no: 게시글 번호 (PK)
-- user_id: 작성자 아이디
-- post_type: 게시글 타입 (QNA, 자유게시판 등)
-- post_title: 제목
-- post_content: 내용
-- post_date: 작성일
-- read_count: 조회수
-
-### t_market (마켓글 테이블)
-- market_no: 마켓글 번호 (PK)
-- user_id: 작성자 아이디
-- market_type: 마켓글 타입
-- market_title: 제목
-- market_content: 내용
-- market_date: 작성일
-- read_count: 조회수
-
-### t_reports (신고 테이블)
-- report_id: 신고 ID (PK)
-- reporter_id: 신고자 아이디
-- post_type: 게시글 타입
-- post_id: 게시글 번호
-- reason: 신고 사유
-- report_date: 신고 일자
-- report_status: 신고처리 상태 (wait, approved, rejected)
-- admin_id: 신고처리자
-- process_date: 처리일자
-
-## 보안 설정
-
-- JWT 토큰 기반 인증
-- 비밀번호 BCrypt 암호화
-- CORS 설정 완료
-- 토큰 없이 접근 가능한 API에 @NoTokenCheck 어노테이션 적용
-
-## 특이사항
-
-1. **신고 누적 제재**: 신고 3회 누적 시 7일 이용 제한
-2. **계정 제재 확인**: 로그인 시 제재 기간 확인
-3. **임시 비밀번호**: UUID 기반 8자리 임시 비밀번호 발급
-4. **컬럼 매핑**: MyBatis ResultMap을 통한 snake_case ↔ camelCase 변환 
+**해결**: `pom.xml`에 Springfox 의존성 추가
