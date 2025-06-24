@@ -372,4 +372,8 @@ gradle-app.setting
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
 
-# End of https://www.toptal.com/developers/gitignore/api/eclipse,reactnative,java,react
+# ignore properties
+springworkspace/startup_web_service/src/main/resources/application.properties
+
+
+# End of https://www.toptal.com/developers/gitignore/api/eclipse,reactnative,java,react"src/main/resources/application.properties" 
