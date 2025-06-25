@@ -6,6 +6,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 /**
  * 보안 설정 클래스
@@ -26,6 +31,9 @@ public class SecurityConfig {
         http
             // CSRF 공격 방지 기능 비활성화 (REST API에서는 불필요)
             .csrf(csrf -> csrf.disable())
+            
+            // CORS 설정 적용
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             
             // 세션 관리 설정 - JWT 토큰을 사용하므로 세션을 사용하지 않음
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -49,10 +57,10 @@ public class SecurityConfig {
                 // - /member/refresh : 토큰 갱신
                 .requestMatchers("/member/*/chkId", "/member", "/member/login", "/member/findId", "/member/findPw", "/member/refresh").permitAll()
                 
-                // 테스트용 허용 경로들 (필요시 주석 해제)
+                // 테스트용 허용 경로들 (임시로 활성화)
                 // - 모든 회원 관련 API를 인증 없이 테스트할 수 있음
                 // - 실제 운영에서는 반드시 주석 처리해야 함
-                // .requestMatchers("/member/memberPw", "/member/*").permitAll()
+                .requestMatchers("/member/**").permitAll()
                 
                 // 기타 모든 요청은 인증 필요 (JWT 토큰이 있어야 접근 가능)
                 .anyRequest().authenticated()
@@ -66,5 +74,32 @@ public class SecurityConfig {
             
         // 설정된 보안 규칙을 반환
         return http.build();
+    }
+    
+    /**
+     * CORS 설정
+     * - 프론트엔드 도메인에서의 요청을 허용하기 위한 설정
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        
+        // 허용할 오리진 설정 (프론트엔드 도메인)
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        
+        // 허용할 HTTP 메소드
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        
+        // 허용할 헤더
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        
+        // 인증 정보 허용 (쿠키, Authorization 헤더 등)
+        configuration.setAllowCredentials(false);
+        
+        // 모든 경로에 대해 CORS 설정 적용
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        
+        return source;
     }
 } 

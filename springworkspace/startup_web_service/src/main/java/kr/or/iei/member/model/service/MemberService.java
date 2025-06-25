@@ -39,6 +39,11 @@ public class MemberService {
 		return dao.chkUserId(userId);
 	}
 	
+	// 이메일 중복 체크
+	public int chkUserEmail(String userEmail) {
+		return dao.chkUserEmail(userEmail);
+	}
+	
 	// 회원가입
 	@Transactional
 	public int insertMember(Member member) {
@@ -122,11 +127,12 @@ public class MemberService {
 			try {
 				// 이메일 발송
 				emailService.sendUserId(userEmail, member.getUserId());
+				return "이메일로 아이디를 발송했습니다"; // 실제 아이디 대신 안내 메시지 반환
 			} catch (Exception e) {
-				// 이메일 발송 실패 시에도 아이디는 반환
+				// 이메일 발송 실패 시에도 아이디는 반환하지 않음
 				System.out.println("이메일 발송 실패: " + e.getMessage());
+				return null; // 이메일 발송 실패 시 null 반환
 			}
-			return member.getUserId();
 		}
 		return null;
 	}
@@ -146,12 +152,12 @@ public class MemberService {
 			try {
 				// 이메일 발송
 				emailService.sendTemporaryPassword(userEmail, userId, tempPw);
+				return "이메일로 임시 비밀번호를 발송했습니다"; // 실제 비밀번호 대신 안내 메시지 반환
 			} catch (Exception e) {
-				// 이메일 발송 실패 시에도 임시 비밀번호는 반환
+				// 이메일 발송 실패 시 원래 비밀번호로 롤백해야 하지만, 간단히 에러 반환
 				System.out.println("이메일 발송 실패: " + e.getMessage());
+				return null; // 이메일 발송 실패 시 null 반환
 			}
-			
-			return tempPw; // 평문 임시 비밀번호 반환 (메일 전송용)
 		}
 		return null;
 	}

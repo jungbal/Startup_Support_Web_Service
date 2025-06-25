@@ -30,13 +30,15 @@ public class WebConfig implements WebMvcConfigurer { //이 클래스는 Spring M
 		return new BCryptPasswordEncoder();
 	}
 	
-	//CORS 설정
+	//CORS 설정 - SecurityConfig에서 관리하므로 비활성화
+	/*
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
-			.allowedOrigins("*")
+			.allowedOriginPatterns("*")  // allowedOrigins 대신 allowedOriginPatterns 사용
 			.allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
 			.allowedHeaders("*")
-			.allowCredentials(false);
+			.allowCredentials(false);    // 쿠키 및 인증 정보 비허용 (CORS 문제 해결)
 	}
+	*/
 }

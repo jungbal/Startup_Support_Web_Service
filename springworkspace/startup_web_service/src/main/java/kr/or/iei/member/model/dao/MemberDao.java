@@ -14,6 +14,7 @@ public interface MemberDao {
 	
 	// 회원 관련 메서드
 	int chkUserId(String userId);
+	int chkUserEmail(String userEmail);
 	int insertMember(Member member);
 	Member memberLogin(String userId);
 	Member selectOneMember(String userId);
@@ -21,6 +22,7 @@ public interface MemberDao {
 	int deleteMember(String userId);
 	int updateMemberPw(Member member);
 	Member findMemberByEmail(String userEmail);
+	List<Member> findAllMembersByEmail(String userEmail);
 	Member findMemberById(String userId);
 	
 	// 내가 쓴 게시물 조회

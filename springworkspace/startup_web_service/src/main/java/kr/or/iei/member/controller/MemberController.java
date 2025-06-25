@@ -69,6 +69,24 @@ public class MemberController {
 		return new ResponseEntity<ResponseDTO>(res, res.getHttpStatus());
 	}
 	
+	// 이메일 중복 체크
+	@GetMapping("/email/{userEmail}/chkEmail")
+	@NoTokenCheck
+	@Operation(summary = "이메일 중복 체크", description = "회원가입 시 이메일 중복을 확인합니다")
+	public ResponseEntity<ResponseDTO> chkUserEmail(
+			@Parameter(description = "확인할 사용자 이메일", required = true) @PathVariable String userEmail) {
+		ResponseDTO res = new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR, "이메일 중복 체크 중 오류가 발생했습니다.", false, "error");
+		
+		try {
+			int count = service.chkUserEmail(userEmail);
+			res = new ResponseDTO(HttpStatus.OK, "", count, "success");
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return new ResponseEntity<ResponseDTO>(res, res.getHttpStatus());
+	}
+	
 	// 회원가입
 	@PostMapping
 	@NoTokenCheck
@@ -224,12 +242,12 @@ public class MemberController {
 		ResponseDTO res = new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR, "아이디 찾기 중 오류가 발생했습니다.", null, "error");
 		
 		try {
-			String userId = service.findUserId(userEmail);
+			String result = service.findUserId(userEmail);
 			
-			if(userId != null) {
-				res = new ResponseDTO(HttpStatus.OK, "아이디를 찾았습니다.", userId, "success");
+			if(result != null) {
+				res = new ResponseDTO(HttpStatus.OK, result, true, "success");
 			} else {
-				res = new ResponseDTO(HttpStatus.OK, "해당 이메일로 가입된 회원이 없습니다.", null, "warning");
+				res = new ResponseDTO(HttpStatus.OK, "해당 이메일로 가입된 회원이 없거나 이메일 발송에 실패했습니다.", false, "warning");
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -248,14 +266,12 @@ public class MemberController {
 		ResponseDTO res = new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR, "비밀번호 찾기 중 오류가 발생했습니다.", null, "error");
 		
 		try {
-			String tempPw = service.findUserPw(userId, userEmail);
+			String result = service.findUserPw(userId, userEmail);
 			
-			if(tempPw != null) {
-				Map<String, String> resultMap = new HashMap<>();
-				resultMap.put("tempPw", tempPw);
-				res = new ResponseDTO(HttpStatus.OK, "임시 비밀번호가 발급되었습니다.", resultMap, "success");
+			if(result != null) {
+				res = new ResponseDTO(HttpStatus.OK, result, true, "success");
 			} else {
-				res = new ResponseDTO(HttpStatus.OK, "아이디 또는 이메일을 확인해주세요.", null, "warning");
+				res = new ResponseDTO(HttpStatus.OK, "아이디 또는 이메일을 확인해주세요.", false, "warning");
 			}
 		} catch(Exception e) {
 			e.printStackTrace();

@@ -52,6 +52,11 @@
 		SELECT COUNT(*) FROM t_users WHERE user_id = #{userId}
 	</select>
 	
+	<!-- 이메일 중복 체크 -->
+	<select id="chkUserEmail" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM t_users WHERE user_email = #{userEmail}
+	</select>
+	
 	<!-- 회원가입 -->
 	<insert id="insertMember" parameterType="kr.or.iei.member.model.dto.Member">
 		INSERT INTO t_users (user_id, user_name, user_pw, user_phone, user_email, user_addr, user_level, report_count)
@@ -91,6 +96,11 @@
 	<!-- 이메일로 회원 찾기 -->
 	<select id="findMemberByEmail" parameterType="String" resultMap="memberResultMap">
 		SELECT * FROM t_users WHERE user_email = #{userEmail}
+	</select>
+	
+	<!-- 이메일로 모든 회원 찾기 (중복 이메일의 모든 회원) -->
+	<select id="findAllMembersByEmail" parameterType="String" resultMap="memberResultMap">
+		SELECT * FROM t_users WHERE user_email = #{userEmail} ORDER BY user_id DESC
 	</select>
 	
 	<!-- 아이디로 회원 찾기 -->
