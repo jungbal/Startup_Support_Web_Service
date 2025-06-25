@@ -1,0 +1,296 @@
+/* ==============================================
+   로그인 페이지 전용 CSS 스타일
+   Login.jsx 컴포넌트에서 사용되는 모든 스타일 정의
+   ============================================== */
+
+/* 로그인 페이지 전체 컨테이너 - 전체 화면을 차지하며 중앙 정렬 */
+.login-container {
+  min-height: 100vh;                    /* 최소 높이를 뷰포트 전체로 설정 */
+  display: flex;                        /* 플렉스 컨테이너 */
+  align-items: center;                  /* 세로 중앙 정렬 */
+  justify-content: center;              /* 가로 중앙 정렬 */
+  background: linear-gradient(135deg,   /* 대각선 그라데이션 배경 */
+    var(--primary-color) 0%,            /* 시작점: 메인 파란색 */
+    var(--secondary-color) 100%);       /* 끝점: 주황색 */
+  padding: var(--spacing-md);           /* 여백으로 모바일에서 가장자리 공간 확보 */
+}
+
+/* 로그인 폼을 감싸는 카드형 컨테이너 */
+.login-paper {
+  background-color: var(--background-white); /* 흰색 배경 */
+  border-radius: 16px;                  /* 둥근 모서리 (기본보다 더 둥글게) */
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); /* 부드러운 그림자 효과 */
+  padding: var(--spacing-xl);           /* 내부 여백 32px */
+  width: 100%;                          /* 전체 너비 */
+  max-width: 400px;                     /* 최대 너비 제한 */
+  position: relative;                   /* 절대 위치 요소의 기준점 */
+}
+
+/* 로그인 헤더 섹션 - 로고와 제목을 포함 */
+.login-header {
+  text-align: center;                   /* 중앙 정렬 */
+  margin-bottom: var(--spacing-xl);     /* 하단 여백 32px */
+}
+
+/* 로고 컨테이너 */
+.login-logo {
+  margin-bottom: var(--spacing-md);     /* 로고와 제목 사이 간격 */
+}
+
+/* 로그인 페이지 제목 */
+.login-title {
+  font-size: var(--font-size-xl);       /* 큰 글자 크기 24px */
+  font-weight: 600;                     /* 굵은 폰트 */
+  color: var(--text-primary);          /* 기본 텍스트 색상 */
+  margin: 0;                            /* 기본 마진 제거 */
+  letter-spacing: -0.5px;               /* 글자 간격 약간 줄임 */
+}
+
+/* 로그인 폼 컨테이너 */
+.login-form {
+  display: flex;                        /* 플렉스 컨테이너 */
+  flex-direction: column;               /* 세로 방향으로 배열 */
+  gap: var(--spacing-md);               /* 폼 요소 간 간격 16px */
+}
+
+/* 폼 그룹 - 각 입력 필드를 감싸는 컨테이너 */
+.login-form-group {
+  position: relative;                   /* 비밀번호 토글 버튼 위치 기준 */
+  margin-bottom: var(--spacing-sm);     /* 하단 여백 8px */
+}
+
+/* 로그인 입력 필드 공통 스타일 */
+.login-input {
+  width: 100%;                          /* 전체 너비 */
+  height: 50px;                         /* 고정 높이 (터치 접근성) */
+  padding: 0 16px;                      /* 좌우 패딩 */
+  border: 2px solid var(--border-color); /* 연한 회색 테두리 */
+  border-radius: var(--border-radius);  /* 둥근 모서리 */
+  font-size: var(--font-size-md);      /* 기본 폰트 크기 */
+  background-color: var(--background-white); /* 흰색 배경 */
+  color: var(--text-primary);          /* 기본 텍스트 색상 */
+  transition: all var(--transition-fast); /* 부드러운 전환 효과 */
+  box-sizing: border-box;               /* padding이 width에 포함 */
+  outline: none;                        /* 기본 포커스 아웃라인 제거 */
+}
+
+/* 입력 필드 포커스 상태 */
+.login-input:focus {
+  border-color: var(--primary-color);   /* 포커스 시 파란색 테두리 */
+  box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1); /* 파란색 포커스 링 */
+}
+
+/* 입력 필드 에러 상태 */
+.login-input.error {
+  border-color: var(--error-color);     /* 에러 시 빨간색 테두리 */
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1); /* 빨간색 포커스 링 */
+}
+
+/* 입력 필드 placeholder 스타일 */
+.login-input::placeholder {
+  color: var(--text-light);             /* 연한 회색 placeholder */
+  font-style: normal;                   /* 기울임체 제거 */
+}
+
+/* 비밀번호 표시/숨김 토글 버튼 */
+.login-password-toggle {
+  position: absolute;                   /* 절대 위치 */
+  right: 12px;                          /* 오른쪽에서 12px */
+  top: 50%;                             /* 상단에서 50% 위치 */
+  transform: translateY(-50%);          /* 세로 중앙 정렬 */
+  background: none;                     /* 배경 없음 */
+  border: none;                         /* 테두리 없음 */
+  cursor: pointer;                      /* 마우스 포인터 */
+  padding: 8px;                         /* 클릭 영역 확보 */
+  color: var(--text-secondary);         /* 보조 텍스트 색상 */
+  display: flex;                        /* 플렉스 컨테이너 */
+  align-items: center;                  /* 세로 중앙 정렬 */
+  justify-content: center;              /* 가로 중앙 정렬 */
+  border-radius: 4px;                   /* 작은 둥근 모서리 */
+  transition: all var(--transition-fast); /* 부드러운 전환 */
+}
+
+/* 비밀번호 토글 버튼 hover 상태 */
+.login-password-toggle:hover {
+  color: var(--primary-color);          /* hover 시 파란색 */
+  background-color: var(--background-hover); /* hover 시 연한 배경 */
+}
+
+/* 아이디 저장 체크박스 컨테이너 */
+.login-remember {
+  display: flex;                        /* 플렉스 컨테이너 */
+  align-items: center;                  /* 세로 중앙 정렬 */
+  gap: var(--spacing-sm);               /* 체크박스와 라벨 간격 */
+  margin: var(--spacing-sm) 0;          /* 상하 여백 */
+}
+
+/* 아이디 저장 체크박스 스타일 */
+.login-remember input[type="checkbox"] {
+  width: 18px;                          /* 체크박스 크기 */
+  height: 18px;                         /* 체크박스 크기 */
+  margin: 0;                            /* 기본 마진 제거 */
+  cursor: pointer;                      /* 마우스 포인터 */
+  accent-color: var(--primary-color);   /* 체크 시 파란색 */
+}
+
+/* 아이디 저장 라벨 스타일 */
+.login-remember label {
+  font-size: var(--font-size-sm);       /* 작은 글자 크기 */
+  color: var(--text-secondary);         /* 보조 텍스트 색상 */
+  cursor: pointer;                      /* 마우스 포인터 */
+  user-select: none;                    /* 텍스트 선택 방지 */
+}
+
+/* 로그인 버튼 스타일 */
+.login-button {
+  width: 100%;                          /* 전체 너비 */
+  height: 50px;                         /* 고정 높이 */
+  background: linear-gradient(135deg,   /* 그라데이션 배경 */
+    var(--primary-color),               /* 시작: 메인 파란색 */
+    var(--primary-dark));               /* 끝: 진한 파란색 */
+  color: var(--text-white);             /* 흰색 텍스트 */
+  border: none;                         /* 테두리 없음 */
+  border-radius: var(--border-radius);  /* 둥근 모서리 */
+  font-size: var(--font-size-md);      /* 기본 폰트 크기 */
+  font-weight: 600;                     /* 굵은 폰트 */
+  cursor: pointer;                      /* 마우스 포인터 */
+  transition: all var(--transition-fast); /* 부드러운 전환 */
+  display: flex;                        /* 플렉스 컨테이너 */
+  align-items: center;                  /* 세로 중앙 정렬 */
+  justify-content: center;              /* 가로 중앙 정렬 */
+  text-transform: uppercase;            /* 대문자 변환 */
+  letter-spacing: 0.5px;                /* 글자 간격 */
+  margin-top: var(--spacing-sm);        /* 상단 여백 */
+}
+
+/* 로그인 버튼 hover 상태 */
+.login-button:hover:not(:disabled) {
+  transform: translateY(-2px);          /* 위로 2px 이동 */
+  box-shadow: 0 4px 12px rgba(30, 60, 114, 0.3); /* 파란색 그림자 */
+}
+
+/* 로그인 버튼 disabled 상태 */
+.login-button:disabled {
+  opacity: 0.7;                         /* 투명도 감소 */
+  cursor: not-allowed;                  /* 사용 불가 커서 */
+  transform: none;                      /* 변형 효과 제거 */
+  box-shadow: none;                     /* 그림자 제거 */
+}
+
+/* 구분선 컨테이너 */
+.login-divider {
+  display: flex;                        /* 플렉스 컨테이너 */
+  align-items: center;                  /* 세로 중앙 정렬 */
+  margin: var(--spacing-lg) 0;          /* 상하 여백 24px */
+  text-align: center;                   /* 텍스트 중앙 정렬 */
+}
+
+/* 구분선 텍스트 스타일 */
+.login-divider span {
+  background-color: var(--background-white); /* 흰색 배경 */
+  color: var(--text-secondary);         /* 보조 텍스트 색상 */
+  padding: 0 var(--spacing-md);         /* 좌우 패딩 */
+  font-size: var(--font-size-sm);      /* 작은 글자 크기 */
+  position: relative;                   /* 가상 요소 위치 기준 */
+  z-index: 1;                           /* 선 위에 표시 */
+}
+
+/* 구분선 스타일 (가상 요소 사용) */
+.login-divider::before {
+  content: '';                          /* 빈 내용 */
+  position: absolute;                   /* 절대 위치 */
+  top: 50%;                             /* 세로 중앙 */
+  left: 0;                              /* 왼쪽 끝부터 */
+  right: 0;                             /* 오른쪽 끝까지 */
+  height: 1px;                          /* 선 두께 */
+  background-color: var(--border-color); /* 연한 회색 선 */
+}
+
+/* 회원가입 버튼 스타일 */
+.signup-button {
+  width: 100%;                          /* 전체 너비 */
+  height: 50px;                         /* 고정 높이 */
+  background-color: transparent;        /* 투명 배경 */
+  color: var(--primary-color);          /* 파란색 텍스트 */
+  border: 2px solid var(--primary-color); /* 파란색 테두리 */
+  border-radius: var(--border-radius);  /* 둥근 모서리 */
+  font-size: var(--font-size-md);      /* 기본 폰트 크기 */
+  font-weight: 500;                     /* 중간 굵기 폰트 */
+  cursor: pointer;                      /* 마우스 포인터 */
+  transition: all var(--transition-fast); /* 부드러운 전환 */
+  display: flex;                        /* 플렉스 컨테이너 */
+  align-items: center;                  /* 세로 중앙 정렬 */
+  justify-content: center;              /* 가로 중앙 정렬 */
+}
+
+/* 회원가입 버튼 hover 상태 */
+.signup-button:hover {
+  background-color: var(--primary-color); /* hover 시 파란색 배경 */
+  color: var(--text-white);             /* hover 시 흰색 텍스트 */
+  transform: translateY(-1px);          /* 살짝 위로 이동 */
+  box-shadow: 0 2px 8px rgba(30, 60, 114, 0.2); /* 은은한 그림자 */
+}
+
+/* 링크 컨테이너 */
+.login-links {
+  text-align: center;                   /* 중앙 정렬 */
+  margin-top: var(--spacing-lg);        /* 상단 여백 24px */
+}
+
+/* 계정 찾기 링크 스타일 */
+.login-link {
+  color: var(--text-secondary);         /* 보조 텍스트 색상 */
+  text-decoration: none;                /* 밑줄 제거 */
+  font-size: var(--font-size-sm);      /* 작은 글자 크기 */
+  transition: color var(--transition-fast); /* 색상 전환 효과 */
+}
+
+/* 계정 찾기 링크 hover 상태 */
+.login-link:hover {
+  color: var(--primary-color);          /* hover 시 파란색 */
+  text-decoration: underline;           /* hover 시 밑줄 표시 */
+}
+
+/* ==============================================
+   반응형 디자인 - 로그인 페이지용
+   모바일과 태블릿에서의 최적화된 레이아웃
+   ============================================== */
+
+/* 태블릿 크기 (768px 이하) */
+@media (max-width: 768px) {
+  .login-container {
+    padding: var(--spacing-sm);         /* 패딩 감소 */
+  }
+  
+  .login-paper {
+    padding: var(--spacing-lg);         /* 내부 패딩 감소 */
+    max-width: 100%;                    /* 최대 너비 제한 해제 */
+  }
+  
+  .login-title {
+    font-size: var(--font-size-lg);     /* 제목 크기 감소 */
+  }
+}
+
+/* 모바일 크기 (480px 이하) */
+@media (max-width: 480px) {
+  .login-container {
+    padding: var(--spacing-xs);         /* 최소 패딩 */
+  }
+  
+  .login-paper {
+    padding: var(--spacing-md);         /* 더 작은 내부 패딩 */
+    border-radius: 12px;                /* 모서리 덜 둥글게 */
+  }
+  
+  .login-input,
+  .login-button,
+  .signup-button {
+    height: 48px;                       /* 모바일에서 높이 감소 */
+    font-size: var(--font-size-sm);    /* 폰트 크기 감소 */
+  }
+  
+  .login-title {
+    font-size: var(--font-size-md);     /* 제목 크기 더 감소 */
+  }
+} 

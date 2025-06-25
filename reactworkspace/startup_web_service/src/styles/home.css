@@ -1,0 +1,146 @@
+/* 홈 페이지 스타일 */
+.home-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+}
+
+.home-header {
+  background: white;
+  border-radius: var(--border-radius-large);
+  box-shadow: var(--shadow);
+  padding: 32px;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.home-title {
+  font-size: 48px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 16px 0;
+}
+
+.home-welcome {
+  font-size: 24px;
+  color: var(--text-primary);
+  margin: 0 0 24px 0;
+}
+
+.home-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.home-nav {
+  background: white;
+  border-radius: var(--border-radius-large);
+  box-shadow: var(--shadow);
+  padding: 32px;
+  margin-bottom: 32px;
+}
+
+.home-nav-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+.home-nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.home-nav-item {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 24px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.home-nav-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.home-nav-item-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.home-nav-item-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+}
+
+.home-nav-item-desc {
+  font-size: 14px;
+  opacity: 0.9;
+  margin: 0;
+}
+
+.home-footer {
+  background: white;
+  border-radius: var(--border-radius-large);
+  box-shadow: var(--shadow);
+  padding: 32px;
+  text-align: center;
+}
+
+.home-logout-btn {
+  background-color: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 16px;
+}
+
+.home-logout-btn:hover {
+  background-color: var(--secondary-dark);
+  box-shadow: var(--shadow-hover);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .home-container {
+    padding: 10px;
+  }
+
+  .home-title {
+    font-size: 32px;
+  }
+
+  .home-welcome {
+    font-size: 20px;
+  }
+
+  .home-nav-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-header,
+  .home-nav,
+  .home-footer {
+    padding: 20px;
+  }
+} 

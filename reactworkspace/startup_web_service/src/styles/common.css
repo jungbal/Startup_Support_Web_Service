@@ -1,0 +1,295 @@
+/* ==============================================
+   전역 CSS 변수 정의 (CSS Custom Properties)
+   모든 컴포넌트에서 일관된 디자인을 위해 사용
+   ============================================== */
+:root {
+  /* 주요 브랜드 컬러 - 창업든든 서비스 대표색 */
+  --primary-color: #1e3c72;        /* 진한 파란색 - 메인 버튼, 링크 등 */
+  --primary-dark: #152a54;         /* 더 진한 파란색 - hover 효과 등 */
+  --secondary-color: #f39c12;      /* 주황색 - 강조, 액센트 색상 */
+  --secondary-dark: #e67e22;       /* 진한 주황색 - hover 효과 */
+  
+  /* 텍스트 컬러 시스템 */
+  --text-primary: #333333;         /* 기본 텍스트 색상 - 제목, 본문 */
+  --text-secondary: #666666;       /* 보조 텍스트 색상 - 설명글 등 */
+  --text-light: #999999;           /* 연한 텍스트 색상 - placeholder 등 */
+  --text-white: #ffffff;           /* 흰색 텍스트 - 버튼 내부 글자 */
+  
+  /* 배경 컬러 시스템 */
+  --background-light: #f5f5f5;     /* 연한 회색 배경 - 전체 페이지 배경 */
+  --background-white: #ffffff;     /* 흰색 배경 - 카드, 폼 등 */
+  --background-hover: #f8f9fa;     /* hover 시 배경색 */
+  
+  /* 상태별 컬러 (성공, 오류, 경고) */
+  --success-color: #27ae60;        /* 성공 메시지, 성공 버튼 */
+  --error-color: #e74c3c;          /* 에러 메시지, 유효성 검사 실패 */
+  --warning-color: #f39c12;        /* 경고 메시지 */
+  
+  /* 테두리 및 그림자 */
+  --border-color: #e0e0e0;         /* 기본 테두리 색상 */
+  --border-radius: 8px;            /* 기본 모서리 둥글기 */
+  --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 기본 그림자 효과 */
+  
+  /* 간격 시스템 (8px 기준) */
+  --spacing-xs: 4px;               /* 아주 작은 간격 */
+  --spacing-sm: 8px;               /* 작은 간격 */
+  --spacing-md: 16px;              /* 중간 간격 */
+  --spacing-lg: 24px;              /* 큰 간격 */
+  --spacing-xl: 32px;              /* 아주 큰 간격 */
+  
+  /* 폰트 크기 시스템 */
+  --font-size-sm: 14px;            /* 작은 글자 - 설명, 라벨 */
+  --font-size-md: 16px;            /* 기본 글자 크기 - 본문 */
+  --font-size-lg: 18px;            /* 큰 글자 - 부제목 */
+  --font-size-xl: 24px;            /* 아주 큰 글자 - 제목 */
+  
+  /* 애니메이션 시간 */
+  --transition-fast: 0.2s;         /* 빠른 전환 효과 */
+  --transition-normal: 0.3s;       /* 일반 전환 효과 */
+}
+
+/* ==============================================
+   전역 리셋 및 기본 스타일
+   브라우저 기본 스타일을 초기화하고 일관성 확보
+   ============================================== */
+
+/* 모든 요소에 box-sizing: border-box 적용 */
+*, *::before, *::after {
+  box-sizing: border-box;           /* padding, border가 width에 포함되도록 */
+}
+
+/* body 기본 스타일 설정 */
+body {
+  margin: 0;                        /* 기본 마진 제거 */
+  padding: 0;                       /* 기본 패딩 제거 */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 
+               'Oxygen', 'Ubuntu', 'Cantarell', sans-serif; /* 시스템 폰트 사용 */
+  font-size: var(--font-size-md);   /* 기본 폰트 크기 */
+  line-height: 1.5;                 /* 줄 간격 1.5배 */
+  color: var(--text-primary);       /* 기본 텍스트 색상 */
+  background-color: var(--background-light); /* 전체 배경색 */
+  -webkit-font-smoothing: antialiased; /* 맥에서 폰트 부드럽게 렌더링 */
+  -moz-osx-font-smoothing: grayscale;  /* 파이어폭스에서 폰트 부드럽게 렌더링 */
+}
+
+/* ==============================================
+   공통 유틸리티 클래스
+   자주 사용되는 스타일을 클래스로 정의
+   ============================================== */
+
+/* 텍스트 정렬 */
+.text-center { text-align: center; }      /* 중앙 정렬 */
+.text-left { text-align: left; }          /* 왼쪽 정렬 */
+.text-right { text-align: right; }        /* 오른쪽 정렬 */
+
+/* 여백 유틸리티 */
+.mt-1 { margin-top: var(--spacing-sm); }     /* 상단 여백 8px */
+.mt-2 { margin-top: var(--spacing-md); }     /* 상단 여백 16px */
+.mt-3 { margin-top: var(--spacing-lg); }     /* 상단 여백 24px */
+.mb-1 { margin-bottom: var(--spacing-sm); }  /* 하단 여백 8px */
+.mb-2 { margin-bottom: var(--spacing-md); }  /* 하단 여백 16px */
+.mb-3 { margin-bottom: var(--spacing-lg); }  /* 하단 여백 24px */
+
+/* 화면에서 숨기기 (접근성 유지) */
+.sr-only {
+  position: absolute;               /* 절대 위치 */
+  width: 1px;                      /* 최소 크기 */
+  height: 1px;                     /* 최소 크기 */
+  padding: 0;                      /* 패딩 제거 */
+  margin: -1px;                    /* 음수 마진으로 화면 밖으로 */
+  overflow: hidden;                /* 넘치는 부분 숨김 */
+  clip: rect(0, 0, 0, 0);         /* 클리핑으로 숨김 */
+  white-space: nowrap;             /* 줄바꿈 방지 */
+  border: 0;                       /* 테두리 제거 */
+}
+
+/* ==============================================
+   폼 관련 공통 스타일
+   모든 입력 요소와 폼에서 사용되는 스타일
+   ============================================== */
+
+/* 폼 그룹 - 입력 필드와 라벨을 감싸는 컨테이너 */
+.form-group {
+  margin-bottom: var(--spacing-md);  /* 폼 요소 간 간격 */
+  position: relative;                /* 절대 위치 요소의 기준점 */
+}
+
+/* 에러 메시지 스타일 */
+.form-error {
+  color: var(--error-color);         /* 빨간색 텍스트 */
+  font-size: var(--font-size-sm);    /* 작은 글자 크기 */
+  margin-top: var(--spacing-xs);     /* 입력 필드와 간격 */
+  display: block;                    /* 블록 요소로 표시 */
+  line-height: 1.4;                  /* 줄 간격 */
+}
+
+/* 성공 메시지 스타일 */
+.form-success {
+  color: var(--success-color);       /* 초록색 텍스트 */
+  font-size: var(--font-size-sm);    /* 작은 글자 크기 */
+  margin-top: var(--spacing-xs);     /* 입력 필드와 간격 */
+  display: block;                    /* 블록 요소로 표시 */
+}
+
+/* ==============================================
+   버튼 공통 스타일
+   모든 버튼에서 사용되는 기본 스타일
+   ============================================== */
+
+/* 기본 버튼 스타일 */
+.btn {
+  display: inline-flex;              /* 인라인 플렉스 - 내용에 맞는 크기 */
+  align-items: center;               /* 세로 중앙 정렬 */
+  justify-content: center;           /* 가로 중앙 정렬 */
+  padding: 12px 24px;                /* 내부 여백 */
+  border: none;                      /* 기본 테두리 제거 */
+  border-radius: var(--border-radius); /* 모서리 둥글기 */
+  font-size: var(--font-size-md);    /* 폰트 크기 */
+  font-weight: 500;                  /* 폰트 굵기 */
+  text-decoration: none;             /* 링크 밑줄 제거 */
+  cursor: pointer;                   /* 마우스 포인터 */
+  transition: all var(--transition-fast); /* 부드러운 전환 효과 */
+  user-select: none;                 /* 텍스트 선택 방지 */
+  outline: none;                     /* 포커스 아웃라인 제거 */
+  min-height: 48px;                  /* 최소 높이 (터치 접근성) */
+}
+
+/* 버튼 hover 상태 */
+.btn:hover {
+  transform: translateY(-1px);       /* 살짝 위로 이동 */
+  box-shadow: var(--box-shadow);     /* 그림자 효과 */
+}
+
+/* 버튼 active 상태 (클릭 시) */
+.btn:active {
+  transform: translateY(0);          /* 원래 위치로 */
+  box-shadow: none;                  /* 그림자 제거 */
+}
+
+/* 버튼 disabled 상태 */
+.btn:disabled {
+  opacity: 0.6;                      /* 투명도 감소 */
+  cursor: not-allowed;               /* 사용 불가 커서 */
+  transform: none;                   /* 변형 효과 제거 */
+  box-shadow: none;                  /* 그림자 제거 */
+}
+
+/* 기본 버튼 (Primary) */
+.btn-primary {
+  background-color: var(--primary-color); /* 기본 배경색 */
+  color: var(--text-white);           /* 흰색 텍스트 */
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark); /* hover 시 진한 색 */
+}
+
+/* 보조 버튼 (Secondary) */
+.btn-secondary {
+  background-color: var(--secondary-color); /* 주황색 배경 */
+  color: var(--text-white);            /* 흰색 텍스트 */
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-dark); /* hover 시 진한 주황색 */
+}
+
+/* 외곽선 버튼 (Outline) */
+.btn-outline {
+  background-color: transparent;       /* 투명 배경 */
+  color: var(--primary-color);         /* 파란색 텍스트 */
+  border: 2px solid var(--primary-color); /* 파란색 테두리 */
+}
+
+.btn-outline:hover {
+  background-color: var(--primary-color); /* hover 시 배경 채우기 */
+  color: var(--text-white);            /* 흰색 텍스트로 변경 */
+}
+
+/* ==============================================
+   로딩 스피너
+   API 호출 중 표시되는 로딩 애니메이션
+   ============================================== */
+
+/* 로딩 스피너 컨테이너 */
+.loading-spinner {
+  width: 20px;                       /* 스피너 크기 */
+  height: 20px;                      /* 스피너 크기 */
+  border: 2px solid transparent;     /* 투명 테두리 */
+  border-top: 2px solid currentColor; /* 상단만 색깔 있는 테두리 */
+  border-radius: 50%;                /* 원형 모양 */
+  animation: spin 1s linear infinite; /* 회전 애니메이션 */
+  margin: 0 auto;                    /* 중앙 정렬 */
+}
+
+/* 회전 애니메이션 정의 */
+@keyframes spin {
+  0% { transform: rotate(0deg); }    /* 시작: 0도 */
+  100% { transform: rotate(360deg); } /* 끝: 360도 */
+}
+
+/* ==============================================
+   반응형 디자인
+   다양한 화면 크기에 대응하는 스타일
+   ============================================== */
+
+/* 태블릿 크기 (768px 이하) */
+@media (max-width: 768px) {
+  /* 루트 변수 재정의 - 모바일에서는 간격을 줄임 */
+  :root {
+    --spacing-md: 12px;              /* 중간 간격 축소 */
+    --spacing-lg: 18px;              /* 큰 간격 축소 */
+    --font-size-xl: 20px;            /* 제목 글자 크기 축소 */
+  }
+  
+  /* 버튼 크기 조정 */
+  .btn {
+    padding: 10px 20px;              /* 패딩 감소 */
+    font-size: var(--font-size-sm);  /* 폰트 크기 감소 */
+    min-height: 44px;                /* 최소 높이 감소 */
+  }
+}
+
+/* 모바일 크기 (480px 이하) */
+@media (max-width: 480px) {
+  /* 바디 폰트 크기 조정 */
+  body {
+    font-size: var(--font-size-sm);  /* 전체적으로 작은 글자 */
+  }
+  
+  /* 버튼을 전체 너비로 */
+  .btn {
+    width: 100%;                     /* 전체 너비 */
+    padding: 12px 16px;              /* 패딩 조정 */
+  }
+}
+
+/* ==============================================
+   Toaster (알림 메시지) 스타일 커스터마이징
+   react-hot-toast 라이브러리 스타일 오버라이드
+   ============================================== */
+
+/* 기본 토스트 스타일 */
+.react-hot-toast {
+  border-radius: var(--border-radius) !important; /* 둥근 모서리 */
+  background: var(--text-primary) !important;     /* 어두운 배경 */
+  color: var(--text-white) !important;            /* 흰색 텍스트 */
+  font-size: var(--font-size-md) !important;      /* 적절한 글자 크기 */
+  padding: 12px 16px !important;                  /* 내부 여백 */
+  box-shadow: var(--box-shadow) !important;       /* 그림자 효과 */
+}
+
+/* 성공 토스트 */
+.react-hot-toast[data-type="success"] {
+  background: var(--success-color) !important;    /* 녹색 배경 */
+}
+
+/* 에러 토스트 */
+.react-hot-toast[data-type="error"] {
+  background: var(--error-color) !important;      /* 빨간색 배경 */
+}
+
+/* 경고 토스트 */
+.react-hot-toast[data-type="warning"] {
+  background: var(--warning-color) !important;    /* 주황색 배경 */
+} 
