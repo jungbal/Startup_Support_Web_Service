@@ -50,8 +50,7 @@ public class MemberService {
 		// 비밀번호 암호화
 		String encodePw = encoder.encode(member.getUserPw());
 		member.setUserPw(encodePw);
-		// 기본 회원 레벨 설정 (4: 일반회원)
-		member.setUserLevel(4);
+		// DB에서 user_level DEFAULT 4로 설정되어 있으므로 별도 설정 불필요
 		return dao.insertMember(member);
 	}
 

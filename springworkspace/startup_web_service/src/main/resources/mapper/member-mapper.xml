@@ -59,8 +59,9 @@
 	
 	<!-- 회원가입 -->
 	<insert id="insertMember" parameterType="kr.or.iei.member.model.dto.Member">
-		INSERT INTO t_users (user_id, user_name, user_pw, user_phone, user_email, user_addr, user_level, report_count)
-		VALUES (#{userId}, #{userName}, #{userPw}, #{userPhone}, #{userEmail}, #{userAddr}, #{userLevel}, 0)
+		INSERT INTO t_users (user_id, user_name, user_pw, user_phone, user_email, user_addr)
+		VALUES (#{userId}, #{userName}, #{userPw}, #{userPhone}, #{userEmail}, #{userAddr})
+		<!-- user_level: DB DEFAULT 4, report_count: DB DEFAULT 0 사용 -->
 	</insert>
 	
 	<!-- 로그인 - 아이디로 회원 정보 조회 -->
@@ -134,7 +135,7 @@
 	
 	<!-- 신고 횟수 증가 -->
 	<update id="increaseReportCount" parameterType="String">
-		UPDATE t_users SET report_count = report_count + 1 WHERE user_id = #{userId}
+		UPDATE t_users SET report_count = NVL(report_count, 0) + 1 WHERE user_id = #{userId}
 	</update>
 	
 	<!-- 회원 이용 제한 -->
