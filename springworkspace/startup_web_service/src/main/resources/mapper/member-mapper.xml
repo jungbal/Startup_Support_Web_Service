@@ -23,6 +23,7 @@
 		<result column="post_content" property="postContent"/>
 		<result column="post_date" property="postDate"/>
 		<result column="read_count" property="readCount"/>
+		<result column="post_status" property="postStatus"/>
 	</resultMap>
 	
 	<resultMap type="kr.or.iei.member.model.dto.Market" id="marketResultMap">
@@ -33,6 +34,8 @@
 		<result column="market_content" property="marketContent"/>
 		<result column="market_date" property="marketDate"/>
 		<result column="read_count" property="readCount"/>
+		<result column="price" property="price"/>
+		<result column="market_status" property="marketStatus"/>
 	</resultMap>
 	
 	<resultMap type="kr.or.iei.member.model.dto.Report" id="reportResultMap">
@@ -142,5 +145,17 @@
 	<update id="banMember" parameterType="kr.or.iei.member.model.dto.Member">
 		UPDATE t_users SET ban_until = #{banUntil} WHERE user_id = #{userId}
 	</update>
+	
+	<!-- 모든 회원 조회 (관리자용) -->
+	<select id="selectAllMembers" resultMap="memberResultMap">
+		SELECT * FROM t_users ORDER BY user_id ASC
+	</select>
+	
+	<!-- 내가 쓴 공지사항 조회 (관리자용) -->
+	<select id="selectMyNotices" parameterType="String" resultMap="postResultMap">
+		SELECT * FROM t_posts 
+		WHERE user_id = #{userId} AND post_type = 'notice' 
+		ORDER BY post_date DESC
+	</select>
 
 </mapper>

@@ -61,6 +61,19 @@ const useAuthStore = create(
       // 로딩 상태만 변경하는 함수 (API 호출 중 스피너 표시용)
       setLoading: (loading) => set({ isLoading: loading }),
 
+      // 사용자 정보 업데이트 함수 (프로필 수정 후 사용)
+      updateUser: (updatedUserData) => {
+        const currentState = get();
+        if (currentState.user) {
+          set({
+            user: {
+              ...currentState.user,
+              ...updatedUserData
+            }
+          });
+        }
+      },
+
       // 페이지 새로고침 시 토큰 체크하여 로그인 상태 복원하는 함수
       checkAuth: async () => {
         // 쿠키에서 액세스 토큰 가져오기

@@ -62,4 +62,42 @@ export const checkPassword = async (passwordData) => {
 export const updatePassword = async (passwordData) => {
   const response = await axios.patch('/member/memberPw', passwordData);
   return response.data;
+};
+
+// 내가 쓴 게시글 조회
+export const getMyPosts = async (userId) => {
+  const response = await axios.get(`/member/${userId}/posts`);
+  return response.data;
+};
+
+// 내가 쓴 마켓글 조회
+export const getMyMarkets = async (userId) => {
+  const response = await axios.get(`/member/${userId}/markets`);
+  return response.data;
+};
+
+// 내가 쓴 공지사항 조회 (관리자용)
+export const getMyNotices = async (userId) => {
+  const response = await axios.get(`/member/${userId}/notices`);
+  return response.data;
+};
+
+// 모든 회원 조회 (관리자용)
+export const getAllMembers = async () => {
+  const response = await axios.get('/member/admin/members');
+  return response.data;
+};
+
+// 모든 신고 조회 (관리자용)
+export const getAllReports = async () => {
+  const response = await axios.get('/member/admin/reports');
+  return response.data;
+};
+
+// 신고 처리 (관리자용)
+export const processReport = async (report, action) => {
+  const response = await axios.patch('/member/admin/reports', report, {
+    params: { action }
+  });
+  return response.data;
 }; 

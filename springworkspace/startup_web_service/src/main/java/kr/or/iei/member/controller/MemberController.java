@@ -334,6 +334,39 @@ public class MemberController {
 	
 	// === 관리자 기능 ===
 	
+	// 모든 회원 조회 (관리자용)
+	@GetMapping("/admin/members")
+	@Operation(summary = "회원 목록 조회", description = "모든 회원 목록을 조회합니다 (관리자 전용)")
+	public ResponseEntity<ResponseDTO> selectAllMembers() {
+		ResponseDTO res = new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR, "회원 목록 조회 중 오류가 발생했습니다.", null, "error");
+		
+		try {
+			List<Member> members = service.selectAllMembers();
+			res = new ResponseDTO(HttpStatus.OK, "", members, "success");
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return new ResponseEntity<ResponseDTO>(res, res.getHttpStatus());
+	}
+	
+	// 내가 쓴 공지사항 조회 (관리자용)
+	@GetMapping("/{userId}/notices")
+	@Operation(summary = "내가 쓴 공지사항 조회", description = "특정 관리자가 작성한 공지사항 목록을 조회합니다")
+	public ResponseEntity<ResponseDTO> selectMyNotices(
+			@Parameter(description = "사용자 아이디", required = true) @PathVariable String userId) {
+		ResponseDTO res = new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR, "공지사항 조회 중 오류가 발생했습니다.", null, "error");
+		
+		try {
+			List<Post> notices = service.selectMyNotices(userId);
+			res = new ResponseDTO(HttpStatus.OK, "", notices, "success");
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return new ResponseEntity<ResponseDTO>(res, res.getHttpStatus());
+	}
+	
 	// 모든 신고 조회 (관리자용)
 	@GetMapping("/admin/reports")
 	@Operation(summary = "신고 목록 조회", description = "모든 신고 목록을 조회합니다 (관리자 전용)")

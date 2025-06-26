@@ -179,6 +179,21 @@ public class MemberService {
 	
 	// === 관리자 기능 ===
 	
+	// 모든 회원 조회 (관리자용)
+	public List<Member> selectAllMembers() {
+		List<Member> members = dao.selectAllMembers();
+		// 비밀번호 제거
+		for(Member member : members) {
+			member.setUserPw(null);
+		}
+		return members;
+	}
+	
+	// 내가 쓴 공지사항 조회 (관리자용)
+	public List<Post> selectMyNotices(String userId) {
+		return dao.selectMyNotices(userId);
+	}
+	
 	// 모든 신고 조회
 	public List<Report> selectAllReports() {
 		return dao.selectAllReports();

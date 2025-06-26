@@ -17,4 +17,6 @@ public class Market {
 	private String marketContent;
 	private Date marketDate;
 	private int readCount;
+	private Integer price;  // Integer로 선언 (null 허용)
+	private String marketStatus;
 } 

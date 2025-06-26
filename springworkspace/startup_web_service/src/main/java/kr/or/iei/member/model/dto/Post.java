@@ -17,4 +17,5 @@ public class Post {
 	private String postContent;
 	private Date postDate;
 	private int readCount;
+	private String postStatus;
 } 

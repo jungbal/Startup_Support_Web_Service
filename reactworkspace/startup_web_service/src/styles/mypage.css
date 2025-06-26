@@ -1,0 +1,138 @@
+.mypage-container {
+  min-height: calc(100vh - 200px);
+}
+
+.mypage-content {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.mypage-sidebar {
+  width: 250px;
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+.mypage-main {
+  flex: 1;
+  padding: 30px;
+  min-height: 500px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .mypage-content {
+    flex-direction: column;
+  }
+  
+  .mypage-sidebar {
+    width: 100%;
+    position: static;
+  }
+  
+  .mypage-main {
+    padding: 20px;
+  }
+}
+
+/* 테이블 스타일 */
+.mypage-table {
+  margin-top: 20px;
+}
+
+.mypage-table th {
+  font-weight: 600;
+  background-color: #f5f5f5;
+}
+
+/* 폼 스타일 */
+.mypage-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.mypage-form .MuiTextField-root {
+  margin-bottom: 20px;
+}
+
+/* 버튼 그룹 */
+.mypage-button-group {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+/* 게시글/마켓글 타입 뱃지 */
+.post-type-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.post-type-badge.notice {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.post-type-badge.qna {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.post-type-badge.common {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.market-type-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.market-type-badge.free {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+.market-type-badge.purchase {
+  background-color: #fce4ec;
+  color: #c2185b;
+}
+
+.market-type-badge.sale {
+  background-color: #e0f2f1;
+  color: #00695c;
+}
+
+/* 신고 상태 뱃지 */
+.report-status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.report-status-badge.wait {
+  background-color: #fff8e1;
+  color: #f57c00;
+}
+
+.report-status-badge.approve {
+  background-color: #e8f5e9;
+  color: #388e3c;
+}
+
+.report-status-badge.reject {
+  background-color: #ffebee;
+  color: #c62828;
+} 

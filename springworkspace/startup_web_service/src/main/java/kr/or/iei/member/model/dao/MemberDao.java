@@ -34,4 +34,8 @@ public interface MemberDao {
 	int updateReportStatus(Report report);
 	int increaseReportCount(String userId);
 	int banMember(Member member);
+	
+	// 관리자 기능 - 회원 관리
+	List<Member> selectAllMembers();
+	List<Post> selectMyNotices(String userId);
 }
