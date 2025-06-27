@@ -5,8 +5,7 @@ import MarketList from "./MarketList"
 export default function MarketMain(){
 
     return(
-        
-        
+
         <Routes>
             <Route path="list" element={<MarketList />} />
         </Routes>

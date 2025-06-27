@@ -90,8 +90,8 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// 공개 라우트 컴포넌트 (로그인한 사용자는 홈으로 리다이렉트)
-const PublicRoute = ({ children }) => {
+// 로그인 전용 라우트 컴포넌트 (이미 로그인한 사용자는 홈으로 리다이렉트)
+const AuthRoute = ({ children }) => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   
   if (isAuthenticated) {
@@ -100,8 +100,6 @@ const PublicRoute = ({ children }) => {
   
   return children;
 };
-
-
 
 function App() {
   const checkAuth = useAuthStore((state) => state.checkAuth);
@@ -137,21 +135,16 @@ function App() {
       />
       <Router>
         <Routes>
-          {/* 공개 라우트 */}
-          <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-          <Route path="/signup" element={<PublicRoute><SignUp /></PublicRoute>} />
-          <Route path="/find-account" element={<PublicRoute><FindAccount /></PublicRoute>} />
-          <Route path="/market/*" element={<MarketMain />}/>
-
-          {/* 보호된 라우트 */}
-          <Route
-            path="/home"
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
+          {/* 로그인 관련 라우트 (이미 로그인한 사용자는 접근 불가) */}
+          <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
+          <Route path="/signup" element={<AuthRoute><SignUp /></AuthRoute>} />
+          <Route path="/find-account" element={<AuthRoute><FindAccount /></AuthRoute>} />
+          
+          {/* 공개 라우트 (로그인 여부 상관없이 접근 가능) */}
+          <Route path="/home" element={<Home />} />
+          <Route path="/market/*" element={<MarketMain />} />
+          
+          {/* 보호된 라우트 (로그인 필요) */}
           <Route
             path="/mypage"
             element={
@@ -161,9 +154,9 @@ function App() {
             }
           />
           
-          {/* 기본 경로와 모든 경로를 로그인으로 리다이렉트 */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          {/* 기본 경로를 홈으로 리다이렉트 */}
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </Router>
     </ThemeProvider>
