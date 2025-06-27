@@ -31,7 +31,7 @@ const schema = yup.object({
 });
 
 const ProfileEdit = () => {
-  const { user, updateUser } = useAuthStore();
+  const { loginMember, setLoginMember } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [initialData, setInitialData] = useState(null);
   const [emailCheckStatus, setEmailCheckStatus] = useState(null);
@@ -48,10 +48,10 @@ const ProfileEdit = () => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      userName: user?.userName || '',
-      userPhone: user?.userPhone || '',
-      userEmail: user?.userEmail || '',
-      userAddr: user?.userAddr || '',
+      userName: loginMember?.userName || '',
+      userPhone: loginMember?.userPhone || '',
+      userEmail: loginMember?.userEmail || '',
+      userAddr: loginMember?.userAddr || '',
     },
   });
 
@@ -59,13 +59,13 @@ const ProfileEdit = () => {
 
   // 이메일이 변경되면 중복체크 상태 초기화
   useEffect(() => {
-    if (watchEmail !== checkedEmail && watchEmail !== user?.userEmail) {
+    if (watchEmail !== checkedEmail && watchEmail !== loginMember?.userEmail) {
       setEmailCheckStatus(null);
       if (errors.userEmail && errors.userEmail.message === '이미 사용중인 이메일입니다') {
         clearErrors('userEmail');
       }
     }
-  }, [watchEmail, checkedEmail, user?.userEmail, errors.userEmail, clearErrors]);
+  }, [watchEmail, checkedEmail, loginMember?.userEmail, errors.userEmail, clearErrors]);
 
   // 이메일 중복 체크
   const handleCheckUserEmail = async () => {
@@ -75,7 +75,7 @@ const ProfileEdit = () => {
     }
 
     // 현재 사용자의 이메일과 같으면 중복체크 안함
-    if (watchEmail === user?.userEmail) {
+    if (watchEmail === loginMember?.userEmail) {
       toast.info('현재 사용중인 이메일입니다');
       return;
     }
@@ -86,7 +86,8 @@ const ProfileEdit = () => {
     try {
       const response = await checkUserEmail(watchEmail);
       
-      if (response.resData === 0) {
+      // 팀원들이 배운 방식: response.data.resData로 접근
+      if (response.data && response.data.resData === 0) {
         setEmailCheckStatus('available');
         setCheckedEmail(watchEmail);
         toast.success('사용 가능한 이메일입니다');
@@ -96,46 +97,45 @@ const ProfileEdit = () => {
         toast.error('이미 사용중인 이메일입니다');
       }
     } catch (error) {
+      console.error('이메일 중복 체크 오류:', error);
       setEmailCheckStatus(null);
       toast.error('이메일 중복 체크 중 오류가 발생했습니다');
     }
   };
 
-  // 사용자 정보 초기화 (authStore user 데이터 사용)
+  // 사용자 정보 초기화 (authStore loginMember 데이터 사용)
   useEffect(() => {
-    console.log('ProfileEdit - user 변경됨:', user);
-    if (user && user.userName && user.userPhone && user.userEmail) {
+    if (loginMember && loginMember.userName && loginMember.userPhone && loginMember.userEmail) {
       const formData = {
-        userName: user.userName,
-        userPhone: user.userPhone,
-        userEmail: user.userEmail,
-        userAddr: user.userAddr || '',
+        userName: loginMember.userName,
+        userPhone: loginMember.userPhone,
+        userEmail: loginMember.userEmail,
+        userAddr: loginMember.userAddr || '',
       };
-      console.log('authStore에서 가져온 데이터로 폼 초기화:', formData);
       reset(formData);
       setInitialData(formData);
     }
-  }, [user, reset]);
+  }, [loginMember, reset]);
 
-  // 최신 사용자 정보 불러오기 (컴포넌트 마운트 시 항상 실행)
+  // 최신 사용자 정보 불러오기 (컴포넌트 마운트 시 한 번만 실행)
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      console.log('ProfileEdit - fetchUserInfo 호출됨');
-      console.log('현재 user:', user);
-      
-      if (!user?.userId) {
-        console.log('user.userId가 없음');
-        return;
-      }
-      
-      try {
-        console.log('getMemberInfo API 호출 중...');
-        const response = await getMemberInfo(user.userId);
-        console.log('getMemberInfo 응답:', response);
-        
-        if (response.alertIcon === 'success') {
-          const userData = response.resData;
-          console.log('가져온 사용자 데이터:', userData);
+    // 컴포넌트 마운트 시 한 번만 최신 정보 가져오기
+    if (loginMember?.userId) {
+      fetchUserInfo();
+    }
+  }, [loginMember?.userId, reset]); // setLoginMember 제거하여 무한 루프 방지
+
+  // 팀원들이 배운 방식: function 선언문 + .then/.catch
+  function fetchUserInfo() {
+    if (!loginMember?.userId) {
+      return;
+    }
+    
+    getMemberInfo(loginMember.userId)
+      .then(function(response) {
+        // 팀원들이 배운 방식: response.data에서 직접 확인
+        if (response.data && response.data.alertIcon === 'success' && response.data.resData) {
+          const userData = response.data.resData;
           
           const formData = {
             userName: userData.userName,
@@ -143,76 +143,58 @@ const ProfileEdit = () => {
             userEmail: userData.userEmail,
             userAddr: userData.userAddr,
           };
-          console.log('API에서 가져온 데이터로 폼 업데이트:', formData);
           reset(formData);
           setInitialData(formData);
           
           // authStore도 최신 정보로 업데이트
-          updateUser(formData);
-          console.log('authStore도 최신 정보로 업데이트됨');
-        } else {
-          console.log('getMemberInfo 실패:', response.clientMsg);
-          toast.error('회원 정보를 불러오는데 실패했습니다.');
+          setLoginMember({ ...loginMember, ...formData });
         }
-      } catch (error) {
-        console.error('getMemberInfo 오류:', error);
-        toast.error('회원 정보를 불러오는데 실패했습니다.');
-      }
-    };
+      })
+      .catch(function(error) {
+        console.error('회원 정보를 불러오는데 실패했습니다.');
+      });
+  }
 
-    // 컴포넌트 마운트 시 항상 최신 정보 가져오기
-    if (user?.userId) {
-      fetchUserInfo();
-    }
-  }, [user?.userId, reset, updateUser]);
-
-  const onSubmit = async (data) => {
-    console.log('ProfileEdit - onSubmit 시작');
-    console.log('현재 user:', user);
-    console.log('폼 데이터:', data);
-
+  const onSubmit = (data) => {
     // 이메일이 변경되었고 중복체크를 하지 않은 경우
-    if (data.userEmail !== user?.userEmail && 
+    if (data.userEmail !== loginMember?.userEmail && 
         (emailCheckStatus !== 'available' || checkedEmail !== data.userEmail)) {
       toast.error('변경된 이메일의 중복 체크를 해주세요');
       return;
     }
     
     setLoading(true);
-    try {
-      const updateData = {
-        userId: user.userId,
-        ...data,
-      };
-      console.log('수정 요청 데이터:', updateData);
+    
+    const updateData = {
+      userId: loginMember.userId,
+      ...data,
+    };
 
-      const response = await updateMember(updateData);
-      console.log('수정 응답:', response);
-      console.log('응답 alertIcon:', response.alertIcon);
-      console.log('응답 clientMsg:', response.clientMsg);
-      
-      if (response.alertIcon === 'success') {
-        toast.success('정보가 수정되었습니다.');
-        setInitialData(data);
-        
-        // authStore의 사용자 정보 업데이트
-        updateUser({
-          userName: data.userName,
-          userPhone: data.userPhone,
-          userEmail: data.userEmail,
-          userAddr: data.userAddr,
-        });
-        console.log('authStore 사용자 정보 업데이트됨');
-      } else {
-        console.log('수정 실패 - alertIcon이 success가 아님');
-        toast.error(response.clientMsg || '수정에 실패했습니다.');
-      }
-    } catch (error) {
-      console.error('수정 중 오류 발생:', error);
-      toast.error('수정 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
+    updateMember(updateData)
+      .then(function(response) {
+        if (response.data && response.data.alertIcon === 'success') {
+          toast.success('정보가 수정되었습니다.');
+          setInitialData(data);
+          
+          // authStore의 사용자 정보 업데이트
+          setLoginMember({
+            ...loginMember,
+            userName: data.userName,
+            userPhone: data.userPhone,
+            userEmail: data.userEmail,
+            userAddr: data.userAddr,
+          });
+        } else {
+          toast.error(response.data?.clientMsg || '수정에 실패했습니다.');
+        }
+      })
+      .catch(function(error) {
+        console.error('수정 중 오류 발생:', error);
+        toast.error('수정 중 오류가 발생했습니다.');
+      })
+      .finally(function() {
+        setLoading(false);
+      });
   };
 
   const handleReset = () => {
@@ -262,7 +244,7 @@ const ProfileEdit = () => {
                   {emailCheckStatus === 'checking' && <CircularProgress size={20} />}
                   {emailCheckStatus === 'available' && <CheckCircle color="success" />}
                   {emailCheckStatus === 'unavailable' && <Cancel color="error" />}
-                  {watchEmail && watchEmail !== user?.userEmail && (
+                  {watchEmail && watchEmail !== loginMember?.userEmail && (
                     <Button
                       variant="outlined"
                       size="small"

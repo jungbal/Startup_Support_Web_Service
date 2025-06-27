@@ -23,7 +23,7 @@ import useAuthStore from '../../store/authStore';
 import { getAllReports, processReport } from '../../api/memberApi';
 
 const ReportManagement = () => {
-  const { user } = useAuthStore();
+  const { loginMember } = useAuthStore();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,22 +35,24 @@ const ReportManagement = () => {
     fetchReports();
   }, []);
 
-  const fetchReports = async () => {
-    try {
-      setLoading(true);
-      const response = await getAllReports();
-      
-      if (response.status === 'success') {
-        setReports(response.data || []);
-      } else {
-        setError('신고 목록을 불러오는데 실패했습니다.');
-      }
-    } catch (error) {
-      setError('신고 목록을 불러오는 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  function fetchReports() {
+    setLoading(true);
+    
+    getAllReports()
+      .then(function(response) {
+        if (response.data && response.data.alertIcon === 'success') {
+          setReports(response.data.resData || []);
+        } else {
+          setError('신고 목록을 불러오는데 실패했습니다.');
+        }
+      })
+      .catch(function(error) {
+        setError('신고 목록을 불러오는 중 오류가 발생했습니다.');
+      })
+      .finally(function() {
+        setLoading(false);
+      });
+  }
 
   const handleOpenDialog = (report, action) => {
     setSelectedReport(report);
@@ -64,39 +66,40 @@ const ReportManagement = () => {
     setDialogAction('');
   };
 
-  const handleProcessReport = async () => {
+  const handleProcessReport = () => {
     if (!selectedReport) return;
 
-    try {
-      const reportData = {
-        reportId: selectedReport.reportId,
-        reportStatus: dialogAction,
-        adminId: user.userId,
-      };
+    const reportData = {
+      reportId: selectedReport.reportId,
+      reportStatus: dialogAction,
+      adminId: loginMember.userId,
+    };
 
-      const response = await processReport(reportData, dialogAction);
-      
-      if (response.status === 'success') {
-        toast.success('신고가 처리되었습니다.');
-        fetchReports(); // 목록 새로고침
-      } else {
-        toast.error('신고 처리에 실패했습니다.');
-      }
-    } catch (error) {
-      toast.error('신고 처리 중 오류가 발생했습니다.');
-    } finally {
-      handleCloseDialog();
-    }
+    processReport(reportData, dialogAction)
+      .then(function(response) {
+        if (response.data && response.data.alertIcon === 'success') {
+          toast.success('신고가 처리되었습니다.');
+          fetchReports(); // 목록 새로고침
+        } else {
+          toast.error('신고 처리에 실패했습니다.');
+        }
+      })
+      .catch(function(error) {
+        toast.error('신고 처리 중 오류가 발생했습니다.');
+      })
+      .finally(function() {
+        handleCloseDialog();
+      });
   };
 
-  const formatDate = (dateString) => {
+  function formatDate(dateString) {
     const date = new Date(dateString);
     return date.toLocaleDateString('ko-KR', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
     });
-  };
+  }
 
   const getPostTypeLabel = (postType) => {
     const typeMap = {

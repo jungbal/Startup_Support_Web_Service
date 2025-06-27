@@ -140,8 +140,8 @@ const SignUp = () => {
   const emailValid = watchEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(watchEmail);
   const emailFormatCorrect = watchEmail && watchEmail.includes('@') && watchEmail.includes('.');
 
-  // 아이디 중복 체크
-  const handleCheckUserId = async () => {
+  // 아이디 중복 체크 - 팀원들이 배운 방식
+  const handleCheckUserId = () => {
     if (!watchUserId) {
       toast.error('아이디를 입력해주세요');
       return;
@@ -150,26 +150,27 @@ const SignUp = () => {
     clearErrors('userId');
     setIdCheckStatus('checking');
     
-    try {
-      const response = await checkUserId(watchUserId);
-      
-      if (response.resData === 0) {
-        setIdCheckStatus('available');
-        setCheckedId(watchUserId);
-        toast.success('사용 가능한 아이디입니다');
-      } else {
-        setIdCheckStatus('unavailable');
-        setError('userId', { message: '이미 사용중인 아이디입니다' });
-        toast.error('이미 사용중인 아이디입니다');
-      }
-    } catch (error) {
-      setIdCheckStatus(null);
-      toast.error('아이디 중복 체크 중 오류가 발생했습니다');
-    }
+    checkUserId(watchUserId)
+      .then(function(response) {
+        // 팀원들이 배운 방식: response.data에서 확인
+        if (response.data && response.data.resData === 0) {
+          setIdCheckStatus('available');
+          setCheckedId(watchUserId);
+          toast.success('사용 가능한 아이디입니다');
+        } else {
+          setIdCheckStatus('unavailable');
+          setError('userId', { message: '이미 사용중인 아이디입니다' });
+          toast.error('이미 사용중인 아이디입니다');
+        }
+      })
+      .catch(function(error) {
+        setIdCheckStatus(null);
+        toast.error('아이디 중복 체크 중 오류가 발생했습니다');
+      });
   };
 
-  // 이메일 중복 체크
-  const handleCheckUserEmail = async () => {
+  // 이메일 중복 체크 - 팀원들이 배운 방식
+  const handleCheckUserEmail = () => {
     if (!watchEmail) {
       toast.error('이메일을 입력해주세요');
       return;
@@ -178,26 +179,27 @@ const SignUp = () => {
     clearErrors('userEmail');
     setEmailCheckStatus('checking');
     
-    try {
-      const response = await checkUserEmail(watchEmail);
-      
-      if (response.resData === 0) {
-        setEmailCheckStatus('available');
-        setCheckedEmail(watchEmail);
-        toast.success('사용 가능한 이메일입니다');
-      } else {
-        setEmailCheckStatus('unavailable');
-        setError('userEmail', { message: '이미 사용중인 이메일입니다' });
-        toast.error('이미 사용중인 이메일입니다');
-      }
-    } catch (error) {
-      setEmailCheckStatus(null);
-      toast.error('이메일 중복 체크 중 오류가 발생했습니다');
-    }
+    checkUserEmail(watchEmail)
+      .then(function(response) {
+        // 팀원들이 배운 방식: response.data에서 확인
+        if (response.data && response.data.resData === 0) {
+          setEmailCheckStatus('available');
+          setCheckedEmail(watchEmail);
+          toast.success('사용 가능한 이메일입니다');
+        } else {
+          setEmailCheckStatus('unavailable');
+          setError('userEmail', { message: '이미 사용중인 이메일입니다' });
+          toast.error('이미 사용중인 이메일입니다');
+        }
+      })
+      .catch(function(error) {
+        setEmailCheckStatus(null);
+        toast.error('이메일 중복 체크 중 오류가 발생했습니다');
+      });
   };
 
-  // 회원가입 처리
-  const onSubmit = async (data) => {
+  // 회원가입 처리 - 팀원들이 배운 방식
+  const onSubmit = (data) => {
     // 아이디 중복 체크 확인
     if (idCheckStatus !== 'available' || checkedId !== data.userId) {
       toast.error('아이디 중복 체크를 해주세요');
@@ -211,22 +213,26 @@ const SignUp = () => {
     }
 
     setIsLoading(true);
-    try {
-      const { confirmPassword, ...signUpData } = data;
-      const response = await signUp(signUpData);
-      
-      if (response.alertIcon === 'success') {
-        toast.success('회원가입이 완료되었습니다');
-        navigate('/login');
-      } else {
-        toast.error(response.clientMsg || '회원가입에 실패했습니다');
-      }
-    } catch (error) {
-      console.error('SignUp error:', error);
-      toast.error('회원가입 중 오류가 발생했습니다');
-    } finally {
-      setIsLoading(false);
-    }
+    
+    const { confirmPassword, ...signUpData } = data;
+    
+    signUp(signUpData)
+      .then(function(response) {
+        // 팀원들이 배운 방식: response.data에서 확인
+        if (response.data && response.data.alertIcon === 'success') {
+          toast.success('회원가입이 완료되었습니다');
+          navigate('/login');
+        } else {
+          toast.error(response.data?.clientMsg || '회원가입에 실패했습니다');
+        }
+      })
+      .catch(function(error) {
+        console.error('SignUp error:', error);
+        toast.error('회원가입 중 오류가 발생했습니다');
+      })
+      .finally(function() {
+        setIsLoading(false);
+      });
   };
 
   return (
