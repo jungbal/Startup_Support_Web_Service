@@ -3,7 +3,7 @@
 <mapper namespace="kr.or.iei.market.model.dao.MarketDao">
 	<!-- 게시글 목록 조회 -->
 	<select id="selectMarketList"
-	resultType="Market">
+	resultType="kr.or.iei.member.model.dto.Market">
 	select market_no as marketNo,
 			user_id as userId,
 			market_type as marketType,

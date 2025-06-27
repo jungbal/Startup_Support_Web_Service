@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import kr.or.iei.market.model.dto.Market;
+import kr.or.iei.member.model.dto.Market;
 
 @Mapper
 public interface MarketDao {

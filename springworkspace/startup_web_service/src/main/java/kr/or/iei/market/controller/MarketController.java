@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.or.iei.common.dto.ResponseDTO;
-import kr.or.iei.market.model.dto.Market;
+import kr.or.iei.member.model.dto.Market;
 import kr.or.iei.market.model.service.MarketService;
 
 @RestController

@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import kr.or.iei.market.model.dao.MarketDao;
-import kr.or.iei.market.model.dto.Market;
+import kr.or.iei.member.model.dto.Market;
 
 @Service
 public class MarketService {

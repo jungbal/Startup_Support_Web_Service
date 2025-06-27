@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import instance from "../../api/axios";
+import createInstance from "../../api/Interceptor";
 
 export default function MarketList(){
     const serverUrl = import.meta.env.VITE_BACK_SERVER;
-    const axiosInstance=instance;
+    const axiosInstance=createInstance();
 
     const [marketList, setMarketList] =useState([]);
     const [reqPage, setReqPage]=useState(1);
