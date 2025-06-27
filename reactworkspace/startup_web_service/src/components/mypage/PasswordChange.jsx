@@ -42,7 +42,7 @@ const schema = yup.object({
 });
 
 const PasswordChange = () => {
-  const { user } = useAuthStore();
+  const { loginMember } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [showPasswords, setShowPasswords] = useState({
     current: false,
@@ -103,46 +103,46 @@ const PasswordChange = () => {
     }));
   };
 
-  const onSubmit = async (data) => {
-    console.log('비밀번호 변경 시도:', { userId: user.userId, currentPassword: '***', newPassword: '***' });
+  const onSubmit = (data) => {
     setLoading(true);
     
-    try {
-      // 1. 현재 비밀번호 확인
-      console.log('현재 비밀번호 확인 API 호출 중...');
-      const checkResponse = await checkPassword({
-        userId: user.userId,
-        userPw: data.currentPassword,
-      });
-      console.log('비밀번호 확인 응답:', checkResponse);
-
-      if (checkResponse.alertIcon !== 'success' || !checkResponse.resData) {
-        console.log('현재 비밀번호 불일치');
+    // 1. 현재 비밀번호 확인
+    checkPassword({
+      userId: loginMember.userId,
+      userPw: data.currentPassword,
+    })
+    .then(function(checkResponse) {
+      // 팀원들이 배운 방식: response.data에서 확인
+      if (checkResponse.data && checkResponse.data.alertIcon !== 'success' || !checkResponse.data?.resData) {
         toast.error('현재 비밀번호가 일치하지 않습니다.');
         setLoading(false);
         return;
       }
 
-      console.log('현재 비밀번호 확인 성공, 새 비밀번호로 변경 중...');
       // 2. 새 비밀번호로 변경
-      const updateResponse = await updatePassword({
-        userId: user.userId,
+      return updatePassword({
+        userId: loginMember.userId,
         userPw: data.newPassword,
       });
-      console.log('비밀번호 변경 응답:', updateResponse);
-
-      if (updateResponse.alertIcon === 'success') {
-        toast.success('비밀번호가 변경되었습니다.');
-        reset();
-      } else {
-        toast.error(updateResponse.clientMsg || '비밀번호 변경에 실패했습니다.');
+    })
+    .then(function(updateResponse) {
+      if (updateResponse) {
+        // 팀원들이 배운 방식: response.data에서 확인
+        if (updateResponse.data && updateResponse.data.alertIcon === 'success') {
+          toast.success('비밀번호가 변경되었습니다.');
+          reset();
+        } else {
+          toast.error(updateResponse.data?.clientMsg || '비밀번호 변경에 실패했습니다.');
+        }
       }
-    } catch (error) {
+    })
+    .catch(function(error) {
       console.error('비밀번호 변경 중 오류:', error);
       toast.error('비밀번호 변경 중 오류가 발생했습니다.');
-    } finally {
+    })
+    .finally(function() {
       setLoading(false);
-    }
+    });
   };
 
   return (
@@ -244,7 +244,7 @@ const PasswordChange = () => {
             error={!!errors.confirmPassword}
             helperText={errors.confirmPassword?.message || 
               (watchConfirmPassword && !passwordsMatch ? '비밀번호가 일치하지 않습니다' : 
-               watchConfirmPassword && passwordsMatch ? '비밀번호가 일치합니다' : '')}
+              watchConfirmPassword && passwordsMatch ? '비밀번호가 일치합니다' : '')}
             disabled={loading}
             InputProps={{
               endAdornment: (
