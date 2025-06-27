@@ -4,7 +4,7 @@ import instance from "../../api/axios";
 
 export default function MarketList(){
     const serverUrl = import.meta.env.VITE_BACK_SERVER;
-    const axiosInstance=instance();
+    const axiosInstance=instance;
 
     const [marketList, setMarketList] =useState([]);
     const [reqPage, setReqPage]=useState(1);
