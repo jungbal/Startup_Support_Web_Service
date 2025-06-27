@@ -54,48 +54,52 @@ const FindAccount = () => {
     resolver: yupResolver(findPwSchema),
   });
 
-  // 아이디 찾기 처리
-  const onSubmitFindId = async (data) => {
+  // 아이디 찾기 처리 - 팀원들이 배운 방식
+  const onSubmitFindId = (data) => {
     setIsLoading(true);
     setEmailSent('');
     
-    try {
-      const response = await findUserId(data.userEmail);
-      
-      if (response.alertIcon === 'success' && response.resData) {
-        setEmailSent(response.clientMsg);
-        toast.success(response.clientMsg);
-      } else {
-        toast.error(response.clientMsg || '해당 이메일로 가입된 회원이 없습니다');
-      }
-    } catch (error) {
-      console.error('Find ID error:', error);
-      toast.error('아이디 찾기 중 오류가 발생했습니다');
-    } finally {
-      setIsLoading(false);
-    }
+    findUserId(data.userEmail)
+      .then(function(response) {
+        // 팀원들이 배운 방식: response.data에서 확인
+        if (response.data && response.data.alertIcon === 'success' && response.data.resData) {
+          setEmailSent(response.data.clientMsg);
+          toast.success(response.data.clientMsg);
+        } else {
+          toast.error(response.data?.clientMsg || '해당 이메일로 가입된 회원이 없습니다');
+        }
+      })
+      .catch(function(error) {
+        console.error('Find ID error:', error);
+        toast.error('아이디 찾기 중 오류가 발생했습니다');
+      })
+      .finally(function() {
+        setIsLoading(false);
+      });
   };
 
-  // 비밀번호 찾기 처리
-  const onSubmitFindPw = async (data) => {
+  // 비밀번호 찾기 처리 - 팀원들이 배운 방식
+  const onSubmitFindPw = (data) => {
     setIsLoading(true);
     setTempPasswordSent('');
     
-    try {
-      const response = await findUserPw(data.userId, data.userEmail);
-      
-      if (response.alertIcon === 'success' && response.resData) {
-        setTempPasswordSent(response.clientMsg);
-        toast.success(response.clientMsg);
-      } else {
-        toast.error(response.clientMsg || '아이디 또는 이메일을 확인해주세요');
-      }
-    } catch (error) {
-      console.error('Find PW error:', error);
-      toast.error('비밀번호 찾기 중 오류가 발생했습니다');
-    } finally {
-      setIsLoading(false);
-    }
+    findUserPw(data.userId, data.userEmail)
+      .then(function(response) {
+        // 팀원들이 배운 방식: response.data에서 확인
+        if (response.data && response.data.alertIcon === 'success' && response.data.resData) {
+          setTempPasswordSent(response.data.clientMsg);
+          toast.success(response.data.clientMsg);
+        } else {
+          toast.error(response.data?.clientMsg || '아이디 또는 이메일을 확인해주세요');
+        }
+      })
+      .catch(function(error) {
+        console.error('Find PW error:', error);
+        toast.error('비밀번호 찾기 중 오류가 발생했습니다');
+      })
+      .finally(function() {
+        setIsLoading(false);
+      });
   };
 
   return (

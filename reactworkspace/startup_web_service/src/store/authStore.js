@@ -5,56 +5,65 @@ import { persist } from 'zustand/middleware';
 // 쿠키 관리를 위한 라이브러리 import - JWT 토큰을 안전하게 저장하기 위해
 import Cookies from 'js-cookie';
 
-// 인증 관련 전역 상태 스토어 생성
+/*
+isLogined : 로그인 여부 (true == 로그인 된 상태, false == 로그아웃 상태)
+setIsLogined : 로그인 상태 변경 시, 호출 함수
+loginMember : 로그인 회원 정보
+setLoginMember : 로그인 회원 정보 변경 시, 호출 함수
+accessToken : 로그인 이후, 요청시마다 헤더에 포함될 토큰
+setAccessToken : accessToken 변경 시, 호출 함수
+refreshToken : accessToken 만료 시, 재발급 할 때 필요한 토큰
+setRefreshToken : refreshToken 변경 시, 호출 함수
+*/
 const useAuthStore = create(
-  // persist 미들웨어로 감싸서 새로고침해도 상태가 유지되도록 함
   persist(
-    // set: 상태 변경 함수, get: 현재 상태 조회 함수
-    (set, get) => ({
-      // 로그인한 사용자 정보 (null이면 로그인 안됨)
-      user: null,
-      // 로그인 여부 boolean 값
-      isAuthenticated: false,
-      // 로딩 상태 (API 호출 중일 때 true)
-      isLoading: false,
-      // JWT 액세스 토큰 (단기간 유효)
-      accessToken: null,
-      // JWT 리프레시 토큰 (장기간 유효, 액세스 토큰 갱신용)
-      refreshToken: null,
-
-      // 로그인 성공 시 사용자 정보와 토큰을 저장하는 함수
-      setAuth: (userData, accessToken, refreshToken) => {
-        // 액세스 토큰이 있으면 쿠키에 1일간 저장
-        if (accessToken) {
-          Cookies.set('accessToken', accessToken, { expires: 1 }); // 1일
-        }
-        // 리프레시 토큰이 있으면 쿠키에 7일간 저장
-        if (refreshToken) {
-          Cookies.set('refreshToken', refreshToken, { expires: 7 }); // 7일
-        }
-        // Zustand 상태 업데이트 - 모든 로그인 관련 정보 저장
-        set({ 
-          user: userData,           // 사용자 정보 저장
-          isAuthenticated: true,   // 로그인 상태를 true로 변경
-          isLoading: false,        // 로딩 완료
-          accessToken,             // 액세스 토큰 상태에 저장
-          refreshToken             // 리프레시 토큰 상태에 저장
+    (set) => ({
+      isLogined: false,
+      setIsLogined: function(loginChk) {
+        set({
+          isLogined: loginChk
         });
       },
-
-      // 로그아웃 처리 함수
-      logout: () => {
-        // 쿠키에서 액세스 토큰 삭제
-        Cookies.remove('accessToken');
-        // 쿠키에서 리프레시 토큰 삭제
-        Cookies.remove('refreshToken');
-        // Zustand 상태를 초기값으로 리셋
-        set({ 
-          user: null,              // 사용자 정보 삭제
-          isAuthenticated: false,  // 로그인 상태를 false로 변경
-          isLoading: false,        // 로딩 상태 false
-          accessToken: null,       // 액세스 토큰 삭제
-          refreshToken: null       // 리프레시 토큰 삭제
+      loginMember: null,
+      setLoginMember: function(memberObj) {
+        set({
+          loginMember: memberObj
+        });
+      },
+      accessToken: null,
+      setAccessToken: function(accessToken) {
+        set({
+          accessToken: accessToken
+        });
+      },
+      refreshToken: null,
+      setRefreshToken: function(refreshToken) {
+        set({
+          refreshToken: refreshToken
+        });
+      },
+      
+      // 기존 방식 호환을 위한 별칭
+      user: null,
+      isAuthenticated: false,
+      setAuth: function(userData, accessToken, refreshToken) {
+        set({
+          isLogined: true,
+          loginMember: userData,
+          user: userData,
+          isAuthenticated: true,
+          accessToken: accessToken,
+          refreshToken: refreshToken
+        });
+      },
+      logout: function() {
+        set({
+          isLogined: false,
+          loginMember: null,
+          user: null,
+          isAuthenticated: false,
+          accessToken: null,
+          refreshToken: null
         });
       },
 
@@ -142,13 +151,9 @@ const useAuthStore = create(
         }
       },
     }),
-    // persist 미들웨어 설정 객체
     {
       name: 'auth-storage',        // localStorage에 저장될 키 이름
-      partialize: (state) => ({   // 어떤 상태만 localStorage에 저장할지 선택
-        user: state.user,          // 사용자 정보만 저장 (보안상 토큰은 제외)
-        isAuthenticated: state.isAuthenticated  // 로그인 상태만 저장
-      }), // 토큰은 보안상 localStorage가 아닌 httpOnly 쿠키에만 저장
+      // 모든 상태를 localStorage에 저장 (팀원들이 배운 방식)
     }
   )
 );

@@ -33,22 +33,14 @@ import '../styles/mypage.css';
 
 const MyPage = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuthStore();
+  const { loginMember, isLogined } = useAuthStore();
   const [selectedMenu, setSelectedMenu] = useState('profile');
 
-  console.log('MyPage 컴포넌트 렌더링됨');
-  console.log('현재 user:', user);
-  console.log('isAuthenticated:', isAuthenticated);
-
   useEffect(() => {
-    console.log('MyPage useEffect 실행됨');
-    if (!isAuthenticated) {
-      console.log('로그인되지 않음, /login으로 리다이렉트');
+    if (!isLogined) {
       navigate('/login');
-    } else {
-      console.log('정상적으로 로그인됨, MyPage 계속 진행');
     }
-  }, [isAuthenticated, navigate]);
+  }, [isLogined, navigate]);
 
   // 일반 사용자 메뉴
   const userMenus = [
@@ -66,7 +58,7 @@ const MyPage = () => {
   ];
 
   // 사용자 레벨에 따라 메뉴 결정
-  const menus = user?.userLevel <= 2 ? [...userMenus, ...adminMenus] : userMenus;
+  const menus = loginMember?.userLevel <= 2 ? [...userMenus, ...adminMenus] : userMenus;
 
   const renderContent = () => {
     switch (selectedMenu) {
@@ -101,8 +93,8 @@ const MyPage = () => {
           <List>
             <ListItem>
               <ListItemText 
-                primary={`${user?.userName}님`} 
-                secondary={user?.userLevel <= 2 ? '관리자' : '일반회원'}
+                primary={`${loginMember?.userName}님`} 
+                secondary={loginMember?.userLevel <= 2 ? '관리자' : '일반회원'}
                 primaryTypographyProps={{ fontWeight: 'bold' }}
               />
             </ListItem>

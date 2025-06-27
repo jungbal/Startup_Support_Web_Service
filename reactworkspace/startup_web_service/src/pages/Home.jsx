@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 
 const Home = () => {
-  const { user, logout, isAuthenticated } = useAuthStore();
+  const { loginMember, logout, isLogined } = useAuthStore();
   const navigate = useNavigate();
   
   const handleMyPageClick = () => {
@@ -26,10 +26,10 @@ const Home = () => {
           <h1 className="home-title">창업든든</h1>
         </div>
         <div className="home-nav-buttons">
-          {isAuthenticated ? (
+          {isLogined ? (
             // 로그인한 경우
             <>
-              <span className="home-username">안녕하세요, {user?.userName}님!</span>
+              <span className="home-username">안녕하세요, {loginMember?.userName}님!</span>
               <button 
                 className="home-nav-btn" 
                 onClick={handleMyPageClick}
@@ -66,8 +66,8 @@ const Home = () => {
       <div className="home-content">
         <div className="home-header">
           <p className="home-subtitle">창업을 든든하게 지원해드립니다</p>
-          {isAuthenticated && (
-            <p className="home-welcome">환영합니다, {user?.userName}님!</p>
+          {isLogined && (
+            <p className="home-welcome">환영합니다, {loginMember?.userName}님!</p>
           )}
         </div>
 

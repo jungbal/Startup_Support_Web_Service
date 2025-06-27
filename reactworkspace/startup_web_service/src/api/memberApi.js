@@ -1,103 +1,157 @@
-import axios from './axios';
+import createInstance from './Interceptor';
+
+// 인터셉터에서 커스터마이징한 axios Instance 사용하기
+const axiosInstance = createInstance();
 
 // 아이디 중복 체크
-export const checkUserId = async (userId) => {
-  const response = await axios.get(`/member/${userId}/chkId`);
-  return response.data; // 여기서 response.data는 axios가 반환하는 HTTP 응답 본문(ResponseDTO)
-};
+export function checkUserId(userId) {
+    let options = {};
+    options.url = `/member/${userId}/chkId`;
+    options.method = 'get';
+    
+    return axiosInstance(options);
+}
 
 // 이메일 중복 체크
-export const checkUserEmail = async (userEmail) => {
-  const response = await axios.get(`/member/email/${encodeURIComponent(userEmail)}/chkEmail`);
-  return response.data;
-};
+export function checkUserEmail(userEmail) {
+    let options = {};
+    options.url = `/member/email/${encodeURIComponent(userEmail)}/chkEmail`;
+    options.method = 'get';
+    
+    return axiosInstance(options);
+}
 
 // 회원가입
-export const signUp = async (memberData) => {
-  const response = await axios.post('/member', memberData);
-  return response.data;
-};
+export function signUp(memberData) {
+    let options = {};
+    options.url = '/member';
+    options.method = 'post';
+    options.data = memberData;
+    
+    return axiosInstance(options);
+}
 
 // 로그인
-export const login = async (loginData) => {
-  const response = await axios.post('/member/login', loginData);
-  return response.data;
-};
+export function login(loginData) {
+    let options = {};
+    options.url = '/member/login';
+    options.method = 'post';
+    options.data = loginData;
+    
+    return axiosInstance(options);
+}
 
 // 아이디 찾기
-export const findUserId = async (userEmail) => {
-  const response = await axios.post('/member/findId', null, {
-    params: { userEmail }
-  });
-  return response.data;
-};
+export function findUserId(userEmail) {
+    let options = {};
+    options.url = '/member/findId';
+    options.method = 'post';
+    options.params = { userEmail };
+    
+    return axiosInstance(options);
+}
 
 // 비밀번호 찾기
-export const findUserPw = async (userId, userEmail) => {
-  const response = await axios.post('/member/findPw', null, {
-    params: { userId, userEmail }
-  });
-  return response.data;
-};
+export function findUserPw(userId, userEmail) {
+    let options = {};
+    options.url = '/member/findPw';
+    options.method = 'post';
+    options.params = { userId, userEmail };
+    
+    return axiosInstance(options);
+}
 
 // 회원 정보 조회
-export const getMemberInfo = async (userId) => {
-  const response = await axios.get(`/member/${userId}`);
-  return response.data;
-};
+export function getMemberInfo(userId) {
+    let options = {};
+    options.url = `/member/${userId}`;
+    options.method = 'get';
+    
+    return axiosInstance(options);
+}
 
 // 회원 정보 수정
-export const updateMember = async (memberData) => {
-  const response = await axios.patch('/member', memberData);
-  return response.data;
-};
+export function updateMember(memberData) {
+    let options = {};
+    options.url = '/member';
+    options.method = 'patch';
+    options.data = memberData;
+    
+    return axiosInstance(options);
+}
 
 // 비밀번호 확인
-export const checkPassword = async (passwordData) => {
-  const response = await axios.post('/member/checkPw', passwordData);
-  return response.data;
-};
+export function checkPassword(passwordData) {
+    let options = {};
+    options.url = '/member/checkPw';
+    options.method = 'post';
+    options.data = passwordData;
+    
+    return axiosInstance(options);
+}
 
 // 비밀번호 변경
-export const updatePassword = async (passwordData) => {
-  const response = await axios.patch('/member/memberPw', passwordData);
-  return response.data;
-};
+export function updatePassword(passwordData) {
+    let options = {};
+    options.url = '/member/memberPw';
+    options.method = 'patch';
+    options.data = passwordData;
+    
+    return axiosInstance(options);
+}
 
 // 내가 쓴 게시글 조회
-export const getMyPosts = async (userId) => {
-  const response = await axios.get(`/member/${userId}/posts`);
-  return response.data;
-};
+export function getMyPosts(userId) {
+    let options = {};
+    options.url = `/member/${userId}/posts`;
+    options.method = 'get';
+    
+    return axiosInstance(options);
+}
 
 // 내가 쓴 마켓글 조회
-export const getMyMarkets = async (userId) => {
-  const response = await axios.get(`/member/${userId}/markets`);
-  return response.data;
-};
+export function getMyMarkets(userId) {
+    let options = {};
+    options.url = `/member/${userId}/markets`;
+    options.method = 'get';
+    
+    return axiosInstance(options);
+}
 
 // 내가 쓴 공지사항 조회 (관리자용)
-export const getMyNotices = async (userId) => {
-  const response = await axios.get(`/member/${userId}/notices`);
-  return response.data;
-};
+export function getMyNotices(userId) {
+    let options = {};
+    options.url = `/member/${userId}/notices`;
+    options.method = 'get';
+    
+    return axiosInstance(options);
+}
 
 // 모든 회원 조회 (관리자용)
-export const getAllMembers = async () => {
-  const response = await axios.get('/member/admin/members');
-  return response.data;
-};
+export function getAllMembers() {
+    let options = {};
+    options.url = '/member/admin/members';
+    options.method = 'get';
+    
+    return axiosInstance(options);
+}
 
 // 모든 신고 조회 (관리자용)
-export const getAllReports = async () => {
-  const response = await axios.get('/member/admin/reports');
-  return response.data;
-};
+export function getAllReports() {
+    let options = {};
+    options.url = '/member/admin/reports';
+    options.method = 'get';
+    
+    return axiosInstance(options);
+}
 
 // 신고 처리 (관리자용)
-export const processReport = async (report, action) => {
-  const response = await axios.patch('/member/admin/reports', report, {
-    params: { action }
-  });
-  return response.data;
-}; 
+export function processReport(report, action) {
+    let options = {};
+    options.url = '/member/admin/reports';
+    options.method = 'patch';
+    options.data = report;
+    options.params = { action };
+    
+    return axiosInstance(options);
+} 

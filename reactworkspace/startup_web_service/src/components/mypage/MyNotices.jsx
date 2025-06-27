@@ -17,42 +17,47 @@ import useAuthStore from '../../store/authStore';
 import { getMyNotices } from '../../api/memberApi';
 
 const MyNotices = () => {
-  const { user } = useAuthStore();
+  const { loginMember } = useAuthStore();
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchMyNotices();
-  }, [user]);
+  }, [loginMember]);
 
-  const fetchMyNotices = async () => {
-    if (!user?.userId) return;
+  // 팀원들이 배운 방식: function 선언문 + .then/.catch
+  function fetchMyNotices() {
+    if (!loginMember?.userId) return;
 
-    try {
-      setLoading(true);
-      const response = await getMyNotices(user.userId);
-      
-      if (response.status === 'success') {
-        setNotices(response.data || []);
-      } else {
-        setError('공지사항을 불러오는데 실패했습니다.');
-      }
-    } catch (error) {
-      setError('공지사항을 불러오는 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    setLoading(true);
+    
+    getMyNotices(loginMember.userId)
+      .then(function(response) {
+        // 팀원들이 배운 방식: response.data에서 확인
+        if (response.data && response.data.alertIcon === 'success') {
+          setNotices(response.data.resData || []);
+        } else {
+          setError('공지사항을 불러오는데 실패했습니다.');
+        }
+      })
+      .catch(function(error) {
+        console.error('공지사항을 불러오는 중 오류가 발생했습니다.');
+        setError('공지사항을 불러오는 중 오류가 발생했습니다.');
+      })
+      .finally(function() {
+        setLoading(false);
+      });
+  }
 
-  const formatDate = (dateString) => {
+  function formatDate(dateString) {
     const date = new Date(dateString);
     return date.toLocaleDateString('ko-KR', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
     });
-  };
+  }
 
   if (loading) {
     return (
@@ -95,8 +100,8 @@ const MyNotices = () => {
                   <TableCell>{formatDate(notice.postDate)}</TableCell>
                   <TableCell>
                     <Chip
-                      label={notice.postStatus === 'public' ? '공개' : '비공개'}
-                      color={notice.postStatus === 'public' ? 'primary' : 'default'}
+                      label={(notice.postStatus === 'public' || notice.postStatus === '공개' || notice.postStatus === null || notice.postStatus === undefined) ? '공개' : '비공개'}
+                      color={(notice.postStatus === 'public' || notice.postStatus === '공개' || notice.postStatus === null || notice.postStatus === undefined) ? 'success' : 'default'}
                       size="small"
                     />
                   </TableCell>
