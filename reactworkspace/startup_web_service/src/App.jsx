@@ -74,26 +74,30 @@ const theme = createTheme({
   },
 });
 
-// 보호된 라우트 컴포넌트
+// 기존 쿠키 토큰 삭제 함수
+function clearOldCookies() {
+  // 기존 쿠키들 삭제
+  document.cookie = 'accessToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  document.cookie = 'rememberedUserId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+}
+
+// 보호된 라우트 컴포넌트 (팀원이 배운 방식)
 const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isLogined = useAuthStore((state) => state.isLogined);
   
-  console.log('ProtectedRoute - isAuthenticated:', isAuthenticated);
-  
-  if (!isAuthenticated) {
-    console.log('인증되지 않음, /login으로 리다이렉트');
+  if (!isLogined) {
     return <Navigate to="/login" replace />;
   }
   
-  console.log('인증됨, 보호된 페이지 렌더링');
   return children;
 };
 
 // 로그인 전용 라우트 컴포넌트 (이미 로그인한 사용자는 홈으로 리다이렉트)
 const AuthRoute = ({ children }) => {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isLogined = useAuthStore((state) => state.isLogined);
   
-  if (isAuthenticated) {
+  if (isLogined) {
     return <Navigate to="/home" replace />;
   }
   
@@ -101,26 +105,10 @@ const AuthRoute = ({ children }) => {
 };
 
 function App() {
-  const checkAuth = useAuthStore((state) => state.checkAuth);
-  const isLoading = useAuthStore((state) => state.isLoading);
-  
   useEffect(() => {
-    // 앱 시작 시 인증 상태 확인
-    checkAuth();
-  }, [checkAuth]);
-
-  if (isLoading) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh' 
-      }}>
-        로딩 중...
-      </div>
-    );
-  }
+    // 앱 시작 시 기존 쿠키 토큰 삭제 (한 번만 실행)
+    clearOldCookies();
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>

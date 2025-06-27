@@ -23,69 +23,56 @@ const marketTypeMap = {
 };
 
 const MyMarkets = () => {
-  const { user } = useAuthStore();
+  const { loginMember } = useAuthStore();
   const [markets, setMarkets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchMyMarkets();
-  }, [user]);
+  }, [loginMember]);
 
-  const fetchMyMarkets = async () => {
-    console.log('MyMarkets - fetchMyMarkets 호출됨');
-    console.log('현재 user:', user);
-    
-    if (!user?.userId) {
-      console.log('user.userId가 없음');
+  function fetchMyMarkets() {
+    if (!loginMember?.userId) {
       return;
     }
 
-    try {
-      setLoading(true);
-      console.log('getMyMarkets API 호출 중...');
-      const response = await getMyMarkets(user.userId);
-      console.log('getMyMarkets 응답:', response);
-      
-      if (response.alertIcon === 'success') {
-        const marketsData = response.resData || [];
-        console.log('가져온 마켓글 데이터:', marketsData);
-        console.log('첫 번째 마켓글 상세:', marketsData[0]);
-        if (marketsData[0]) {
-          console.log('첫 번째 마켓글의 price:', marketsData[0].price);
-          console.log('첫 번째 마켓글의 marketStatus:', marketsData[0].marketStatus);
+    setLoading(true);
+    
+    getMyMarkets(loginMember.userId)
+      .then(function(response) {
+        if (response.data && response.data.alertIcon === 'success') {
+          const marketsData = response.data.resData || [];
+          setMarkets(marketsData);
+        } else {
+          setError('마켓글을 불러오는데 실패했습니다.');
         }
-        setMarkets(marketsData);
-      } else {
-        console.log('getMyMarkets 실패:', response.clientMsg);
-        setError('마켓글을 불러오는데 실패했습니다.');
-      }
-    } catch (error) {
-      console.error('getMyMarkets 오류:', error);
-      setError('마켓글을 불러오는 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
+      })
+      .catch(function(error) {
+        console.error('마켓글을 불러오는 중 오류가 발생했습니다.');
+        setError('마켓글을 불러오는 중 오류가 발생했습니다.');
+      })
+      .finally(function() {
+        setLoading(false);
+      });
+  }
 
-  const formatDate = (dateString) => {
+  function formatDate(dateString) {
     const date = new Date(dateString);
     return date.toLocaleDateString('ko-KR', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
     });
-  };
+  }
 
-  const formatPrice = (price) => {
-    console.log('formatPrice 호출됨, price:', price, 'typeof:', typeof price);
+  function formatPrice(price) {
     if (price === null || price === undefined || price === 0) return '무료';
     if (typeof price !== 'number') {
-      console.warn('price가 숫자가 아님:', price);
       return '가격 정보 없음';
     }
     return price.toLocaleString() + '원';
-  };
+  }
 
   if (loading) {
     return (

@@ -23,58 +23,48 @@ const postTypeMap = {
 };
 
 const MyPosts = () => {
-  const { user } = useAuthStore();
+  const { loginMember } = useAuthStore();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchMyPosts();
-  }, [user]);
+  }, [loginMember]);
 
-  const fetchMyPosts = async () => {
-    console.log('MyPosts - fetchMyPosts 호출됨');
-    console.log('현재 user:', user);
-    
-    if (!user?.userId) {
-      console.log('user.userId가 없음');
+  function fetchMyPosts() {
+    if (!loginMember?.userId) {
       return;
     }
 
-    try {
-      setLoading(true);
-      console.log('getMyPosts API 호출 중...');
-      const response = await getMyPosts(user.userId);
-      console.log('getMyPosts 응답:', response);
-      
-      if (response.alertIcon === 'success') {
-        const postsData = response.resData || [];
-        console.log('가져온 게시글 데이터:', postsData);
-        console.log('첫 번째 게시글 상세:', postsData[0]);
-        if (postsData[0]) {
-          console.log('첫 번째 게시글의 postStatus:', postsData[0].postStatus);
+    setLoading(true);
+    
+    getMyPosts(loginMember.userId)
+      .then(function(response) {
+        if (response.data && response.data.alertIcon === 'success') {
+          const postsData = response.data.resData || [];
+          setPosts(postsData);
+        } else {
+          setError('게시글을 불러오는데 실패했습니다.');
         }
-        setPosts(postsData);
-      } else {
-        console.log('getMyPosts 실패:', response.clientMsg);
-        setError('게시글을 불러오는데 실패했습니다.');
-      }
-    } catch (error) {
-      console.error('getMyPosts 오류:', error);
-      setError('게시글을 불러오는 중 오류가 발생했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
+      })
+      .catch(function(error) {
+        console.error('게시글을 불러오는 중 오류가 발생했습니다.');
+        setError('게시글을 불러오는 중 오류가 발생했습니다.');
+      })
+      .finally(function() {
+        setLoading(false);
+      });
+  }
 
-  const formatDate = (dateString) => {
+  function formatDate(dateString) {
     const date = new Date(dateString);
     return date.toLocaleDateString('ko-KR', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
     });
-  };
+  }
 
   if (loading) {
     return (
