@@ -15,6 +15,7 @@ import SignUp from './pages/SignUp';
 import FindAccount from './pages/FindAccount';
 import MyPage from './pages/MyPage';
 import Home from './pages/Home';
+import MarketMain from './components/Market/MarketMain';
 
 // MUI 테마 설정
 const theme = createTheme({
@@ -140,7 +141,8 @@ function App() {
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/signup" element={<PublicRoute><SignUp /></PublicRoute>} />
           <Route path="/find-account" element={<PublicRoute><FindAccount /></PublicRoute>} />
-          
+          <Route path="/market/*" element={<MarketMain />}/>
+
           {/* 보호된 라우트 */}
           <Route
             path="/home"

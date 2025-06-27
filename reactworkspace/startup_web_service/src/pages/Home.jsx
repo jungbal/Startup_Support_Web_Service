@@ -47,6 +47,13 @@ const Home = () => {
             <h3 className="home-nav-item-title">교육 및 멘토링</h3>
             <p className="home-nav-item-desc">창업 노하우와 전문가 멘토링</p>
           </div>
+          <div className="home-nav-item" onClick={function(){
+              navigate("/market");
+            }}>
+            <span className="home-nav-item-icon">🛒</span>
+            <h3 className="home-nav-item-title">마켓</h3>
+            <p className="home-nav-item-desc" >사업용 중고 물품 판매</p>
+          </div>
         </div>
       </div>
 
