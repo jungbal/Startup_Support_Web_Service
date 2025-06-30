@@ -202,24 +202,139 @@ public class MemberService {
 	// 신고 처리
 	@Transactional
 	public int processReport(Report report, String action) {
-		// 신고 상태 업데이트
-		int result = dao.updateReportStatus(report);
+		// action에 따라 report_status 설정
+		// wait: 대기 상태 유지
+		// rejected: 신고 반려 (DB 트리거가 게시글의 신고 카운트 1 감소)
+		// approved: 신고 승인 (신고 횟수 유지, 작성자 누적 신고 횟수 증가)
+		// deleted: 게시글/마켓글 직접 삭제
 		
-		if(result > 0 && "approve".equals(action)) {
-			// 신고 승인 시 해당 회원의 신고 횟수 증가
-			dao.increaseReportCount(report.getReporterId());
+		int result = 0;
+		
+		if ("wait".equals(action)) {
+			// 대기 상태로 유지 (아무 처리 안함)
+			return 1;
+		} else if ("rejected".equals(action)) {
+			// 신고 반려 처리 (DB 트리거가 자동으로 게시글의 신고 카운트를 1 감소시킴)
+			report.setReportStatus("rejected");
+			result = dao.updateReportStatus(report);
+		} else if ("approved".equals(action)) {
+			// 신고 승인 처리 (게시글 신고 횟수는 유지, 작성자 누적 신고 횟수만 증가)
+			report.setReportStatus("approved");
+			result = dao.updateReportStatus(report);
 			
-			// 신고 횟수에 따른 제재 처리
-			Member reportedMember = dao.selectOneMember(report.getReporterId());
-			if(reportedMember.getReportCount() >= 3) {
-				// 3회 이상 신고 시 7일 제재
-				Calendar cal = Calendar.getInstance();
-				cal.add(Calendar.DAY_OF_MONTH, 7);
-				reportedMember.setBanUntil(cal.getTime());
-				dao.banMember(reportedMember);
+			if (result > 0) {
+				// 신고된 게시글의 작성자 ID를 조회
+				String reportedUserId = getPostWriterId(report.getPostType(), report.getPostId());
+				
+				// 신고가 승인되었으므로 작성자의 누적 신고 횟수 증가
+				if (reportedUserId != null) {
+					// 작성자의 신고 누적 횟수 증가
+					dao.increaseReportCount(reportedUserId);
+					
+					// 업데이트된 회원 정보 조회
+					Member reportedMember = dao.selectOneMember(reportedUserId);
+					
+					// 신고 누적 6회 이상 시 7일 제재
+					if (reportedMember != null && reportedMember.getReportCount() >= 6) {
+						// 이미 제재 중이 아닌 경우에만 새로운 제재 적용
+						if (reportedMember.getBanUntil() == null || reportedMember.getBanUntil().before(new Date())) {
+							Calendar cal = Calendar.getInstance();
+							cal.add(Calendar.DAY_OF_MONTH, 7);
+							reportedMember.setBanUntil(cal.getTime());
+							dao.banMember(reportedMember);
+						}
+					}
+				}
+			}
+		} else if ("deleted".equals(action)) {
+			// 게시글/마켓글 직접 삭제 처리
+			report.setReportStatus("deleted");
+			result = dao.updateReportStatus(report);
+			
+			if (result > 0) {
+				// 먼저 게시글 작성자 ID를 조회 (삭제 전에 조회해야 함)
+				String reportedUserId = getPostWriterId(report.getPostType(), report.getPostId());
+				
+				// 게시글 타입에 따라 삭제 처리
+				if ("post".equals(report.getPostType())) {
+					// 게시글 삭제
+					dao.deletePost(report.getPostId());
+				} else if ("market".equals(report.getPostType())) {
+					// 마켓글 삭제
+					dao.deleteMarket(report.getPostId());
+				}
+				
+				// 게시글이 삭제되었으므로 작성자의 누적 신고 횟수 증가
+				if (reportedUserId != null) {
+					// 작성자의 신고 누적 횟수 증가
+					dao.increaseReportCount(reportedUserId);
+					
+					// 업데이트된 회원 정보 조회
+					Member reportedMember = dao.selectOneMember(reportedUserId);
+					
+					// 신고 누적 6회 이상 시 7일 제재
+					if (reportedMember != null && reportedMember.getReportCount() >= 6) {
+						// 이미 제재 중이 아닌 경우에만 새로운 제재 적용
+						if (reportedMember.getBanUntil() == null || reportedMember.getBanUntil().before(new Date())) {
+							Calendar cal = Calendar.getInstance();
+							cal.add(Calendar.DAY_OF_MONTH, 7);
+							reportedMember.setBanUntil(cal.getTime());
+							dao.banMember(reportedMember);
+						}
+					}
+				}
 			}
 		}
 		
 		return result;
+	}
+	
+	// 게시글/마켓글 작성자 ID 조회
+	private String getPostWriterId(String postType, int postId) {
+		if ("post".equals(postType)) {
+			Post post = dao.selectOnePost(postId);
+			return post != null ? post.getUserId() : null;
+		} else if ("market".equals(postType)) {
+			Market market = dao.selectOneMarket(postId);
+			return market != null ? market.getUserId() : null;
+		}
+		return null;
+	}
+	
+	// 회원 등급 수정 (관리자용)
+	@Transactional
+	public int updateUserLevel(Member member) {
+		return dao.updateUserLevel(member);
+	}
+	
+	// 자동등업 체크 (게시글 2개 + 댓글 2개 작성 시 등급 4 → 3으로 승급)
+	@Transactional
+	public void checkAutoLevelUp(String userId) {
+		// 현재 회원 정보 조회
+		Member member = dao.selectOneMember(userId);
+		
+		// 등급 4인 회원만 자동등업 대상
+		if (member != null && member.getUserLevel() == 4) {
+			// 사용자의 게시글 수와 댓글 수 조회
+			int postCount = dao.countUserPosts(userId);
+			int commentCount = dao.countUserComments(userId);
+			
+			// 게시글 2개 이상 && 댓글 2개 이상 작성 시 등급 3으로 승급
+			if (postCount >= 2 && commentCount >= 2) {
+				member.setUserLevel(3);
+				dao.updateUserLevel(member);
+				System.out.println("자동등업 완료: " + userId + " (등급 4 → 3)");
+			}
+		}
+	}
+	
+	// 사용자 게시글 수 조회
+	public int countUserPosts(String userId) {
+		return dao.countUserPosts(userId);
+	}
+	
+	// 사용자 댓글 수 조회
+	public int countUserComments(String userId) {
+		return dao.countUserComments(userId);
 	}
 }

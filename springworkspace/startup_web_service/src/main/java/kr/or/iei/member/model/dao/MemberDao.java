@@ -38,4 +38,23 @@ public interface MemberDao {
 	// 관리자 기능 - 회원 관리
 	List<Member> selectAllMembers();
 	List<Post> selectMyNotices(String userId);
+	
+	// 회원 등급 수정
+	int updateUserLevel(Member member);
+	
+	// 자동등업을 위한 게시글/댓글 수 조회
+	int countUserPosts(String userId);
+	int countUserComments(String userId);
+	
+	// 게시글 삭제
+	int deletePost(int postNo);
+	
+	// 마켓글 삭제
+	int deleteMarket(int marketNo);
+	
+	// 게시글 단건 조회
+	Post selectOnePost(int postNo);
+	
+	// 마켓글 단건 조회
+	Market selectOneMarket(int marketNo);
 }

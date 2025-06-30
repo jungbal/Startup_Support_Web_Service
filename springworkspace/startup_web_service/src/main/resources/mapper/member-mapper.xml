@@ -157,5 +157,42 @@
 		WHERE user_id = #{userId} AND post_type = 'notice' 
 		ORDER BY post_date DESC
 	</select>
+	
+	<!-- 회원 등급 수정 (관리자용) -->
+	<update id="updateUserLevel" parameterType="kr.or.iei.member.model.dto.Member">
+		UPDATE t_users SET user_level = #{userLevel} WHERE user_id = #{userId}
+	</update>
+	
+	<!-- 자동등업을 위한 사용자 게시글 수 조회 -->
+	<select id="countUserPosts" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM t_posts 
+		WHERE user_id = #{userId} 
+		AND post_type IN ('common', 'qna')
+	</select>
+	
+	<!-- 자동등업을 위한 사용자 댓글 수 조회 -->
+	<select id="countUserComments" parameterType="String" resultType="int">
+		SELECT COUNT(*) FROM t_comment WHERE user_id = #{userId}
+	</select>
+	
+	<!-- 게시글 삭제 -->
+	<delete id="deletePost" parameterType="int">
+		DELETE FROM t_posts WHERE post_no = #{postNo}
+	</delete>
+	
+	<!-- 마켓글 삭제 -->
+	<delete id="deleteMarket" parameterType="int">
+		DELETE FROM t_market WHERE market_no = #{marketNo}
+	</delete>
+	
+	<!-- 게시글 단건 조회 -->
+	<select id="selectOnePost" parameterType="int" resultMap="postResultMap">
+		SELECT * FROM t_posts WHERE post_no = #{postNo}
+	</select>
+	
+	<!-- 마켓글 단건 조회 -->
+	<select id="selectOneMarket" parameterType="int" resultMap="marketResultMap">
+		SELECT * FROM t_market WHERE market_no = #{marketNo}
+	</select>
 
 </mapper>

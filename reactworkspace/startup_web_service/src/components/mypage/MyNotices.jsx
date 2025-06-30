@@ -26,7 +26,7 @@ const MyNotices = () => {
     fetchMyNotices();
   }, [loginMember]);
 
-  // 팀원들이 배운 방식: function 선언문 + .then/.catch
+  // function 선언문 + .then/.catch
   function fetchMyNotices() {
     if (!loginMember?.userId) return;
 
@@ -34,7 +34,7 @@ const MyNotices = () => {
     
     getMyNotices(loginMember.userId)
       .then(function(response) {
-        // 팀원들이 배운 방식: response.data에서 확인
+        // response.data에서 확인
         if (response.data && response.data.alertIcon === 'success') {
           setNotices(response.data.resData || []);
         } else {
