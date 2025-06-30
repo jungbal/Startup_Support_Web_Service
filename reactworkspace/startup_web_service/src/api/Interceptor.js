@@ -3,6 +3,9 @@ import useAuthStore from "../store/authStore";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 
+// 환경변수 파일에 저장된 서버 URL 읽어오기
+const serverUrl = import.meta.env.VITE_BACK_SERVER;
+
 // 외부 컴포넌트에서 서버 요청 시 사용할 axios 인스턴스 생성 함수
 export default function createInstance() {
     const instance = axios.create();
@@ -63,7 +66,7 @@ function setInterceptors(instance) {
                     const refreshToken = useAuthStore.getState().refreshToken;
 
                     let options = {};
-                    options.url = '/member/refresh';
+                    options.url = serverUrl + '/member/refresh';
                     options.method = 'post';
                     options.data = loginMember;
                     options.headers = {};

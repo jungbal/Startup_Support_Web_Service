@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.or.iei.common.annotation.NoTokenCheck;
+import kr.or.iei.common.annotation.TokenRequired;
 import kr.or.iei.common.dto.ResponseDTO;
 import kr.or.iei.member.model.dto.LoginMember;
 import kr.or.iei.member.model.dto.Market;
@@ -385,10 +386,10 @@ public class MemberController {
 	
 	// 신고 처리 (관리자용)
 	@PatchMapping("/admin/reports")
-	@Operation(summary = "신고 처리", description = "신고를 승인 또는 거절 처리합니다 (관리자 전용)")
+	@Operation(summary = "신고 처리", description = "신고를 처리합니다 (wait: 대기, rejected: 반려, approved: 승인, deleted: 삭제) (관리자 전용)")
 	public ResponseEntity<ResponseDTO> processReport(
 			@Parameter(description = "처리할 신고 정보", required = true) @RequestBody Report report, 
-			@Parameter(description = "처리 액션 (approve/reject)", required = true) @RequestParam String action) {
+			@Parameter(description = "처리 액션 (wait/rejected/approved/deleted)", required = true) @RequestParam String action) {
 		ResponseDTO res = new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR, "신고 처리 중 오류가 발생했습니다.", false, "error");
 		
 		try {
@@ -398,6 +399,59 @@ public class MemberController {
 				res = new ResponseDTO(HttpStatus.OK, "신고 처리가 완료되었습니다.", true, "success");
 			} else {
 				res = new ResponseDTO(HttpStatus.OK, "신고 처리 중 오류가 발생했습니다.", false, "warning");
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return new ResponseEntity<ResponseDTO>(res, res.getHttpStatus());
+	}
+	
+	// 회원 등급 수정 (관리자용)
+	@PatchMapping("/admin/userLevel")
+	@TokenRequired
+	public ResponseEntity<ResponseDTO> updateUserLevel(@RequestBody Member member) {
+		ResponseDTO res = new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR, "회원 등급 수정 중 오류가 발생했습니다.", null, "error");
+		
+		try {
+			int result = service.updateUserLevel(member);
+			if(result > 0) {
+				res = new ResponseDTO(HttpStatus.OK, "회원 등급이 수정되었습니다.", null, "success");
+			} else {
+				res = new ResponseDTO(HttpStatus.BAD_REQUEST, "회원 등급 수정에 실패했습니다.", null, "error");
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return new ResponseEntity<ResponseDTO>(res, res.getHttpStatus());
+	}
+	
+	// 자동등업 테스트용 엔드포인트 (개발/테스트용)
+	@PostMapping("/test/autoLevelUp")
+	@TokenRequired
+	public ResponseEntity<ResponseDTO> testAutoLevelUp(@RequestParam String userId) {
+		ResponseDTO res = new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR, "자동등업 테스트 중 오류가 발생했습니다.", null, "error");
+		
+		try {
+			// 현재 회원 정보 조회
+			Member beforeMember = service.selectOneMember(userId);
+			
+			// 자동등업 체크 실행
+			service.checkAutoLevelUp(userId);
+			
+			// 업데이트된 회원 정보 조회
+			Member afterMember = service.selectOneMember(userId);
+			
+			if(beforeMember.getUserLevel() != afterMember.getUserLevel()) {
+				res = new ResponseDTO(HttpStatus.OK, 
+					"자동등업 완료: 등급 " + beforeMember.getUserLevel() + " → " + afterMember.getUserLevel(), 
+					afterMember, "success");
+			} else {
+				res = new ResponseDTO(HttpStatus.OK, 
+					"자동등업 조건 미충족 (현재 등급: " + afterMember.getUserLevel() + 
+					", 게시글: " + service.countUserPosts(userId) + "개, 댓글: " + service.countUserComments(userId) + "개)", 
+					afterMember, "info");
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
