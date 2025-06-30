@@ -28,7 +28,7 @@ export default function CommercialMapFilter() {
   const serverUrl = import.meta.env.VITE_BACK_SERVER;
   const kakaoKey = import.meta.env.VITE_KAKAO_MAP_KEY;
 
-  // 지도 초기화
+  // 카카오 지도 초기화
   useEffect(() => {
     if (window.kakao && window.kakao.maps) {
       initMap();
@@ -39,10 +39,12 @@ export default function CommercialMapFilter() {
       script.onload = () => window.kakao.maps.load(() => initMap());
       document.head.appendChild(script);
     }
-  }, []);
+  }, [kakaoKey]);
 
   const initMap = () => {
     const container = document.getElementById('kakao-map');
+    if (!container) return;
+
     const options = {
       center: new window.kakao.maps.LatLng(37.5665, 126.9780),
       level: 5,
@@ -51,6 +53,7 @@ export default function CommercialMapFilter() {
     setMap(mapInstance);
   };
 
+  // 마커 출력
   const displayMarkers = (stores) => {
     markers.forEach((m) => m.setMap(null));
     const newMarkers = [];
@@ -61,6 +64,7 @@ export default function CommercialMapFilter() {
     stores.forEach((store) => {
       const lat = parseFloat(store.latitude);
       const lng = parseFloat(store.longitude);
+
       if (!isNaN(lat) && !isNaN(lng)) {
         const position = new window.kakao.maps.LatLng(lat, lng);
         const marker = new window.kakao.maps.Marker({ position });
@@ -70,12 +74,14 @@ export default function CommercialMapFilter() {
       }
     });
 
-    if (stores.length > 0) {
+    if (newMarkers.length > 0) {
       map.setBounds(bounds);
     }
+
     setMarkers(newMarkers);
   };
 
+  // 마커 클릭 시 이동
   const moveToMarker = (store) => {
     const lat = parseFloat(store.latitude);
     const lng = parseFloat(store.longitude);
@@ -85,6 +91,7 @@ export default function CommercialMapFilter() {
     }
   };
 
+  // 검색 요청
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (selectedLarge) params.append('largeCode', selectedLarge);
@@ -93,7 +100,7 @@ export default function CommercialMapFilter() {
     if (keyword) params.append('keyword', keyword);
 
     axios
-      .get(`${serverUrl}/commercial/filter?${params.toString()}`)
+      .get(`${serverUrl}commercial/filter?${params.toString()}`)
       .then((res) => {
         const list = res.data.list || [];
         setStoreList(list);
@@ -105,49 +112,58 @@ export default function CommercialMapFilter() {
       });
   };
 
-  // 대분류
+  // 대분류 불러오기
   useEffect(() => {
-    axios.get(`${serverUrl}/commercial/large`)
-      .then((res) => {
-        setLargeList(Array.isArray(res.data) ? res.data : []);
-      })
+    axios
+      .get(`${serverUrl}commercial/large`)
+      .then((res) => setLargeList(Array.isArray(res.data) ? res.data : []))
       .catch(() => setLargeList([]));
-  }, []);
+  }, [serverUrl]);
 
-  // 중분류
+  // 중분류 불러오기
   useEffect(() => {
     if (selectedLarge) {
-      axios.get(`${serverUrl}/commercial/middle?largeCode=${selectedLarge}`)
+      axios
+        .get(`${serverUrl}commercial/middle?largeCode=${selectedLarge}`)
         .then((res) => {
           setMiddleList(Array.isArray(res.data) ? res.data : []);
+          setSelectedMiddle('');
+          setSmallList([]);
+          setSelectedSmall('');
         })
-        .catch(() => setMiddleList([]));
+        .catch(() => {
+          setMiddleList([]);
+          setSelectedMiddle('');
+          setSmallList([]);
+          setSelectedSmall('');
+        });
     } else {
       setMiddleList([]);
-      setSmallList([]);
       setSelectedMiddle('');
+      setSmallList([]);
       setSelectedSmall('');
     }
-  }, [selectedLarge]);
+  }, [selectedLarge, serverUrl]);
 
-  // 소분류
+  // 소분류 불러오기
   useEffect(() => {
     if (selectedLarge && selectedMiddle) {
-      axios.get(`${serverUrl}/commercial/small?largeCode=${selectedLarge}&mediumCode=${selectedMiddle}`)
-        .then((res) => {
-          setSmallList(Array.isArray(res.data) ? res.data : []);
-        })
-        .catch(() => setSmallList([]));
+      axios
+        .get(`${serverUrl}commercial/small?largeCode=${selectedLarge}&mediumCode=${selectedMiddle}`)
+        .then((res) => setSmallList(Array.isArray(res.data) ? res.data : []))
+        .catch(() => {
+          setSmallList([]);
+          setSelectedSmall('');
+        });
     } else {
       setSmallList([]);
       setSelectedSmall('');
     }
-  }, [selectedMiddle]);
+  }, [selectedMiddle, selectedLarge, serverUrl]);
 
   return (
     <Box sx={{ width: '100vw', height: '100vh', position: 'relative' }}>
-      
-      {/* 필터 UI */}
+      {/* 필터 패널 */}
       <Paper
         elevation={4}
         sx={{
@@ -165,27 +181,48 @@ export default function CommercialMapFilter() {
       >
         <FormControl fullWidth size="small">
           <InputLabel>대분류 선택</InputLabel>
-          <Select value={selectedLarge} label="대분류 선택" onChange={(e) => setSelectedLarge(e.target.value)}>
+          <Select
+            value={selectedLarge || ''}
+            label="대분류 선택"
+            onChange={(e) => setSelectedLarge(e.target.value)}
+          >
+            <MenuItem value="">전체</MenuItem>
             {largeList.map((item) => (
-              <MenuItem key={item.code} value={item.code}>{item.name}</MenuItem>
+              <MenuItem key={item.code} value={item.code}>
+                {item.name}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
 
         <FormControl fullWidth size="small" disabled={!selectedLarge}>
           <InputLabel>중분류 선택</InputLabel>
-          <Select value={selectedMiddle} label="중분류 선택" onChange={(e) => setSelectedMiddle(e.target.value)}>
+          <Select
+            value={selectedMiddle || ''}
+            label="중분류 선택"
+            onChange={(e) => setSelectedMiddle(e.target.value)}
+          >
+            <MenuItem value="">전체</MenuItem>
             {middleList.map((item) => (
-              <MenuItem key={item.code} value={item.code}>{item.name}</MenuItem>
+              <MenuItem key={item.code} value={item.code}>
+                {item.name}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
 
         <FormControl fullWidth size="small" disabled={!selectedMiddle}>
           <InputLabel>소분류 선택</InputLabel>
-          <Select value={selectedSmall} label="소분류 선택" onChange={(e) => setSelectedSmall(e.target.value)}>
+          <Select
+            value={selectedSmall || ''}
+            label="소분류 선택"
+            onChange={(e) => setSelectedSmall(e.target.value)}
+          >
+            <MenuItem value="">전체</MenuItem>
             {smallList.map((item) => (
-              <MenuItem key={item.code} value={item.code}>{item.name}</MenuItem>
+              <MenuItem key={item.code} value={item.code}>
+                {item.name}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -194,7 +231,7 @@ export default function CommercialMapFilter() {
           size="small"
           label="상호명을 입력하세요"
           variant="outlined"
-          value={keyword}
+          value={keyword || ''}
           onChange={(e) => setKeyword(e.target.value)}
           fullWidth
         />
@@ -204,10 +241,10 @@ export default function CommercialMapFilter() {
         </Button>
       </Paper>
 
-      {/* 지도 */}
+      {/* 지도 출력 영역 */}
       <Box id="kakao-map" sx={{ width: '100%', height: '100%' }} />
 
-      {/* 결과 리스트 */}
+      {/* 검색 결과 하단 리스트 */}
       {storeList.length > 0 && (
         <Box
           sx={{
@@ -217,7 +254,7 @@ export default function CommercialMapFilter() {
             right: 20,
             maxHeight: 300,
             overflowY: 'auto',
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backgroundColor: 'rgba(255,255,255,0.95)',
             borderRadius: 2,
             padding: 2,
             boxShadow: 3,
@@ -248,3 +285,5 @@ export default function CommercialMapFilter() {
     </Box>
   );
 }
+
+

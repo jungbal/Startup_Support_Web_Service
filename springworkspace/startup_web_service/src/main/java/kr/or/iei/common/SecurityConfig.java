@@ -62,6 +62,9 @@ public class SecurityConfig {
                 // - 실제 운영에서는 반드시 주석 처리해야 함
                 .requestMatchers("/member/**").permitAll()
                 
+                //상권 api관련
+                .requestMatchers("/commercial/**").permitAll()
+                
                 // 기타 모든 요청은 인증 필요 (JWT 토큰이 있어야 접근 가능)
                 .anyRequest().authenticated()
             )

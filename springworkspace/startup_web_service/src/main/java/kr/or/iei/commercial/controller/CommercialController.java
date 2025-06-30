@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import kr.or.iei.commercial.model.dto.Commercial;
 import kr.or.iei.commercial.model.service.CommercialService;
+import kr.or.iei.common.annotation.NoTokenCheck;
 
 @RestController
 @CrossOrigin("*") // 프론트 요청 허용
@@ -22,6 +23,7 @@ public class CommercialController {
      * 조건 검색 API
      * - 대/중/소 분류 + 키워드 + 페이징
      */
+    @NoTokenCheck
     @GetMapping("/filter")
     public Map<String, Object> getFilteredCommercial(
         @RequestParam(required = false) String largeCode,
@@ -54,18 +56,21 @@ public class CommercialController {
     }
 
     // 대분류 목록 조회
+    @NoTokenCheck
     @GetMapping("/large")
     public ArrayList<Map<String, String>> getLargeCategories() {
         return service.getLargeCategories();
     }
 
     // 중분류 목록 조회
+    @NoTokenCheck
     @GetMapping("/middle")
     public ArrayList<Map<String, String>> getMiddleCategories(@RequestParam String largeCode) {
         return service.getMiddleCategories(largeCode);
     }
 
     // 소분류 목록 조회
+    @NoTokenCheck
     @GetMapping("/small")
     public ArrayList<Map<String, String>> getSmallCategories(
         @RequestParam String largeCode,
