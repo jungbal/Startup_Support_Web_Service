@@ -2,21 +2,95 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="kr.or.iei.commercial.model.dao.CommercialDao">
 
-<!-- resultMap 정의 -->
+    <!-- 상가 DTO 매핑 -->
     <resultMap id="commercialResultMap" type="kr.or.iei.commercial.model.dto.Commercial">
-        <result property="storeId" column="STORE_ID"/>
-        <result property="storeName" column="STORE_NAME"/>
-        <result property="provinceName" column="PROVINCE_NAME"/>
-        <result property="districtName" column="DISTRICT_NAME"/>
-        <result property="townName" column="TOWN_NAME"/>
-        <result property="roadAddr" column="ROAD_ADDR"/>
-        <result property="landAddr" column="LAND_ADDR"/>
-        <result property="categoryLarge" column="CATEGORY_LARGE"/>
-        <result property="categoryMedium" column="CATEGORY_MEDIUM"/>
-        <result property="categorySmall" column="CATEGORY_SMALL"/>
-        <result property="largeCode" column="LARGE_CODE"/>
-        <result property="mediumCode" column="MEDIUM_CODE"/>
-        <result property="smallCode" column="SMALL_CODE"/>
+        <result property="storeId" column="M_NO"/>
+        <result property="storeName" column="M_NM"/>
+        <result property="provinceName" column="SIDO_NM"/>
+        <result property="districtName" column="SIGUN_NM"/>
+        <result property="townName" column="HANG_NM"/>
+        <result property="roadAddr" column="DORO_ADDR"/>
+        <result property="landAddr" column="ZIBUN_ADDR"/>
+        <result property="categoryLarge" column="G_GB_NM"/>
+        <result property="categoryMedium" column="S_GB_NM"/>
+        <result property="categorySmall" column="T_GB_NM"/>
+        <result property="largeCode" column="G_GB_CD"/>
+        <result property="mediumCode" column="S_GB_CD"/>
+        <result property="smallCode" column="T_GB_CD"/>
     </resultMap>
-    
+
+    <!-- 조건 검색 쿼리 -->
+    <select id="selectByCondition" resultMap="commercialResultMap" parameterType="map">
+        SELECT *
+        FROM (
+            SELECT ROWNUM AS RNUM, A.*
+            FROM (
+                SELECT *
+                FROM TBL_STORE_INFO
+                WHERE 1=1
+                <if test="largeCode != null and largeCode != ''">
+                    AND G_GB_CD = #{largeCode}
+                </if>
+                <if test="mediumCode != null and mediumCode != ''">
+                    AND S_GB_CD = #{mediumCode}
+                </if>
+                <if test="smallCode != null and smallCode != ''">
+                    AND T_GB_CD = #{smallCode}
+                </if>
+                <if test="keyword != null and keyword != ''">
+                    AND M_NM LIKE '%' || #{keyword} || '%'
+                </if>
+                ORDER BY M_NO DESC
+            ) A
+            WHERE ROWNUM &lt;= #{endRow}
+        )
+        WHERE RNUM &gt;= #{startRow}
+    </select>
+
+    <!-- 총 개수 조회 -->
+    <select id="selectTotalCount" resultType="int" parameterType="map">
+        SELECT COUNT(*)
+        FROM TBL_STORE_INFO
+        WHERE 1=1
+        <if test="largeCode != null and largeCode != ''">
+            AND G_GB_CD = #{largeCode}
+        </if>
+        <if test="mediumCode != null and mediumCode != ''">
+            AND S_GB_CD = #{mediumCode}
+        </if>
+        <if test="smallCode != null and smallCode != ''">
+            AND T_GB_CD = #{smallCode}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND M_NM LIKE '%' || #{keyword} || '%'
+        </if>
+    </select>
+
+    <!-- 대분류 목록 -->
+    <select id="selectLargeCategories" resultType="map">
+        SELECT DISTINCT G_GB_CD AS code, G_GB_NM AS name
+        FROM TBL_STORE_INFO
+        WHERE G_GB_CD IS NOT NULL
+        ORDER BY G_GB_NM
+    </select>
+
+    <!-- 중분류 목록 (대분류 코드 기준) -->
+    <select id="selectMiddleCategories" parameterType="string" resultType="map">
+        SELECT DISTINCT S_GB_CD AS code, S_GB_NM AS name
+        FROM TBL_STORE_INFO
+        WHERE G_GB_CD = #{largeCode}
+          AND S_GB_CD IS NOT NULL
+        ORDER BY S_GB_NM
+    </select>
+
+    <!-- 소분류 목록 (대+중분류 코드 기준) -->
+    <select id="selectSmallCategories" parameterType="map" resultType="map">
+        SELECT DISTINCT T_GB_CD AS code, T_GB_NM AS name
+        FROM TBL_STORE_INFO
+        WHERE G_GB_CD = #{largeCode}
+          AND S_GB_CD = #{mediumCode}
+          AND T_GB_CD IS NOT NULL
+        ORDER BY T_GB_NM
+    </select>
+
 </mapper>

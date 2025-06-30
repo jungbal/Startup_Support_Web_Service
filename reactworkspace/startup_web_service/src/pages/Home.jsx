@@ -80,9 +80,9 @@ const Home = () => {
               <h3 className="home-nav-item-title">창업 지원</h3>
               <p className="home-nav-item-desc">사업계획서 작성부터 자금 조달까지</p>
             </div>
-            <div className="home-nav-item">
+            <div className="home-nav-item" onClick={() => navigate('/commercial')}>
               <span className="home-nav-item-icon">📊</span>
-              <h3 className="home-nav-item-title">시장 분석</h3>
+              <h3 className="home-nav-item-title">상권 분석</h3>
               <p className="home-nav-item-desc">업종별 시장 동향과 경쟁 분석</p>
             </div>
             <div className="home-nav-item" onClick={function(){
