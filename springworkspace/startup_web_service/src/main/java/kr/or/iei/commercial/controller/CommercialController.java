@@ -23,7 +23,6 @@ public class CommercialController {
      * 조건 검색 API
      * - 대/중/소 분류 + 키워드 + 페이징
      */
-    @NoTokenCheck
     @GetMapping("/filter")
     public Map<String, Object> getFilteredCommercial(
         @RequestParam(required = false) String largeCode,
@@ -33,7 +32,7 @@ public class CommercialController {
         @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int numOfRows
     ) {
-        int startRow = (page - 1) * numOfRows + 1;
+        int startRow = (page - 1) * numOfRows;
         int endRow = page * numOfRows;
 
         Map<String, Object> param = new HashMap<>();
@@ -54,6 +53,7 @@ public class CommercialController {
         result.put("numOfRows", numOfRows);
         return result;
     }
+
 
     // 대분류 목록 조회
     @NoTokenCheck

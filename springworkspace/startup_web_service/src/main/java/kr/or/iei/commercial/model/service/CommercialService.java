@@ -31,8 +31,8 @@ public class CommercialService {
     }
 
     // 중분류 목록
-    public ArrayList<Map<String, String>> getMiddleCategories(String mediumCode) {
-        return dao.selectMiddleCategories(mediumCode);
+    public ArrayList<Map<String, String>> getMiddleCategories(String largeCode) {
+        return dao.selectMiddleCategories(largeCode);
     }
 
     // 소분류 목록
