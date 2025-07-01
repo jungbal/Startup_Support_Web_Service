@@ -7,13 +7,21 @@
 	select market_no as marketNo,
 			user_id as userId,
 			market_type as marketType,
-			market_title as marketContent,
+			market_title as marketTitle,
 			market_content as marketContent,
 			market_date as marketDate,
 			market_status as marketStatus,
 			report_count as reportCount,
-			read_count as readCount
+			read_count as readCount,
+			price as price
 		from t_market
-		where market_status = "public"
+		where market_status = 'public'
+	</select>
+	
+	<!-- 게시글 수 조회 -->
+	<select id="selectBoardCount"
+	resultType="_int">
+	select count(*) 
+		from t_market
 	</select>
 </mapper>

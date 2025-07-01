@@ -65,6 +65,8 @@ public class SecurityConfig {
                 //상권 api관련
                 .requestMatchers("/commercial/**").permitAll()
                 
+                .requestMatchers("/market/**").permitAll()
+                
                 // 기타 모든 요청은 인증 필요 (JWT 토큰이 있어야 접근 가능)
                 .anyRequest().authenticated()
             )

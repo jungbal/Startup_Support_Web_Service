@@ -11,4 +11,6 @@ public interface MarketDao {
 
 	ArrayList<Market> selectMarketList();
 
+	int selectBoardCount();
+
 }

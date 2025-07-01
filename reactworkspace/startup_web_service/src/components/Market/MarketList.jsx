@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import createInstance from "../../api/Interceptor";
+import useAuthStore from "../../store/authStore";
+import PageNavi from "./PageNavi";
 
 export default function MarketList(){
     const serverUrl = import.meta.env.VITE_BACK_SERVER;
@@ -8,6 +10,8 @@ export default function MarketList(){
 
     const [marketList, setMarketList] =useState([]);
     const [reqPage, setReqPage]=useState(1);
+    const [pageInfo, setPageInfo] = useState({});           
+    const {isLogined} = useAuthStore();
 
     useEffect(function(){
         let options={};
@@ -16,18 +20,20 @@ export default function MarketList(){
 
         axiosInstance(options)
         .then(function(res){
-
-        })
-        .catch(function(err){
-
-        })
-    },[]);
+            console.log(res.data);
+            setMarketList(res.data.resData.marketList);
+            //setPageInfo(res.data.resData.pageInfo);
+        });
+    },[reqPage]);
 
 
     return(
         <div>
             <div>Market</div>
+            {isLogined
+            ?
             <Link to="/market/write" className="btn-primary">판매글 쓰기</Link>
+            :''}
             <div>
                 <ul>
                     {marketList.map(function(market, index){
@@ -35,7 +41,9 @@ export default function MarketList(){
                     })}
                 </ul>
             </div>
-
+            <div>
+                <PageNavi pageInfo={pageInfo} reqPage={reqPage} setReqPage={setReqPage} />
+            </div>
         </div>
     )
 }
@@ -46,7 +54,7 @@ function MarketItem(props){
 
     return (
         <li onClick={function(){
-            navigate("/market/view/" + market.market.No);
+            navigate("/market/view/" + market.marketNo);
         }}>
             <div>
                 <div>{market.marketTitle}</div>
