@@ -26,8 +26,8 @@ public class CommercialService {
     }
 
     // 대분류 목록
-    public ArrayList<Map<String, String>> getLargeCategories() {
-        return dao.selectLargeCategories();
+    public ArrayList<Map<String, String>> getLargeCategories(String largeCode) {
+        return dao.selectLargeCategories(largeCode);
     }
 
     // 중분류 목록

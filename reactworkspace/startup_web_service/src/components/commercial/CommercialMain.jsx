@@ -11,17 +11,29 @@ import {
   Button,
 } from '@mui/material';
 
-export default function CommercialMapFilter() {
-  const [largeList, setLargeList] = useState([]);
-  const [middleList, setMiddleList] = useState([]);
-  const [smallList, setSmallList] = useState([]);
+import useCommercialStore from '../../store/useCommercialStore';
 
-  const [selectedLarge, setSelectedLarge] = useState('');
-  const [selectedMiddle, setSelectedMiddle] = useState('');
-  const [selectedSmall, setSelectedSmall] = useState('');
-  const [keyword, setKeyword] = useState('');
+export default function CommercialMain() {
+  // Zustand 상태 가져오기
+  const {
+    largeList,
+    setLargeList,
+    middleList,
+    setMiddleList,
+    smallList,
+    setSmallList,
+    selectedLargeCode,
+    setSelectedLargeCode,
+    selectedMediumCode,
+    setSelectedMediumCode,
+    selectedSmallCode,
+    setSelectedSmallCode,
+    keyword,
+    setKeyword,
+    storeList,
+    setStoreList,
+  } = useCommercialStore();
 
-  const [storeList, setStoreList] = useState([]);
   const [map, setMap] = useState(null);
   const [markers, setMarkers] = useState([]);
 
@@ -29,45 +41,47 @@ export default function CommercialMapFilter() {
   const kakaoKey = import.meta.env.VITE_KAKAO_MAP_KEY;
 
   // 카카오 지도 초기화
-  useEffect(() => {
+  useEffect(function() {
     if (window.kakao && window.kakao.maps) {
       initMap();
     } else {
-      const script = document.createElement('script');
+      var script = document.createElement('script');
       script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoKey}&autoload=false`;
       script.async = true;
-      script.onload = () => window.kakao.maps.load(() => initMap());
+      script.onload = function() {
+        window.kakao.maps.load(initMap);
+      };
       document.head.appendChild(script);
     }
   }, [kakaoKey]);
 
-  const initMap = () => {
-    const container = document.getElementById('kakao-map');
+  function initMap() {
+    var container = document.getElementById('kakao-map');
     if (!container) return;
 
-    const options = {
+    var options = {
       center: new window.kakao.maps.LatLng(37.5665, 126.9780),
       level: 5,
     };
-    const mapInstance = new window.kakao.maps.Map(container, options);
+    var mapInstance = new window.kakao.maps.Map(container, options);
     setMap(mapInstance);
-  };
+  }
 
   // 마커 출력
-  const displayMarkers = (stores) => {
-    markers.forEach((m) => m.setMap(null));
-    const newMarkers = [];
+  function displayMarkers(stores) {
+    markers.forEach(function(m) { m.setMap(null); });
+    var newMarkers = [];
 
     if (!map) return;
-    const bounds = new window.kakao.maps.LatLngBounds();
+    var bounds = new window.kakao.maps.LatLngBounds();
 
-    stores.forEach((store) => {
-      const lat = parseFloat(store.latitude);
-      const lng = parseFloat(store.longitude);
+    stores.forEach(function(store) {
+      var lat = parseFloat(store.latitude);
+      var lng = parseFloat(store.longitude);
 
       if (!isNaN(lat) && !isNaN(lng)) {
-        const position = new window.kakao.maps.LatLng(lat, lng);
-        const marker = new window.kakao.maps.Marker({ position });
+        var position = new window.kakao.maps.LatLng(lat, lng);
+        var marker = new window.kakao.maps.Marker({ position: position });
         marker.setMap(map);
         newMarkers.push(marker);
         bounds.extend(position);
@@ -79,87 +93,89 @@ export default function CommercialMapFilter() {
     }
 
     setMarkers(newMarkers);
-  };
+  }
 
   // 마커 클릭 시 이동
-  const moveToMarker = (store) => {
-    const lat = parseFloat(store.latitude);
-    const lng = parseFloat(store.longitude);
+  function moveToMarker(store) {
+    var lat = parseFloat(store.latitude);
+    var lng = parseFloat(store.longitude);
     if (!isNaN(lat) && !isNaN(lng)) {
-      const moveLatLng = new window.kakao.maps.LatLng(lat, lng);
+      var moveLatLng = new window.kakao.maps.LatLng(lat, lng);
       map.panTo(moveLatLng);
     }
-  };
+  }
 
   // 검색 요청
-  const handleSearch = () => {
-    const params = new URLSearchParams();
-    if (selectedLarge) params.append('largeCode', selectedLarge);
-    if (selectedMiddle) params.append('mediumCode', selectedMiddle);
-    if (selectedSmall) params.append('smallCode', selectedSmall);
+  function handleSearch() {
+    var params = new URLSearchParams();
+    if (selectedLargeCode) params.append('largeCode', selectedLargeCode);
+    if (selectedMediumCode) params.append('mediumCode', selectedMediumCode);
+    if (selectedSmallCode) params.append('smallCode', selectedSmallCode);
     if (keyword) params.append('keyword', keyword);
 
-    axios
-      .get(`${serverUrl}commercial/filter?${params.toString()}`)
-      .then((res) => {
-        const list = res.data.list || [];
+    axios.get(serverUrl + 'commercial/filter?' + params.toString())
+      .then(function(res) {
+        var list = res.data.list || [];
         setStoreList(list);
         displayMarkers(list);
       })
-      .catch(() => {
+      .catch(function() {
         setStoreList([]);
         displayMarkers([]);
       });
-  };
+  }
 
   // 대분류 불러오기
-  useEffect(() => {
-    axios
-      .get(`${serverUrl}commercial/large`)
-      .then((res) => setLargeList(Array.isArray(res.data) ? res.data : []))
-      .catch(() => setLargeList([]));
-  }, [serverUrl]);
+  useEffect(function() {
+    axios.get(serverUrl + 'commercial/large')
+      .then(function(res) {
+        setLargeList(Array.isArray(res.data) ? res.data : []);
+      })
+      .catch(function() {
+        setLargeList([]);
+      });
+  }, [serverUrl, setLargeList]);
 
-  // 중분류 불러오기
-  useEffect(() => {
-    if (selectedLarge) {
-      axios
-        .get(`${serverUrl}commercial/middle?largeCode=${selectedLarge}`)
-        .then((res) => {
+  // 중분류 불러오기 및 선택 초기화
+  useEffect(function() {
+    if (selectedLargeCode) {
+      axios.get(serverUrl + 'commercial/middle?largeCode=' + selectedLargeCode)
+        .then(function(res) {
           setMiddleList(Array.isArray(res.data) ? res.data : []);
-          setSelectedMiddle('');
+          setSelectedMediumCode('');
           setSmallList([]);
-          setSelectedSmall('');
+          setSelectedSmallCode('');
         })
-        .catch(() => {
+        .catch(function() {
           setMiddleList([]);
-          setSelectedMiddle('');
+          setSelectedMediumCode('');
           setSmallList([]);
-          setSelectedSmall('');
+          setSelectedSmallCode('');
         });
     } else {
       setMiddleList([]);
-      setSelectedMiddle('');
+      setSelectedMediumCode('');
       setSmallList([]);
-      setSelectedSmall('');
+      setSelectedSmallCode('');
     }
-  }, [selectedLarge, serverUrl]);
+  }, [selectedLargeCode, serverUrl, setMiddleList, setSelectedMediumCode, setSmallList, setSelectedSmallCode]);
 
-  // 소분류 불러오기
-  useEffect(() => {
-    if (selectedLarge && selectedMiddle) {
-      axios
-        .get(`${serverUrl}commercial/small?largeCode=${selectedLarge}&mediumCode=${selectedMiddle}`)
-        .then((res) => setSmallList(Array.isArray(res.data) ? res.data : []))
-        .catch(() => {
+  // 소분류 불러오기 및 선택 초기화
+  useEffect(function() {
+    if (selectedLargeCode && selectedMediumCode) {
+      axios.get(serverUrl + 'commercial/small?largeCode=' + selectedLargeCode + '&mediumCode=' + selectedMediumCode)
+        .then(function(res) {
+          setSmallList(Array.isArray(res.data) ? res.data : []);
+        })
+        .catch(function() {
           setSmallList([]);
-          setSelectedSmall('');
+          setSelectedSmallCode('');
         });
     } else {
       setSmallList([]);
-      setSelectedSmall('');
+      setSelectedSmallCode('');
     }
-  }, [selectedMiddle, selectedLarge, serverUrl]);
+  }, [selectedLargeCode, selectedMediumCode, serverUrl, setSmallList, setSelectedSmallCode]);
 
   return (
     <Box sx={{ width: '100vw', height: '100vh', position: 'relative' }}>
@@ -182,48 +198,60 @@ export default function CommercialMapFilter() {
         <FormControl fullWidth size="small">
           <InputLabel>대분류 선택</InputLabel>
           <Select
-            value={selectedLarge || ''}
+            value={selectedLargeCode || ''}
             label="대분류 선택"
-            onChange={(e) => setSelectedLarge(e.target.value)}
+            onChange={function(e) {
+              setSelectedLargeCode(e.target.value);
+            }}
           >
             <MenuItem value="">전체</MenuItem>
-            {largeList.map((item) => (
-              <MenuItem key={item.code} value={item.code}>
-                {item.name}
-              </MenuItem>
-            ))}
+            {largeList.map(function(item) {
+              return (
+                <MenuItem key={item.code} value={item.code}>
+                  {item.name}
+                </MenuItem>
+              );
+            })}
           </Select>
         </FormControl>
 
-        <FormControl fullWidth size="small" disabled={!selectedLarge}>
+        <FormControl fullWidth size="small" disabled={!selectedLargeCode}>
           <InputLabel>중분류 선택</InputLabel>
           <Select
-            value={selectedMiddle || ''}
+            value={selectedMediumCode || ''}
             label="중분류 선택"
-            onChange={(e) => setSelectedMiddle(e.target.value)}
+            onChange={function(e) {
+              setSelectedMediumCode(e.target.value);
+            }}
           >
             <MenuItem value="">전체</MenuItem>
-            {middleList.map((item) => (
-              <MenuItem key={item.code} value={item.code}>
-                {item.name}
-              </MenuItem>
-            ))}
+            {middleList.map(function(item) {
+              return (
+                <MenuItem key={item.code} value={item.code}>
+                  {item.name}
+                </MenuItem>
+              );
+            })}
           </Select>
         </FormControl>
 
-        <FormControl fullWidth size="small" disabled={!selectedMiddle}>
+        <FormControl fullWidth size="small" disabled={!selectedMediumCode}>
           <InputLabel>소분류 선택</InputLabel>
           <Select
-            value={selectedSmall || ''}
+            value={selectedSmallCode || ''}
             label="소분류 선택"
-            onChange={(e) => setSelectedSmall(e.target.value)}
+            onChange={function(e) {
+              setSelectedSmallCode(e.target.value);
+            }}
           >
             <MenuItem value="">전체</MenuItem>
-            {smallList.map((item) => (
-              <MenuItem key={item.code} value={item.code}>
-                {item.name}
-              </MenuItem>
-            ))}
+            {smallList.map(function(item) {
+              return (
+                <MenuItem key={item.code} value={item.code}>
+                  {item.name}
+                </MenuItem>
+              );
+            })}
           </Select>
         </FormControl>
 
@@ -232,7 +260,9 @@ export default function CommercialMapFilter() {
           label="상호명을 입력하세요"
           variant="outlined"
           value={keyword || ''}
-          onChange={(e) => setKeyword(e.target.value)}
+          onChange={function(e) {
+            setKeyword(e.target.value);
+          }}
           fullWidth
         />
 
@@ -261,29 +291,31 @@ export default function CommercialMapFilter() {
             zIndex: 10,
           }}
         >
-          {storeList.map((store, index) => (
-            <Box
-              key={index}
-              sx={{
-                padding: 1,
-                borderBottom: '1px solid #ddd',
-                cursor: 'pointer',
-              }}
-              onClick={() => moveToMarker(store)}
-            >
-              <strong>{store.storeName}</strong>
-              <div style={{ fontSize: '0.9rem', color: '#555' }}>
-                {store.roadAddr || store.landAddr}
-              </div>
-              <div style={{ fontSize: '0.85rem', color: '#888' }}>
-                {store.categoryLarge} &gt; {store.categoryMedium} &gt; {store.categorySmall}
-              </div>
-            </Box>
-          ))}
+          {storeList.map(function(store, index) {
+            return (
+              <Box
+                key={index}
+                sx={{
+                  padding: 1,
+                  borderBottom: '1px solid #ddd',
+                  cursor: 'pointer',
+                }}
+                onClick={function() {
+                  moveToMarker(store);
+                }}
+              >
+                <strong>{store.storeName}</strong>
+                <div style={{ fontSize: '0.9rem', color: '#555' }}>
+                  {store.roadAddr || store.landAddr}
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#888' }}>
+                  {store.categoryLarge} &gt; {store.categoryMedium} &gt; {store.categorySmall}
+                </div>
+              </Box>
+            );
+          })}
         </Box>
       )}
     </Box>
   );
 }
-
-

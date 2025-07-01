@@ -19,11 +19,10 @@ public class CommercialController {
     @Autowired
     private CommercialService service;
 
-    /**
+    /*
      * 조건 검색 API
      * - 대/중/소 분류 + 키워드 + 페이징
      */
-    @NoTokenCheck
     @GetMapping("/filter")
     public Map<String, Object> getFilteredCommercial(
         @RequestParam(required = false) String largeCode,
@@ -33,7 +32,7 @@ public class CommercialController {
         @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int numOfRows
     ) {
-        int startRow = (page - 1) * numOfRows + 1;
+        int startRow = (page - 1) * numOfRows;
         int endRow = page * numOfRows;
 
         Map<String, Object> param = new HashMap<>();
@@ -55,11 +54,12 @@ public class CommercialController {
         return result;
     }
 
+
     // 대분류 목록 조회
     @NoTokenCheck
     @GetMapping("/large")
-    public ArrayList<Map<String, String>> getLargeCategories() {
-        return service.getLargeCategories();
+    public ArrayList<Map<String, String>> getLargeCategories(@RequestParam(required = false) String largeCode) {
+        return service.getLargeCategories(largeCode);
     }
 
     // 중분류 목록 조회
@@ -72,10 +72,7 @@ public class CommercialController {
     // 소분류 목록 조회
     @NoTokenCheck
     @GetMapping("/small")
-    public ArrayList<Map<String, String>> getSmallCategories(
-        @RequestParam String largeCode,
-        @RequestParam String mediumCode
-    ) {
+    public ArrayList<Map<String, String>> getSmallCategories(@RequestParam String largeCode, @RequestParam String mediumCode) {
         Map<String, String> param = new HashMap<>();
         param.put("largeCode", largeCode);
         param.put("mediumCode", mediumCode);
