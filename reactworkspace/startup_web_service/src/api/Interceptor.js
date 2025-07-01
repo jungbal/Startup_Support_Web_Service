@@ -53,7 +53,7 @@ function setInterceptors(instance) {
 
             const originalRequest = error.config; // 기존 요청 정보를 담고 있는 객체
             
-            if(error.status == 403){ //토큰 유효시간 만료
+            if(error.response && error.response.status == 403){ //토큰 유효시간 만료
                 //status가 403인 경우는 accessToken이 만료되었을 때에도 응답되고, refreshToken이 만료되었을 때에도 응답됨.
 
                 if(error.config.headers.refreshToken === undefined
@@ -113,10 +113,16 @@ function setInterceptors(instance) {
                     })
                 }
 
-            }else if(error.status == 401){ //발급 토큰과, 헤더에 포함된 토큰이 다른 경우 (비인가 접근)
+            }else if(error.response && error.response.status == 401){ //발급 토큰과, 헤더에 포함된 토큰이 다른 경우 (비인가 접근)
+                // 로그인 정보 초기화
+                useAuthStore.getState().setIsLogined(false);
+                useAuthStore.getState().setLoginMember(null);
+                useAuthStore.getState().setAccessToken(null);
+                useAuthStore.getState().setRefreshToken(null);
+                
                 Swal.fire({
                     title : '알림',
-                    text : '로그인이 필요한 서비스입니다.',
+                    text : error.response.data.clientMsg || '로그인이 필요한 서비스입니다.',
                     icon : 'warning',
                     confirmButtonText : '확인'
                 }).then(function(result){
@@ -125,7 +131,7 @@ function setInterceptors(instance) {
                     }
                 });
 
-            }else { // HttpStatus.INTERNAL_SERVER_ERROR == 500 (서버 오류)
+            }else if(error.response) { // 기타 서버 오류
                 const res = error.response.data; //백엔드에서 응답해준 ResponseDTO 객체
                 Swal.fire({
                     title : "알림",

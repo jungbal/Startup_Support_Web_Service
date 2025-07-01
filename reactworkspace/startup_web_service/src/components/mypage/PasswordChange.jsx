@@ -20,6 +20,8 @@ import * as yup from 'yup';
 import toast from 'react-hot-toast';
 import useAuthStore from '../../store/authStore';
 import { checkPassword, updatePassword } from '../../api/memberApi';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 // 유효성 검증 스키마
 const schema = yup.object({
@@ -42,7 +44,8 @@ const schema = yup.object({
 });
 
 const PasswordChange = () => {
-  const { loginMember } = useAuthStore();
+  const { loginMember, setIsLogined, setLoginMember, setAccessToken, setRefreshToken } = useAuthStore();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showPasswords, setShowPasswords] = useState({
     current: false,
@@ -129,7 +132,22 @@ const PasswordChange = () => {
       if (updateResponse) {
         // 팀원들이 배운 방식: response.data에서 확인
         if (updateResponse.data && updateResponse.data.alertIcon === 'success') {
-          toast.success('비밀번호가 변경되었습니다.');
+          // 비밀번호 변경 성공 시 알림 후 로그인 정보 초기화
+          Swal.fire({
+            title: '비밀번호 변경 완료',
+            text: '비밀번호가 성공적으로 변경되었습니다. 변경된 비밀번호로 다시 로그인해주세요.',
+            icon: 'success',
+            confirmButtonText: '확인',
+          }).then(() => {
+            // 로그인 정보를 초기화
+            setIsLogined(false);
+            setLoginMember(null);
+            setAccessToken(null);
+            setRefreshToken(null);
+            
+            // 로그인 페이지로 이동
+            navigate('/login');
+          });
           reset();
         } else {
           toast.error(updateResponse.data?.clientMsg || '비밀번호 변경에 실패했습니다.');

@@ -19,50 +19,6 @@ const Home = () => {
   };
   
   return (
-    <div className="home-container">
-      {/* 상단 네비게이션 바 */}
-      <div className="home-navbar">
-        <div className="home-logo">
-          <h1 className="home-title">창업든든</h1>
-        </div>
-        <div className="home-nav-buttons">
-          {isLogined ? (
-            // 로그인한 경우
-            <>
-              <span className="home-username">안녕하세요, {loginMember?.userName}님!</span>
-              <button 
-                className="home-nav-btn" 
-                onClick={handleMyPageClick}
-              >
-                마이페이지
-              </button>
-              <button 
-                className="home-nav-btn home-logout-btn" 
-                onClick={logout}
-              >
-                로그아웃
-              </button>
-            </>
-          ) : (
-            // 로그인하지 않은 경우
-            <>
-              <button 
-                className="home-nav-btn home-login-btn" 
-                onClick={handleLoginClick}
-              >
-                로그인
-              </button>
-              <button 
-                className="home-nav-btn home-signup-btn" 
-                onClick={handleSignUpClick}
-              >
-                회원가입
-              </button>
-            </>
-          )}
-
-        </div>
-      </div>
 
       <div className="home-content">
         <div className="home-header">
@@ -110,7 +66,6 @@ const Home = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
