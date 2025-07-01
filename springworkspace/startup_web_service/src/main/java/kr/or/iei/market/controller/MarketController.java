@@ -25,7 +25,7 @@ public class MarketController {
 	private MarketService service;
 	
 	
-	@GetMapping("/list")
+	@GetMapping("/list/{reqPage}")
 	@NoTokenCheck
 	public ResponseEntity<ResponseDTO> selectMarketList(@PathVariable int reqPage){
 		ResponseDTO res= new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR,"마켓글 조회 중 오류가 발생하였습니다",null,"error");

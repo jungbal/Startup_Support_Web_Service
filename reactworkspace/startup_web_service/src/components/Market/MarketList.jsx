@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import createInstance from "../../api/Interceptor";
 import useAuthStore from "../../store/authStore";
-import PageNavi from "./PageNavi";
+import PageNavi from "../common/PageNavi";
 
 export default function MarketList(){
     const serverUrl = import.meta.env.VITE_BACK_SERVER;
@@ -15,14 +15,14 @@ export default function MarketList(){
 
     useEffect(function(){
         let options={};
-        options.url=serverUrl + "/market/list";
+        options.url=serverUrl + "/market/list/"+reqPage;
         options.method='get';
 
         axiosInstance(options)
         .then(function(res){
             console.log(res.data);
             setMarketList(res.data.resData.marketList);
-            //setPageInfo(res.data.resData.pageInfo);
+            setPageInfo(res.data.resData.pageInfo);
         });
     },[reqPage]);
 
