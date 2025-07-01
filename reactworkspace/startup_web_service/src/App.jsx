@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { Box } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Toaster } from 'react-hot-toast';
 import useAuthStore from './store/authStore';
@@ -8,6 +9,11 @@ import useAuthStore from './store/authStore';
 // CSS 파일 import
 import './styles/common.css';
 import './styles/home.css';
+
+// Components
+import Header from './components/common/Header';
+import Footer from './components/common/Footer';
+import FloatingButtons from './components/common/FloatingButtons';
 
 // Pages
 import Login from './pages/Login';
@@ -106,23 +112,18 @@ const AuthRoute = ({ children }) => {
   return children;
 };
 
-function App() {
-  useEffect(() => {
-    // 앱 시작 시 기존 쿠키 토큰 삭제 (한 번만 실행)
-    clearOldCookies();
-  }, []);
+// Header와 Footer를 조건부로 표시하는 컴포넌트
+function AppWithHeaderFooter() {
+  const location = useLocation();
+  
+  // Header와 Footer를 숨길 페이지들
+  const hideHeaderFooterPaths = ['/login', '/signup', '/find-account'];
+  const shouldHideHeaderFooter = hideHeaderFooterPaths.includes(location.pathname);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Toaster
-        position="top-center"
-        reverseOrder={false}
-        toastOptions={{
-          duration: 4000,
-        }}
-      />
-      <Router>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      {!shouldHideHeaderFooter && <Header />}
+      <Box sx={{ flex: 1 }}>
         <Routes>
           {/* 로그인 관련 라우트 (이미 로그인한 사용자는 접근 불가) */}
           <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
@@ -148,6 +149,31 @@ function App() {
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
+      </Box>
+      {!shouldHideHeaderFooter && <Footer />}
+      {!shouldHideHeaderFooter && <FloatingButtons />}
+    </Box>
+  );
+}
+
+function App() {
+  useEffect(() => {
+    // 앱 시작 시 기존 쿠키 토큰 삭제 (한 번만 실행)
+    clearOldCookies();
+  }, []);
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 4000,
+        }}
+      />
+      <Router>
+        <AppWithHeaderFooter />
       </Router>
     </ThemeProvider>
   );
