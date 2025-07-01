@@ -18,10 +18,10 @@ public interface CommercialDao {
     int selectTotalCount(Map<String, Object> param);
 
     // 대분류 목록
-    ArrayList<Map<String, String>> selectLargeCategories();
+    ArrayList<Map<String, String>> selectLargeCategories(@Param("largeCode") String largeCode);
 
     // 중분류 목록
-    ArrayList<Map<String, String>> selectMiddleCategories(@Param("largeCode") String largeCode);
+    ArrayList<Map<String, String>> selectMiddleCategories(@Param("mediumCode") String mediumCode);
 
     // 소분류 목록
     ArrayList<Map<String, String>> selectSmallCategories(Map<String, String> param);

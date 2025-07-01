@@ -55,24 +55,31 @@
         </if>
     </select>
 
-    <select id="selectLargeCategories" resultType="map">
-        SELECT DISTINCT G_GB_CD AS code, G_GB_NM AS name
-        FROM M_COMMERCIAL_INFO WHERE G_GB_CD IS NOT NULL
-        ORDER BY G_GB_NM
-    </select>
+    <!-- 대분류 목록 조회 -->
+	<select id="selectLargeCategories" resultType="map">
+	  SELECT DISTINCT G_GB_CD AS code, G_GB_NM AS name
+	  FROM M_COMMERCIAL_INFO
+	  WHERE G_GB_CD IS NOT NULL
+	  ORDER BY G_GB_NM
+	</select>
+	
+	<!-- 중분류 목록 조회 -->
+	<select id="selectMiddleCategories" parameterType="string" resultType="map">
+	  SELECT DISTINCT S_GB_CD AS code, S_GB_NM AS name
+	  FROM M_COMMERCIAL_INFO
+	  WHERE G_GB_CD = #{largeCode}
+	    AND S_GB_CD IS NOT NULL
+	  ORDER BY S_GB_NM
+	</select>
+	
+	<!-- 소분류 목록 조회 -->
+	<select id="selectSmallCategories" parameterType="map" resultType="map">
+	  SELECT DISTINCT T_GB_CD AS code, T_GB_NM AS name
+	  FROM M_COMMERCIAL_INFO
+	  WHERE G_GB_CD = #{largeCode}
+	    AND S_GB_CD = #{mediumCode}
+	    AND T_GB_CD IS NOT NULL
+	  ORDER BY T_GB_NM
+	</select>
 
-    <select id="selectMiddleCategories" parameterType="string" resultType="map">
-        SELECT DISTINCT S_GB_CD AS code, S_GB_NM AS name
-        FROM M_COMMERCIAL_INFO WHERE G_GB_CD = #{largeCode}
-          AND S_GB_CD IS NOT NULL
-        ORDER BY S_GB_NM
-    </select>
-
-    <select id="selectSmallCategories" parameterType="map" resultType="map">
-        SELECT DISTINCT T_GB_CD AS code, T_GB_NM AS name
-        FROM M_COMMERCIAL_INFO WHERE G_GB_CD = #{largeCode}
-          AND S_GB_CD = #{mediumCode}
-          AND T_GB_CD IS NOT NULL
-        ORDER BY T_GB_NM
-    </select>
 </mapper>
