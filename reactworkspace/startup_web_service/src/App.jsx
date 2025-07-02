@@ -118,7 +118,7 @@ function AppWithHeaderFooter() {
   const location = useLocation();
   
   // Header와 Footer를 숨길 페이지들
-  const hideHeaderFooterPaths = ['/login', '/signup', '/find-account'];
+  const hideHeaderFooterPaths = ['/login', '/signup', '/find-account', '/commercial'];
   const shouldHideHeaderFooter = hideHeaderFooterPaths.includes(location.pathname);
 
   return (
