@@ -24,4 +24,41 @@
 	select count(*) 
 		from t_market
 	</select>
+	
+	<!-- 마켓글 등록 -->
+	<insert id="insertMarket"
+	parameterType="Market">
+	insert into t_market
+		values(
+			#{marketNo},
+			#{userId},
+			#{marketType},
+			#{marketTitle},
+			#{marketContent},
+			sysdate,
+			default,
+			#{price},
+			default,
+			default
+		)
+	</insert>
+	
+	<!-- 마켓글 번호 조회 -->
+	<select id="selectMarketNo"
+	parameterType="Market"
+	resultType="_int">
+	select seq_market.nextval from dual
+	</select>
+	
+	<!-- 마켓글 첨부파일 정보 등록-->
+	<insert id="insertMarketFile"
+	parameterType="MarketFile">
+	insert into t_market_post_file
+		values(
+				seq_market_post_file.nextval,
+				#{marketNo},
+				#{fileName},
+				#{filePath}
+				)
+	</insert>
 </mapper>

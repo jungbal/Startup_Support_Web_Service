@@ -7,6 +7,9 @@
 }
 
 .page-item {
+  display: flex; 
+  align-items: center;
+  justify-content: center;
   padding: 8px 12px;
   margin: 0 4px;
   border: 1px solid #ccc;
@@ -17,12 +20,12 @@
 }
 
 .page-item:hover {
-  background-color: #f0f0f0;
+  background-color: #b3aaa0c4;
 }
 
 .active-page {
-  background-color: #007bff;
+  background-color: #ff8c00;
   color: white;
   font-weight: bold;
-  border: 1px solid #007bff;
+  border: 1px solid #b3aaa0c4;
 }

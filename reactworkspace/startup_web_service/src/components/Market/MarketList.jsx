@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import createInstance from "../../api/Interceptor";
 import useAuthStore from "../../store/authStore";
 import PageNavi from "../common/PageNavi";
+import "./MarketList.css"; 
 
 export default function MarketList(){
     const serverUrl = import.meta.env.VITE_BACK_SERVER;
@@ -13,6 +14,7 @@ export default function MarketList(){
     const [pageInfo, setPageInfo] = useState({});           
     const {isLogined} = useAuthStore();
 
+    //마켓글 불러오기
     useEffect(function(){
         let options={};
         options.url=serverUrl + "/market/list/"+reqPage;
@@ -20,7 +22,6 @@ export default function MarketList(){
 
         axiosInstance(options)
         .then(function(res){
-            console.log(res.data);
             setMarketList(res.data.resData.marketList);
             setPageInfo(res.data.resData.pageInfo);
         });
@@ -28,14 +29,14 @@ export default function MarketList(){
 
 
     return(
-        <div>
-            <div>Market</div>
+        <div className="market-list-container">
+            <h1>Market</h1>
             {isLogined
             ?
             <Link to="/market/write" className="btn-primary">판매글 쓰기</Link>
             :''}
             <div>
-                <ul>
+                <ul className="market-list">
                     {marketList.map(function(market, index){
                         return <MarketItem key={"market"+index} market={market} />
                     })}
@@ -53,10 +54,14 @@ function MarketItem(props){
     const navigate = useNavigate();
 
     return (
-        <li onClick={function(){
+        <li className="market-item" onClick={function(){
             navigate("/market/view/" + market.marketNo);
         }}>
-            <div>
+            <div className="market-thumb-wrapper">
+                <img src={market.boardThumbPath ? serverUrl + "/postFile/" + market.boardThumbPath.substring(0,8) + "/" + market.boardThumbPath
+                                               : "/image/default_img.png"}/>
+            </div>
+            <div className="market-info">
                 <div>{market.marketTitle}</div>
                 <div>{market.userId}</div>
                 <div>{market.marketDate}</div>

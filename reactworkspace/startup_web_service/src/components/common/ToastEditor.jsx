@@ -6,18 +6,15 @@ import createInstance from '../../api/Interceptor';
 
 //게시글 본문 작성을 위한 에디터 
 export default function ToastEditor(props){
-    const MarketContent=props.MarketContent;
+    const marketContent=props.marketContent;
     const setMarketContent=props.setMarketContent;
     const type= props.type; //등록 : 0, 수정 : 1
-
-
+    
     const editorRef=useRef(null); //에디터와 연결할 ref 변수
 
-    function changeContent(){
+    function changeContent(e){
         //에디터 본문에 작성한 내용 state변수에 세팅
         const editorText=editorRef.current.getInstance().getHTML(); 
-        
-        console.log(editorText);
         setMarketContent(editorText);
     }
     
@@ -47,10 +44,10 @@ export default function ToastEditor(props){
                 (2) MarketUpdate의 useEffect에 전달한 함수가 실행되고 MarketContent 변수를 변경함 
                     이 때 MarketContent는 빈 문자열이 아니므로 아래 조건식에 만족하여 에디터가 랜더링 된다
             */}
-            {type == 0 || (type == 1 && MarketContent != '')
+            {type == 0 || (type == 1 && marketContent != '')
             ?
             <Editor ref={editorRef}
-                    initialValue={MarketContent}
+                    initialValue={marketContent ? marketContent : ' '}
                     initialEditType="wysiwyg"
                     language="ko-KR"
                     height="600px"
