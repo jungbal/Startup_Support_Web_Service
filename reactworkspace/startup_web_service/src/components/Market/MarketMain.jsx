@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import MarketList from "./MarketList"
-
+import MarketWrite from "./MarketWrite"
 
 export default function MarketMain(){
 
@@ -8,6 +8,7 @@ export default function MarketMain(){
 
         <Routes>
             <Route path="list" element={<MarketList />} />
+            <Route path="write" element={<MarketWrite />} />
         </Routes>
     );
 }

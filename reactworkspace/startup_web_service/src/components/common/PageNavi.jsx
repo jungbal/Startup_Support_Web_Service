@@ -1,3 +1,5 @@
+import "../../styles/pageNavi.css";
+
 //목록 하단 페이지 네비게이션 제작 컴포넌트
 export default function PageNavi(props){
     
