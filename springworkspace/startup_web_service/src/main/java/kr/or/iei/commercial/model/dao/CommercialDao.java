@@ -21,7 +21,7 @@ public interface CommercialDao {
     ArrayList<Map<String, String>> selectLargeCategories(@Param("largeCode") String largeCode);
 
     // 중분류 목록
-    ArrayList<Map<String, String>> selectMiddleCategories(@Param("mediumCode") String mediumCode);
+    ArrayList<Map<String, String>> selectMiddleCategories(@Param("largeCode") String largeCode);
 
     // 소분류 목록
     ArrayList<Map<String, String>> selectSmallCategories(Map<String, String> param);

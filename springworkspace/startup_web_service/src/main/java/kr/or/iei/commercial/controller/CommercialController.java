@@ -23,6 +23,7 @@ public class CommercialController {
      * 조건 검색 API
      * - 대/중/소 분류 + 키워드 + 페이징
      */
+    @NoTokenCheck
     @GetMapping("/filter")
     public Map<String, Object> getFilteredCommercial(
         @RequestParam(required = false) String largeCode,
