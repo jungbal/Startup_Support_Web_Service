@@ -13,6 +13,17 @@ import {
   Divider
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
+import { Bar, Doughnut } from 'react-chartjs-2';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-material.css';
 
@@ -23,6 +34,9 @@ import 'ag-grid-community/styles/ag-theme-material.css';
 */}
 // ag-Grid 모듈 등록
 ModuleRegistry.registerModules([AllCommunityModule]);
+
+// Chart.js 모듈 등록
+ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Title, Tooltip, Legend);
 
 export default function CommercialDetail() {
   const { storeId } = useParams();
@@ -181,6 +195,78 @@ export default function CommercialDetail() {
     );
   }
 
+  // 1. 중복 없는 중분류 목록 만들기 (Set, map 금지)
+function getUniqueCategorySmalls(relatedStores) {
+  var smalls = [];
+  for (var i = 0; i < relatedStores.length; i++) {
+    var small = relatedStores[i].categorySmall || '기타';
+    var exists = false;
+
+    for (var j = 0; j < smalls.length; j++) {
+      if (smalls[j] === small) {
+        exists = true;
+        break;
+      }
+    }
+
+    if (!exists) {
+      smalls.push(small);
+    }
+  }
+  return smalls;
+}
+
+// 2. 각 중분류별 상가 수 계산
+function countStoresBySmall(relatedStores, smalls) {
+  var counts = [];
+  for (var i = 0; i < smalls.length; i++) {
+    var label = smalls[i];
+    var count = 0;
+
+    for (var j = 0; j < relatedStores.length; j++) {
+      var small = relatedStores[j].categorySmall || '기타';
+      if (small === label) {
+        count++;
+      }
+    }
+
+    counts.push(count);
+  }
+  return counts;
+}
+
+// 3. chart.js용 데이터 구성
+function createChartData(relatedStores) {
+  var smalls = getUniqueCategorySmalls(relatedStores);
+  var counts = countStoresBySmall(relatedStores, smalls);
+
+  return {
+    labels: smalls,
+    datasets: [{
+      label: '중분류별 상가 수',
+      data: counts,
+      backgroundColor: '#42a5f5'
+    }]
+  };
+}
+
+// 4. chart.js 옵션 (기본)
+function getChartOptions() {
+  return {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top'
+      },
+      title: {
+        display: true,
+        text: '중분류별 상가 수 비교'
+      }
+    }
+  };
+}
+
   // 상가 정보 표시
   return (
     <Box sx={{ padding: 3, maxWidth: '1200px', margin: '0 auto' }}>
@@ -224,6 +310,12 @@ export default function CommercialDetail() {
           </Typography>
         </CardContent>
       </Card>
+
+      {/* 차트 */} 
+      <Box sx={{ mb: 4 }}>
+        <Bar options={getChartOptions()} data={createChartData(relatedStores)} />
+      </Box>
+
 
       <Divider sx={{ mb: 3 }} />
 
