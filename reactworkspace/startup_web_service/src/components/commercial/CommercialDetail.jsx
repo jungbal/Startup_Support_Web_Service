@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import * as XLSX from 'xlsx';
 import { AgGridReact } from 'ag-grid-react';
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 import {
@@ -13,6 +14,7 @@ import {
   Divider
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-material.css';
 
@@ -20,6 +22,10 @@ import 'ag-grid-community/styles/ag-theme-material.css';
     작성자 : 이정원
     날짜 : 2025-07-03
     내용 : 상가 상세정보 페이지 작성(ag-Grid 적용)
+
+    작성자 :이정원
+    날짜 : 2025-07-03 17:16
+    내용 : 관련 상가 목록 엑셀 저장 기능 추가
 */}
 // ag-Grid 모듈 등록
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -48,6 +54,16 @@ export default function CommercialDetail() {
       filter: 'agTextColumnFilter',
       floatingFilter: true
     },
+    {
+        field: "landAddr",
+        headerName: "지번주소",
+        width: 300,
+        filter: 'agTextColumnFilter',
+        floatingFilter: true,
+        cellRenderer: function(params) {
+            return params.value || params.data.landAddr;
+        }
+    },
     { 
       field: "roadAddr", 
       headerName: "도로명주소", 
@@ -55,28 +71,28 @@ export default function CommercialDetail() {
       filter: 'agTextColumnFilter',
       floatingFilter: true,
       cellRenderer: function(params) {
-        return params.value || params.data.landAddr;
+        return params.value || params.data.roadAddr;
       }
     },
     {
       field: "categoryLarge",
       headerName: "대분류",
       width: 150,
-      filter: 'agSetColumnFilter',
+      filter: 'agTextColumnFilter',
       floatingFilter: true
     },
     { 
       field: "categoryMedium", 
       headerName: "중분류", 
       width: 150,
-      filter: 'agSetColumnFilter',
+      filter: 'agTextColumnFilter',
       floatingFilter: true
     },
     { 
       field: "categorySmall", 
       headerName: "소분류", 
       width: 150,
-      filter: 'agSetColumnFilter',
+      filter: 'agTextColumnFilter',
       floatingFilter: true
     }
   ]);
@@ -163,6 +179,65 @@ export default function CommercialDetail() {
     setGridApi(params.api);
   }
 
+  // ag-Grid 행 클릭 시 해당 상가 상세페이지로 이동
+  function onRowClicked(params) {
+    const clickedStoreId = params.data.storeId;
+    if (clickedStoreId) {
+      navigate(`/commercial/detail/${clickedStoreId}`, {
+        state: {
+          searchConditions: previousSearchConditions
+        }
+      });
+    }
+  }
+
+  // 엑셀 내보내기 (XLSX 형식)
+  function handleExportToExcel() {
+    if (!relatedStores.length) {
+      alert('내보낼 데이터가 없습니다.');
+      return;
+    }
+
+    // 엑셀용 데이터 변환 - json 형식의 데이터를 엑셀 형식으로 변환
+    const excelData = relatedStores.map(function(store) {
+      return {
+        '상호명': store.storeName || '',
+        '지번주소': store.zibunAddr || store.landAddr || '',
+        '도로명주소': store.roadAddr || '',
+        '대분류': store.categoryLarge || '',
+        '중분류': store.categoryMedium || '',
+        '소분류': store.categorySmall || ''
+      };
+    });
+
+    // 워크시트 생성 - json 형식의 데이터를 엑셀 형식으로 변환
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    
+    // 컬럼 너비 설정
+    const columnWidths = [
+      { wch: 25 }, // 상호명
+      { wch: 35 }, // 지번주소
+      { wch: 35 }, // 도로명주소
+      { wch: 15 }, // 대분류
+      { wch: 15 }, // 중분류
+      { wch: 15 }, // 소분류
+      { wch: 15 }  // 상가ID
+    ];
+    worksheet['!cols'] = columnWidths;
+
+    // 워크북 생성 - 워크시트를 워크북에 추가하기 위해 생성
+    const workbook = XLSX.utils.book_new();
+    
+    // 워크시트를 워크북에 추가 - 워크시트를 워크북에 추가하기 위해 생성
+    XLSX.utils.book_append_sheet(workbook, worksheet, '관련상가목록');
+
+    // 파일명 생성
+    const fileName = `관련상가목록_${storeDetail?.categoryMedium || '상가정보'}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+
+    // 파일 다운로드
+    XLSX.writeFile(workbook, fileName);
+  }
+
   // 로딩 중일 때
   if (loading) {
     return (
@@ -218,10 +293,6 @@ export default function CommercialDetail() {
           <Typography variant="body1" sx={{ mb: 1 }}>
             <strong>🏢 지역:</strong> {storeDetail.provinceName} {storeDetail.districtName} {storeDetail.townName}
           </Typography>
-          
-          <Typography variant="body2" color="text.secondary">
-            <strong>ID:</strong> {storeDetail.storeId}
-          </Typography>
         </CardContent>
       </Card>
 
@@ -238,14 +309,23 @@ export default function CommercialDetail() {
           </Typography>
         </Box>
         
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={handleClearFilters}
-          sx={{ ml: 2 }}
-        >
-          필터 초기화
-        </Button>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleClearFilters}
+          >
+            필터 초기화
+          </Button>
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<FileDownloadIcon />}
+            onClick={handleExportToExcel}
+          >
+            엑셀 저장
+          </Button>
+        </Box>
       </Box>
 
       {/* ag-Grid */}
@@ -255,15 +335,22 @@ export default function CommercialDetail() {
             rowData={relatedStores}
             columnDefs={colDefs}
             pagination={true}
-            paginationPageSize={20}
+            paginationPageSize={100}
             domLayout="normal"
-            rowSelection="single"
+            rowSelection={{ mode: 'multiRow' }}
             animateRows={true}
             onGridReady={onGridReady}
+            onRowClicked={onRowClicked}
+            theme="legacy"
             defaultColDef={{
               sortable: true,
               resizable: true,
               filter: true
+            }}
+            getRowStyle={function(params) {
+              return {
+                cursor: 'pointer'
+              };
             }}
           />
         </div>
