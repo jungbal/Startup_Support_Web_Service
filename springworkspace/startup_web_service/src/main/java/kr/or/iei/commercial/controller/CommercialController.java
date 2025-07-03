@@ -79,4 +79,11 @@ public class CommercialController {
         param.put("mediumCode", mediumCode);
         return service.getSmallCategories(param);
     }
+
+    // 상가 상세정보 조회
+    @NoTokenCheck
+    @GetMapping("/detail/{storeId}")
+    public Commercial getCommercialDetail(@PathVariable String storeId) {
+        return service.getCommercialDetail(storeId);
+    }
 }

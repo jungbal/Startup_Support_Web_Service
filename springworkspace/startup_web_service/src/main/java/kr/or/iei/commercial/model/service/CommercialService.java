@@ -39,4 +39,9 @@ public class CommercialService {
     public ArrayList<Map<String, String>> getSmallCategories(Map<String, String> param) {
         return dao.selectSmallCategories(param);
     }
+
+    // 상가 상세정보 조회
+    public Commercial getCommercialDetail(String storeId) {
+        return dao.selectCommercialDetail(storeId);
+    }
 }

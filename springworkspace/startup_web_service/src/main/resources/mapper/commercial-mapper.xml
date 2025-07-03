@@ -92,4 +92,11 @@
         ORDER BY T_GB_NM
     </select>
 
+    <!-- 상가 상세정보 조회 -->
+    <select id="selectCommercialDetail" parameterType="string" resultMap="commercialResultMap">
+        SELECT *
+        FROM M_COMMERCIAL_INFO
+        WHERE M_NO = #{storeId}
+    </select>
+
 </mapper>
