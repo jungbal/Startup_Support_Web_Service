@@ -43,7 +43,7 @@ const schema = yup.object({
     .oneOf([yup.ref('newPassword')], '비밀번호가 일치하지 않습니다'),
 });
 
-const PasswordChange = () => {
+function PasswordChange() {
   const { loginMember, setIsLogined, setLoginMember, setAccessToken, setRefreshToken } = useAuthStore();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -99,14 +99,16 @@ const PasswordChange = () => {
 
   const passwordsMatch = watchNewPassword && watchConfirmPassword && watchNewPassword === watchConfirmPassword;
 
-  const togglePasswordVisibility = (field) => {
-    setShowPasswords((prev) => ({
-      ...prev,
-      [field]: !prev[field],
-    }));
-  };
+  function togglePasswordVisibility(field) {
+    setShowPasswords(function(prev) {
+      return {
+        ...prev,
+        [field]: !prev[field]
+      };
+    });
+  }
 
-  const onSubmit = (data) => {
+  function onSubmit(data) {
     setLoading(true);
     
     // 1. 현재 비밀번호 확인
@@ -161,7 +163,7 @@ const PasswordChange = () => {
     .finally(function() {
       setLoading(false);
     });
-  };
+  }
 
   return (
     <Box>
@@ -182,7 +184,7 @@ const PasswordChange = () => {
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
-                  onClick={() => togglePasswordVisibility('current')}
+                  onClick={function() { togglePasswordVisibility('current'); }}
                   edge="end"
                 >
                   {showPasswords.current ? <VisibilityOff /> : <Visibility />}
@@ -205,7 +207,7 @@ const PasswordChange = () => {
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
-                    onClick={() => togglePasswordVisibility('new')}
+                    onClick={function() { togglePasswordVisibility('new'); }}
                     edge="end"
                   >
                     {showPasswords.new ? <VisibilityOff /> : <Visibility />}
@@ -274,7 +276,7 @@ const PasswordChange = () => {
                         <Cancel color="error" fontSize="small" />
                     )}
                     <IconButton
-                      onClick={() => togglePasswordVisibility('confirm')}
+                      onClick={function() { togglePasswordVisibility('confirm'); }}
                       edge="end"
                     >
                       {showPasswords.confirm ? <VisibilityOff /> : <Visibility />}
@@ -290,7 +292,7 @@ const PasswordChange = () => {
           <Button
             type="button"
             variant="outlined"
-            onClick={() => reset()}
+            onClick={function() { reset(); }}
             disabled={loading}
           >
             초기화

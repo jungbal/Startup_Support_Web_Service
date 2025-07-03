@@ -30,7 +30,7 @@ const schema = yup.object({
   userAddr: yup.string().required('주소를 입력하세요'),
 });
 
-const ProfileEdit = () => {
+function ProfileEdit() {
   const { loginMember, setLoginMember } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const [initialData, setInitialData] = useState(null);
@@ -68,7 +68,7 @@ const ProfileEdit = () => {
   }, [watchEmail, checkedEmail, loginMember?.userEmail, errors.userEmail, clearErrors]);
 
   // 이메일 중복 체크
-  const handleCheckUserEmail = async () => {
+  function handleCheckUserEmail() {
     if (!watchEmail) {
       toast.error('이메일을 입력해주세요');
       return;
@@ -83,25 +83,25 @@ const ProfileEdit = () => {
     clearErrors('userEmail');
     setEmailCheckStatus('checking');
     
-    try {
-      const response = await checkUserEmail(watchEmail);
-      
-      // 팀원들이 배운 방식: response.data.resData로 접근
-      if (response.data && response.data.resData === 0) {
-        setEmailCheckStatus('available');
-        setCheckedEmail(watchEmail);
-        toast.success('사용 가능한 이메일입니다');
-      } else {
-        setEmailCheckStatus('unavailable');
-        setError('userEmail', { message: '이미 사용중인 이메일입니다' });
-        toast.error('이미 사용중인 이메일입니다');
-      }
-    } catch (error) {
-      console.error('이메일 중복 체크 오류:', error);
-      setEmailCheckStatus(null);
-      toast.error('이메일 중복 체크 중 오류가 발생했습니다');
-    }
-  };
+    checkUserEmail(watchEmail)
+      .then(function(response) {
+        // response.data.resData로 접근
+        if (response.data && response.data.resData === 0) {
+          setEmailCheckStatus('available');
+          setCheckedEmail(watchEmail);
+          toast.success('사용 가능한 이메일입니다');
+        } else {
+          setEmailCheckStatus('unavailable');
+          setError('userEmail', { message: '이미 사용중인 이메일입니다' });
+          toast.error('이미 사용중인 이메일입니다');
+        }
+      })
+      .catch(function(error) {
+        console.error('이메일 중복 체크 오류:', error);
+        setEmailCheckStatus(null);
+        toast.error('이메일 중복 체크 중 오류가 발생했습니다');
+      });
+  }
 
   // 사용자 정보 초기화 (authStore loginMember 데이터 사용)
   useEffect(() => {
@@ -155,7 +155,7 @@ const ProfileEdit = () => {
       });
   }
 
-  const onSubmit = (data) => {
+  function onSubmit(data) {
     // 이메일이 변경되었고 중복체크를 하지 않은 경우
     if (data.userEmail !== loginMember?.userEmail && 
         (emailCheckStatus !== 'available' || checkedEmail !== data.userEmail)) {
@@ -195,13 +195,13 @@ const ProfileEdit = () => {
       .finally(function() {
         setLoading(false);
       });
-  };
+  }
 
-  const handleReset = () => {
+  function handleReset() {
     if (initialData) {
       reset(initialData);
     }
-  };
+  }
 
   return (
     <Box>

@@ -55,7 +55,7 @@ const schema = yup.object({
   userAddr: yup.string().required('주소를 입력해주세요'),
 });
 
-const SignUp = () => {
+function SignUp() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -141,7 +141,7 @@ const SignUp = () => {
   const emailFormatCorrect = watchEmail && watchEmail.includes('@') && watchEmail.includes('.');
 
   // 아이디 중복 체크 - 팀원들이 배운 방식
-  const handleCheckUserId = () => {
+  function handleCheckUserId() {
     if (!watchUserId) {
       toast.error('아이디를 입력해주세요');
       return;
@@ -167,10 +167,10 @@ const SignUp = () => {
         setIdCheckStatus(null);
         toast.error('아이디 중복 체크 중 오류가 발생했습니다');
       });
-  };
+  }
 
   // 이메일 중복 체크 - 팀원들이 배운 방식
-  const handleCheckUserEmail = () => {
+  function handleCheckUserEmail() {
     if (!watchEmail) {
       toast.error('이메일을 입력해주세요');
       return;
@@ -196,10 +196,10 @@ const SignUp = () => {
         setEmailCheckStatus(null);
         toast.error('이메일 중복 체크 중 오류가 발생했습니다');
       });
-  };
+  }
 
   // 회원가입 처리 - 팀원들이 배운 방식
-  const onSubmit = (data) => {
+  function onSubmit(data) {
     // 아이디 중복 체크 확인
     if (idCheckStatus !== 'available' || checkedId !== data.userId) {
       toast.error('아이디 중복 체크를 해주세요');
@@ -233,7 +233,7 @@ const SignUp = () => {
       .finally(function() {
         setIsLoading(false);
       });
-  };
+  }
 
   return (
     <div className="signup-container">
@@ -295,12 +295,12 @@ const SignUp = () => {
               placeholder="비밀번호"
               {...register('userPw')}
               autoComplete="new-password"
-              onFocus={() => setPasswordFocused(true)}
+              onFocus={function() { setPasswordFocused(true); }}
             />
             <button
               type="button"
               className="signup-password-toggle"
-              onClick={() => setShowPassword(!showPassword)}
+              onClick={function() { setShowPassword(!showPassword); }}
             >
               {showPassword ? <VisibilityOff /> : <Visibility />}
             </button>
@@ -342,7 +342,7 @@ const SignUp = () => {
             <button
               type="button"
               className="signup-password-toggle"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              onClick={function() { setShowConfirmPassword(!showConfirmPassword); }}
             >
               {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
             </button>
@@ -368,8 +368,8 @@ const SignUp = () => {
               placeholder="전화번호 (010-0000-0000)"
               {...register('userPhone')}
               autoComplete="tel"
-              onFocus={() => setPhoneFocused(true)}
-              onBlur={() => setPhoneFocused(false)}
+              onFocus={function() { setPhoneFocused(true); }}
+              onBlur={function() { setPhoneFocused(false); }}
             />
             {errors.userPhone && (
               <div className="form-error">{errors.userPhone.message}</div>
@@ -394,8 +394,8 @@ const SignUp = () => {
               placeholder="이메일"
               {...register('userEmail')}
               autoComplete="email"
-              onFocus={() => setEmailFocused(true)}
-              onBlur={() => setEmailFocused(false)}
+              onFocus={function() { setEmailFocused(true); }}
+              onBlur={function() { setEmailFocused(false); }}
             />
             <button
               type="button"
@@ -446,7 +446,7 @@ const SignUp = () => {
             <button
               type="button"
               className="signup-cancel-button"
-              onClick={() => navigate('/login')}
+              onClick={function() { navigate('/login'); }}
             >
               <ArrowBack />
               취소

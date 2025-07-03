@@ -19,7 +19,7 @@ const schema = yup.object({
   userPw: yup.string().required('비밀번호를 입력해주세요'),
 });
 
-const Login = () => {
+function Login() {
   const navigate = useNavigate();
   
   // 스토리지에 저장한 데이터 추출하기
@@ -120,7 +120,7 @@ const Login = () => {
             <button
               type="button"
               className="login-password-toggle"
-              onClick={() => setShowPassword(!showPassword)}
+              onClick={function() { setShowPassword(!showPassword); }}
             >
               {showPassword ? <VisibilityOff /> : <Visibility />}
             </button>
@@ -150,7 +150,7 @@ const Login = () => {
           <button
             type="button"
             className="signup-button"
-            onClick={() => navigate('/signup')}
+            onClick={function() { navigate('/signup'); }}
           >
             회원가입
           </button>

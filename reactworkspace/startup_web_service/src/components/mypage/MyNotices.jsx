@@ -16,7 +16,7 @@ import {
 import useAuthStore from '../../store/authStore';
 import { getMyNotices } from '../../api/memberApi';
 
-const MyNotices = () => {
+function MyNotices() {
   const { loginMember } = useAuthStore();
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(true);
