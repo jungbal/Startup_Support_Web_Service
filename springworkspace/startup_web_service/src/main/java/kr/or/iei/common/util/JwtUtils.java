@@ -20,11 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtUtils {
 
 	//application.properties에 작성된 값 읽어오기
-	@Value("${jwt.secret-key}")
+	@Value("${jwt.secretKey}")
 	private String jwtSecretKey;
-	@Value("${jwt.expire-minute}")
+	@Value("${jwt.expireMinute}")
 	private int jwtExpireMinute;
-	@Value("${jwt.expire-hour-refresh}")
+	@Value("${jwt.expireHourRefresh}")
 	private int jwtExpireHourRefresh;
 	
 	/**

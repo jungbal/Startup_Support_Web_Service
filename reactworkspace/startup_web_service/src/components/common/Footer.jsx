@@ -20,26 +20,50 @@ export default function Footer() {
           mb: 3,
           flexWrap: 'wrap'
         }}>
-          <img 
-            src="/image/footer1.png" 
-            alt="정부 로고 1" 
-            style={{ height: '40px', width: 'auto' }}
-          />
-          <img 
-            src="/image/footer2.png" 
-            alt="정부 로고 2" 
-            style={{ height: '40px', width: 'auto' }}
-          />
-          <img 
-            src="/image/footer3.png" 
-            alt="정부 로고 3" 
-            style={{ height: '40px', width: 'auto' }}
-          />
-          <img 
-            src="/image/footer4.png" 
-            alt="정부 로고 4" 
-            style={{ height: '40px', width: 'auto' }}
-          />
+          <a 
+            href="https://www.moel.go.kr/index.do" 
+            target="_blank"
+            style={{ display: 'inline-block' }}
+          >
+            <img 
+              src="/image/footer1.png" 
+              alt="고용노동부 로고" 
+              style={{ height: '40px', width: 'auto', cursor: 'pointer' }}
+            />
+          </a>
+          <a 
+            href="https://www.semas.or.kr/web/main/index.kmdc" 
+            target="_blank"
+            style={{ display: 'inline-block' }}
+          >
+            <img 
+              src="/image/footer2.png" 
+              alt="소상공인시장 진흥공단 로고" 
+              style={{ height: '40px', width: 'auto', cursor: 'pointer' }}
+            />
+          </a>
+          <a 
+            href="https://www.mss.go.kr/site/smba/main.do" 
+            target="_blank"
+            style={{ display: 'inline-block' }}
+          >
+            <img 
+              src="/image/footer3.png" 
+              alt="중소벤처기업부 로고" 
+              style={{ height: '40px', width: 'auto', cursor: 'pointer' }}
+            />
+          </a>
+          <a 
+            href="https://www.kised.or.kr/" 
+            target="_blank"
+            style={{ display: 'inline-block' }}
+          >
+            <img 
+              src="/image/footer4.png" 
+              alt="창업진흥원 로고" 
+              style={{ height: '40px', width: 'auto', cursor: 'pointer' }}
+            />
+          </a>
         </Box>
 
         <Divider sx={{ mb: 3 }} />

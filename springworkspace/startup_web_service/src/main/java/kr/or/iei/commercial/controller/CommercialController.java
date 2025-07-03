@@ -31,10 +31,10 @@ public class CommercialController {
         @RequestParam(required = false) String smallCode,
         @RequestParam(required = false) String keyword,
         @RequestParam(defaultValue = "1") int page,
-        @RequestParam(defaultValue = "10") int numOfRows
+        @RequestParam(defaultValue = "8") int size
     ) {
-        int startRow = (page - 1) * numOfRows;
-        int endRow = page * numOfRows;
+        int startRow = (page - 1) * size;
+        int endRow = page * size;
 
         Map<String, Object> param = new HashMap<>();
         param.put("largeCode", largeCode);
@@ -51,7 +51,7 @@ public class CommercialController {
         result.put("list", list);
         result.put("totalCount", totalCount);
         result.put("page", page);
-        result.put("numOfRows", numOfRows);
+        result.put("size", size);
         return result;
     }
 
@@ -78,5 +78,12 @@ public class CommercialController {
         param.put("largeCode", largeCode);
         param.put("mediumCode", mediumCode);
         return service.getSmallCategories(param);
+    }
+
+    // 상가 상세정보 조회
+    @NoTokenCheck
+    @GetMapping("/detail/{storeId}")
+    public Commercial getCommercialDetail(@PathVariable String storeId) {
+        return service.getCommercialDetail(storeId);
     }
 }

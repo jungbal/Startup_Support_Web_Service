@@ -22,7 +22,7 @@ const marketTypeMap = {
   sale: { label: '판매', className: 'sale' },
 };
 
-const MyMarkets = () => {
+function MyMarkets() {
   const { loginMember } = useAuthStore();
   const [markets, setMarkets] = useState([]);
   const [loading, setLoading] = useState(true);

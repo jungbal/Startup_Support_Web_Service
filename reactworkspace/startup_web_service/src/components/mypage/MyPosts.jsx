@@ -22,7 +22,7 @@ const postTypeMap = {
   common: { label: '자유게시판', className: 'common' },
 };
 
-const MyPosts = () => {
+function MyPosts() {
   const { loginMember } = useAuthStore();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);

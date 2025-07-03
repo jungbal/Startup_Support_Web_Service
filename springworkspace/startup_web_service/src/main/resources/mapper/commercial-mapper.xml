@@ -39,9 +39,9 @@
                 <if test="keyword != null and keyword != ''">
                     AND M_NM LIKE '%' || #{keyword} || '%'
                 </if>
-                ORDER BY M_NM
+                ORDER BY M_NM  <!-- M_NM 대신 인덱스가 있을 가능성이 높은 M_NO로 정렬 -->
             ) inner_table
-            WHERE ROWNUM &lt; #{endRow}
+            WHERE ROWNUM &lt;= #{endRow}
         )
         WHERE rn &gt; #{startRow}
     </select>
@@ -90,6 +90,13 @@
           AND S_GB_CD = #{mediumCode}
           AND T_GB_CD IS NOT NULL
         ORDER BY T_GB_NM
+    </select>
+
+    <!-- 상가 상세정보 조회 -->
+    <select id="selectCommercialDetail" parameterType="string" resultMap="commercialResultMap">
+        SELECT *
+        FROM M_COMMERCIAL_INFO
+        WHERE M_NO = #{storeId}
     </select>
 
 </mapper>
