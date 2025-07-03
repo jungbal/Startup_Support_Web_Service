@@ -117,13 +117,20 @@ const AuthRoute = ({ children }) => {
 function AppWithHeaderFooter() {
   const location = useLocation();
   
-  // Header와 Footer를 숨길 페이지들
-  const hideHeaderFooterPaths = ['/login', '/signup', '/find-account', '/commercial'];
-  const shouldHideHeaderFooter = hideHeaderFooterPaths.includes(location.pathname);
+  // Header를 숨길 페이지들
+  const hideHeaderPaths = ['/login', '/signup', '/find-account'];
+  const shouldHideHeader = hideHeaderPaths.includes(location.pathname);
+  
+  // Footer를 숨길 페이지들
+  const hideFooterPaths = ['/login', '/signup', '/find-account', '/commercial'];
+  const shouldHideFooter = hideFooterPaths.includes(location.pathname);
+  
+  // FloatingButtons를 숨길 페이지들 (Footer와 동일하게 처리)
+  const shouldHideFloatingButtons = hideFooterPaths.includes(location.pathname);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      {!shouldHideHeaderFooter && <Header />}
+      {!shouldHideHeader && <Header />}
       <Box sx={{ flex: 1 }}>
         <Routes>
           {/* 로그인 관련 라우트 (이미 로그인한 사용자는 접근 불가) */}
@@ -151,8 +158,8 @@ function AppWithHeaderFooter() {
           <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </Box>
-      {!shouldHideHeaderFooter && <Footer />}
-      {!shouldHideHeaderFooter && <FloatingButtons />}
+      {!shouldHideFooter && <Footer />}
+      {!shouldHideFloatingButtons && <FloatingButtons />}
     </Box>
   );
 }
