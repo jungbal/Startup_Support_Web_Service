@@ -266,7 +266,23 @@ function getChartOptions() {
     }
   };
 }
+// 5. doughnut 차트용 데이터 구성
+function createDoughnutData(relatedStores) {
+  var smalls = getUniqueCategorySmalls(relatedStores);
+  var counts = countStoresBySmall(relatedStores, smalls);
 
+  return {
+    labels: smalls,
+    datasets: [{
+      data: counts,
+      backgroundColor: [
+        '#42a5f5', '#66bb6a', '#ffa726', '#ab47bc', '#26a69a', '#ef5350',
+        '#ec407a', '#7e57c2', '#ffee58', '#8d6e63', '#789262'
+      ],
+      borderWidth: 1
+    }]
+  };
+}
   // 상가 정보 표시
   return (
     <Box sx={{ padding: 3, maxWidth: '1200px', margin: '0 auto' }}>
@@ -311,9 +327,19 @@ function getChartOptions() {
         </CardContent>
       </Card>
 
-      {/* 차트 */} 
-      <Box sx={{ mb: 4 }}>
-        <Bar options={getChartOptions()} data={createChartData(relatedStores)} />
+      {/* 차트 시각화 영역 */}
+      <Box sx={{ mb: 4, display: 'flex', gap: 4, justifyContent: 'space-between' }}>
+        {/* Bar 차트 (왼쪽) */}
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="h6" sx={{ mb: 1 }}>중분류별 상가 수</Typography>
+          <Bar options={getChartOptions()} data={createChartData(relatedStores)} />
+        </Box>
+
+        {/* Doughnut 차트 (오른쪽) */}
+        <Box sx={{ width: 300 }}>
+          <Typography variant="h6" sx={{ mb: 1 }}>중분류 비율</Typography>
+          <Doughnut data={createDoughnutData(relatedStores)} />
+        </Box>
       </Box>
 
 
