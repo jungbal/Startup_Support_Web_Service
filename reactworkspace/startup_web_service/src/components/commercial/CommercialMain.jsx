@@ -203,7 +203,7 @@ export default function CommercialMain() {
         const targetMarker = markers.find(function(marker) {
           const markerPosition = marker.getPosition();
           return Math.abs(markerPosition.getLat() - coords.getLat()) < 0.0001 && 
-                 Math.abs(markerPosition.getLng() - coords.getLng()) < 0.0001;
+                  Math.abs(markerPosition.getLng() - coords.getLng()) < 0.0001;
         });
         
         if (targetMarker) {
@@ -445,7 +445,12 @@ export default function CommercialMain() {
           label="상호명"
           variant="outlined"
           value={keyword || ''}
-          onChange={function(e) { setKeyword(e.target.value); }}
+          onChange={(e) => setKeyword(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSearch();
+            }
+          }}
           fullWidth
           size="small"
         />
