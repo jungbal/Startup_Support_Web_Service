@@ -51,16 +51,16 @@
 	<insert id="insertMarket"
 	parameterType="kr.or.iei.member.model.dto.Market">
 	insert into t_market
-		(market_no as marketNo,
-		 user_id as userId,
-		 market_type as marketType,
-		 market_title as marketTitle,
-		 market_Content as marketContent,
-		 market_date as marketDate,
-		 market_status as marketStatus,
+		(market_no,
+		 user_id,
+		 market_type ,
+		 market_title,
+		 market_Content,
+		 market_date ,
+		 market_status,
 		 price,
-		 report_count as reportCount,
-		 read_count as readCount
+		 report_count,
+		 read_count
 		)
 		values(
 			#{marketNo},
