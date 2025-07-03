@@ -39,9 +39,9 @@
                 <if test="keyword != null and keyword != ''">
                     AND M_NM LIKE '%' || #{keyword} || '%'
                 </if>
-                ORDER BY M_NM
+                ORDER BY M_NM  <!-- M_NM 대신 인덱스가 있을 가능성이 높은 M_NO로 정렬 -->
             ) inner_table
-            WHERE ROWNUM &lt; #{endRow}
+            WHERE ROWNUM &lt;= #{endRow}
         )
         WHERE rn &gt; #{startRow}
     </select>

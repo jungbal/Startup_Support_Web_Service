@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import useCommercialStore from '../../store/useCommercialStore';
 
@@ -40,10 +40,11 @@ export default function CommercialMain() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 120;
+  const itemsPerPage = 8;
 
   const [map, setMap] = useState(null);
   const [markers, setMarkers] = useState([]);
+  const infoWindowRef = useRef(null);
 
   const serverUrl = import.meta.env.VITE_BACK_SERVER;
   const kakaoKey = import.meta.env.VITE_KAKAO_MAP_KEY;
@@ -76,7 +77,13 @@ export default function CommercialMain() {
   function displayMarkers(stores) {
     if (!map || !window.kakao || !window.kakao.maps.services) return;
 
+    // 기존 마커들 제거
     markers.forEach(function(marker) { marker.setMap(null); });
+    
+    // 기존 InfoWindow 닫기
+    if (infoWindowRef.current) {
+      infoWindowRef.current.close();
+    }
 
     const newMarkers = [];
     const bounds = new window.kakao.maps.LatLngBounds();
@@ -108,7 +115,38 @@ export default function CommercialMain() {
           newMarkers.push(marker);
           bounds.extend(coords);
 
+          // 마커 클릭 시 InfoWindow 표시
           window.kakao.maps.event.addListener(marker, 'click', function() {
+            // 기존 InfoWindow 닫기
+            if (infoWindowRef.current) {
+              infoWindowRef.current.close();
+            }
+            
+            // InfoWindow 내용 생성
+            const content = `
+              <div style="padding: 15px; width: 250px; font-family: Arial, sans-serif;">
+                <div style="font-weight: bold; font-size: 16px; color: #333; margin-bottom: 8px;">
+                  ${store.storeName}
+                </div>
+                <div style="font-size: 14px; color: #666; line-height: 1.4;">
+                  📍 ${address}
+                </div>
+                <div style="font-size: 12px; color: #999; margin-top: 6px;">
+                  ${store.categoryLarge} > ${store.categoryMedium} > ${store.categorySmall}
+                </div>
+              </div>
+            `;
+            
+            // 새 InfoWindow 생성 및 표시
+            const newInfoWindow = new window.kakao.maps.InfoWindow({
+              content: content,
+              removable: true
+            });
+            
+            newInfoWindow.open(map, marker);
+            infoWindowRef.current = newInfoWindow;
+            
+            // 지도 중심 이동
             map.panTo(coords);
           });
         }
@@ -134,8 +172,51 @@ export default function CommercialMain() {
     geocoder.addressSearch(address, function(result, status) {
       if (status === window.kakao.maps.services.Status.OK && result.length > 0) {
         const coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
+        
+        // 기존 InfoWindow 닫기
+        if (infoWindowRef.current) {
+          infoWindowRef.current.close();
+        }
+        
+        // InfoWindow 내용 생성
+        const content = `
+          <div style="padding: 15px; width: 250px; font-family: Arial, sans-serif;">
+            <div style="font-weight: bold; font-size: 16px; color: #333; margin-bottom: 8px;">
+              ${store.storeName}
+            </div>
+            <div style="font-size: 14px; color: #666; line-height: 1.4;">
+              📍 ${address}
+            </div>
+            <div style="font-size: 12px; color: #999; margin-top: 6px;">
+              ${store.categoryLarge} > ${store.categoryMedium} > ${store.categorySmall}
+            </div>
+          </div>
+        `;
+        
+        // 새 InfoWindow 생성 및 표시
+        const newInfoWindow = new window.kakao.maps.InfoWindow({
+          content: content,
+          removable: true
+        });
+        
+        // 해당 위치의 마커 찾기 (정확한 마커 매칭을 위해)
+        const targetMarker = markers.find(function(marker) {
+          const markerPosition = marker.getPosition();
+          return Math.abs(markerPosition.getLat() - coords.getLat()) < 0.0001 && 
+                 Math.abs(markerPosition.getLng() - coords.getLng()) < 0.0001;
+        });
+        
+        if (targetMarker) {
+          newInfoWindow.open(map, targetMarker);
+        } else {
+          // 마커를 찾지 못한 경우 좌표에 InfoWindow 표시
+          newInfoWindow.open(map, coords);
+        }
+        
+        infoWindowRef.current = newInfoWindow;
+        
         // 지도를 특정 좌표로 이동시키면서 레벨을 조정
-        map.setLevel(2, { anchor: coords, animate: true }); // 레벨 3으로 확대, 부드러운 애니메이션
+        map.setLevel(2, { anchor: coords, animate: true }); // 레벨 2로 확대, 부드러운 애니메이션
         map.panTo(coords); // 해당 좌표로 중심 이동
       }
     });
@@ -162,13 +243,11 @@ export default function CommercialMain() {
         const list = Array.isArray(res.data.list) ? res.data.list : [];
         const totalCount = res.data.totalCount || 0;
         setStoreList(list);
-        displayMarkers(list);
         setTotalPages(Math.ceil(totalCount / itemsPerPage));
       })
       .catch(function(err) {
         console.error('Error fetching filtered commercial data:', err);
         setStoreList([]);
-        displayMarkers([]);
         setTotalPages(1);
       });
   }
@@ -227,6 +306,18 @@ export default function CommercialMain() {
       setSelectedSmallCode('');
     }
   }, [selectedLargeCode, selectedMediumCode, serverUrl]);
+
+  // 초기 데이터 로딩 - 페이지 마운트 시 첫 페이지 데이터 자동 로딩
+  useEffect(function() {
+    fetchStoreList(1);
+  }, [serverUrl]);
+
+  // 지도가 준비되면 현재 storeList로 마커 표시
+  useEffect(function() {
+    if (map) {
+      displayMarkers(storeList);
+    }
+  }, [map, storeList]);
 
   // 페이지 번호를 5개 그룹으로 제한하는 커스텀 renderItem 함수
   function renderPaginationItem(item) {
