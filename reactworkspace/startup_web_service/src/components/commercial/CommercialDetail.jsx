@@ -14,9 +14,7 @@ import {
   Divider
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-<<<<<<< HEAD
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-=======
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -28,7 +26,6 @@ import {
   Legend
 } from 'chart.js';
 import { Bar, Doughnut } from 'react-chartjs-2';
->>>>>>> 5de954b68b6456cd06b99be37c45f9da9999fa94
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-material.css';
 
