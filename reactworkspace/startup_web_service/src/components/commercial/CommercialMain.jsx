@@ -40,7 +40,7 @@ export default function CommercialMain() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 20;
+  const itemsPerPage = 120;
 
   const [map, setMap] = useState(null);
   const [markers, setMarkers] = useState([]);
@@ -231,10 +231,14 @@ export default function CommercialMain() {
   // 페이지 번호를 5개 그룹으로 제한하는 커스텀 renderItem 함수
   function renderPaginationItem(item) {
     if (item.type === 'page') {
-      const groupSize = 5; // 한 번에 보여줄 페이지 번호 개수를 5로 설정
-      const currentGroup = Math.ceil(currentPage / groupSize); // 현재 페이지가 속한 그룹
-      const startPage = (currentGroup - 1) * groupSize + 1; // 그룹의 시작 페이지
-      const endPage = Math.min(startPage + groupSize - 1, totalPages); // 그룹의 끝 페이지 (총 페이지를 넘지 않도록)
+      const displayPageCount = 5; // 한 번에 표시할 페이지 번호 개수
+      let startPage = Math.max(1, currentPage - Math.floor(displayPageCount / 2));
+      let endPage = Math.min(totalPages, startPage + displayPageCount - 1);
+
+      // 전체 페이지 끝 부분에 있을 때 5개 페이지가 표시되도록 startPage 조정
+      if (endPage - startPage + 1 < displayPageCount) {
+        startPage = Math.max(1, endPage - displayPageCount + 1);
+      }
 
       if (item.page >= startPage && item.page <= endPage) {
         return <PaginationItem {...item} />;
