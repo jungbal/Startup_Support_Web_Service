@@ -19,4 +19,6 @@ public class Member {
 	private int userLevel;
 	private int reportCount;
 	private Date banUntil;
+	
+	
 }

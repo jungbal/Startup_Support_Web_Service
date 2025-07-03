@@ -1,10 +1,12 @@
 package kr.or.iei.common;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import kr.or.iei.common.filter.EncodingFilter;
@@ -28,6 +30,16 @@ public class WebConfig implements WebMvcConfigurer { //이 클래스는 Spring M
 	@Bean
 	public BCryptPasswordEncoder bcrypt() {
 		return new BCryptPasswordEncoder();
+	}
+	
+	@Value("${file.uploadPath}")
+	private String uploadPath; //C:/Start_Support_Img/market
+	
+	//자원 요청에 대한 접근 권한 부여
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/market/postFile/**") //요청 URL
+				.addResourceLocations("file:///"+uploadPath+"/postFile/"); //자원이 위치한 경로
 	}
 	
 	//CORS 설정 - SecurityConfig에서 관리하므로 비활성화

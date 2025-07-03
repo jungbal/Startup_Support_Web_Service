@@ -19,4 +19,7 @@ public class Market {
 	private int readCount;
 	private Integer price;  // Integer로 선언 (null 허용)
 	private String marketStatus;
+	
+	private String filePath; // 썸네일 표기를 위한 join 해오기 위함
+	
 } 
