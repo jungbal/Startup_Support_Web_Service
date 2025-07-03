@@ -25,4 +25,7 @@ public interface CommercialDao {
 
     // 소분류 목록
     ArrayList<Map<String, String>> selectSmallCategories(Map<String, String> param);
+
+    // 상가 상세정보 조회
+    Commercial selectCommercialDetail(@Param("storeId") String storeId);
 }

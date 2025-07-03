@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import useCommercialStore from '../../store/useCommercialStore';
 
@@ -40,7 +41,7 @@ export default function CommercialMain() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 8;
+  const [itemsPerPage, setItemsPerPage] = useState(8);
 
   const [map, setMap] = useState(null);
   const [markers, setMarkers] = useState([]);
@@ -48,6 +49,32 @@ export default function CommercialMain() {
 
   const serverUrl = import.meta.env.VITE_BACK_SERVER;
   const kakaoKey = import.meta.env.VITE_KAKAO_MAP_KEY;
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // 전역 함수로 등록 (InfoWindow 버튼에서 사용)
+  // 상가 상세정보 페이지 이동
+  useEffect(() => {
+    window.goToDetail = (storeId) => {
+      navigate(`/commercial/detail/${storeId}`, {
+        state: {
+          searchConditions: {
+            selectedLargeCode,
+            selectedMediumCode,
+            selectedSmallCode,
+            keyword,
+            currentPage,
+            itemsPerPage
+          }
+        }
+      });
+    };
+    
+    return () => {
+      delete window.goToDetail;
+    };
+  }, [navigate, selectedLargeCode, selectedMediumCode, selectedSmallCode, keyword, currentPage, itemsPerPage]);
 
   useEffect(function() {
     if (window.kakao && window.kakao.maps) {
@@ -72,6 +99,42 @@ export default function CommercialMain() {
 
     const mapInstance = new window.kakao.maps.Map(container, options);
     setMap(mapInstance);
+  }
+
+  // InfoWindow HTML 내용 생성 함수
+  function createInfoWindowContent(store, address) {
+    return `
+      <div style="padding: 15px; width: 250px; font-family: Arial, sans-serif;">
+        <div style="font-weight: bold; font-size: 16px; color: #333; margin-bottom: 8px;">
+          ${store.storeName}
+        </div>
+        <div style="font-size: 14px; color: #666; line-height: 1.4; margin-bottom: 8px;">
+          📍 ${address}
+        </div>
+        <div style="font-size: 12px; color: #999; margin-bottom: 12px;">
+          ${store.categoryLarge} > ${store.categoryMedium} > ${store.categorySmall}
+        </div>
+        <button 
+          onclick="window.goToDetail('${store.storeId}')"
+          style="
+            background: #1976d2; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            padding: 8px 16px; 
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            width: 100%;
+            transition: background-color 0.2s;
+          "
+          onmouseover="this.style.background='#1565c0'"
+          onmouseout="this.style.background='#1976d2'"
+        >
+          📋 상세정보 보기
+        </button>
+      </div>
+    `;
   }
 
   function displayMarkers(stores) {
@@ -123,19 +186,7 @@ export default function CommercialMain() {
             }
             
             // InfoWindow 내용 생성
-            const content = `
-              <div style="padding: 15px; width: 250px; font-family: Arial, sans-serif;">
-                <div style="font-weight: bold; font-size: 16px; color: #333; margin-bottom: 8px;">
-                  ${store.storeName}
-                </div>
-                <div style="font-size: 14px; color: #666; line-height: 1.4;">
-                  📍 ${address}
-                </div>
-                <div style="font-size: 12px; color: #999; margin-top: 6px;">
-                  ${store.categoryLarge} > ${store.categoryMedium} > ${store.categorySmall}
-                </div>
-              </div>
-            `;
+            const content = createInfoWindowContent(store, address);
             
             // 새 InfoWindow 생성 및 표시
             const newInfoWindow = new window.kakao.maps.InfoWindow({
@@ -179,19 +230,7 @@ export default function CommercialMain() {
         }
         
         // InfoWindow 내용 생성
-        const content = `
-          <div style="padding: 15px; width: 250px; font-family: Arial, sans-serif;">
-            <div style="font-weight: bold; font-size: 16px; color: #333; margin-bottom: 8px;">
-              ${store.storeName}
-            </div>
-            <div style="font-size: 14px; color: #666; line-height: 1.4;">
-              📍 ${address}
-            </div>
-            <div style="font-size: 12px; color: #999; margin-top: 6px;">
-              ${store.categoryLarge} > ${store.categoryMedium} > ${store.categorySmall}
-            </div>
-          </div>
-        `;
+        const content = createInfoWindowContent(store, address);
         
         // 새 InfoWindow 생성 및 표시
         const newInfoWindow = new window.kakao.maps.InfoWindow({
@@ -307,10 +346,32 @@ export default function CommercialMain() {
     }
   }, [selectedLargeCode, selectedMediumCode, serverUrl]);
 
-  // 초기 데이터 로딩 - 페이지 마운트 시 첫 페이지 데이터 자동 로딩
+  // 이전 검색 조건 복원 및 초기 데이터 로딩
   useEffect(function() {
-    fetchStoreList(1);
-  }, [serverUrl]);
+    const searchConditions = location.state?.searchConditions;
+    if (searchConditions) {
+      // 상세 페이지에서 돌아온 경우 - 이전 검색 조건 복원
+      setSelectedLargeCode(searchConditions.selectedLargeCode || '');
+      setSelectedMediumCode(searchConditions.selectedMediumCode || '');
+      setSelectedSmallCode(searchConditions.selectedSmallCode || '');
+      setKeyword(searchConditions.keyword || '');
+      setCurrentPage(searchConditions.currentPage || 1);
+      setItemsPerPage(searchConditions.itemsPerPage || 8);
+      
+      // 검색 조건이 있는 경우 해당 페이지의 데이터 로딩
+      fetchStoreList(searchConditions.currentPage || 1);
+    } else {
+      // 메뉴에서 진입한 경우 - 초기 상태로 설정하고 데이터 로딩
+      setSelectedLargeCode('');
+      setSelectedMediumCode('');
+      setSelectedSmallCode('');
+      setKeyword('');
+      setCurrentPage(1);
+      setItemsPerPage(8);
+      
+      fetchStoreList(1);
+    }
+  }, [location.state, serverUrl]);
 
   // 지도가 준비되면 현재 storeList로 마커 표시
   useEffect(function() {
