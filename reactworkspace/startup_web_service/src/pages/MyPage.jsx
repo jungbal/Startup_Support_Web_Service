@@ -31,7 +31,7 @@ import MemberManagement from '../components/mypage/MemberManagement';
 import ReportManagement from '../components/mypage/ReportManagement';
 import '../styles/mypage.css';
 
-const MyPage = () => {
+function MyPage() {
   const navigate = useNavigate();
   const { loginMember, isLogined } = useAuthStore();
   const [selectedMenu, setSelectedMenu] = useState('profile');
@@ -60,7 +60,7 @@ const MyPage = () => {
   // 사용자 레벨에 따라 메뉴 결정
   const menus = loginMember?.userLevel <= 2 ? [...userMenus, ...adminMenus] : userMenus;
 
-  const renderContent = () => {
+  function renderContent() {
     switch (selectedMenu) {
       case 'profile':
         return <ProfileEdit />;
@@ -79,7 +79,7 @@ const MyPage = () => {
       default:
         return <ProfileEdit />;
     }
-  };
+  }
 
   return (
     <Container maxWidth="lg" className="mypage-container">
@@ -103,7 +103,7 @@ const MyPage = () => {
               <ListItemButton
                 key={menu.id}
                 selected={selectedMenu === menu.id}
-                onClick={() => setSelectedMenu(menu.id)}
+                onClick={function() { setSelectedMenu(menu.id); }}
               >
                 <ListItemIcon>{menu.icon}</ListItemIcon>
                 <ListItemText primary={menu.label} />

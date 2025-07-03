@@ -5,6 +5,14 @@ import useAuthStore from "../../store/authStore";
 import PageNavi from "../common/PageNavi";
 import "./MarketList.css"; 
 
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Typography from '@mui/material/Typography';
+import CardActionArea from '@mui/material/CardActionArea';
+
+
+
 export default function MarketList(){
     const serverUrl = import.meta.env.VITE_BACK_SERVER;
     const axiosInstance=createInstance();
@@ -27,6 +35,7 @@ export default function MarketList(){
         });
     },[reqPage]);
 
+    
 
     return(
         <div className="market-list-container">
@@ -51,22 +60,36 @@ export default function MarketList(){
 
 function MarketItem(props){
     const market=props.market;
+    const serverUrl = import.meta.env.VITE_BACK_SERVER;
     const navigate = useNavigate();
+
 
     return (
         <li className="market-item" onClick={function(){
             navigate("/market/view/" + market.marketNo);
         }}>
-            <div className="market-thumb-wrapper">
-                <img src={market.boardThumbPath ? serverUrl + "/postFile/" + market.boardThumbPath.substring(0,8) + "/" + market.boardThumbPath
-                                               : "/image/default_img.png"}/>
-            </div>
-            <div className="market-info">
-                <div>{market.marketTitle}</div>
-                <div>{market.userId}</div>
-                <div>{market.marketDate}</div>
-            </div>
-
+            <Card sx={{ maxWidth: 345 }}>
+                <CardActionArea>
+                    <CardMedia
+                        component="img"
+                        height="300"
+                        image={market.filePath ? serverUrl + "/market/postFile/" + market.filePath.substring(0,8) + "/" + market.filePath
+                                                : "/image/default_img.png"}
+                    />
+                    <CardContent>
+                        <Typography gutterBottom variant="h5" component="div">
+                            {market.marketTitle}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            {market.userId}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            {market.marketDate}
+                        </Typography>
+                    </CardContent>
+            
+                </CardActionArea>
+            </Card>
         </li>
     )
 }

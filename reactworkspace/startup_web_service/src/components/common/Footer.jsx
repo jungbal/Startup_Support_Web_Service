@@ -21,46 +21,46 @@ export default function Footer() {
           flexWrap: 'wrap'
         }}>
           <a 
-            href="https://www.mss.go.kr/" 
+            href="https://www.moel.go.kr/index.do" 
             target="_blank"
             style={{ display: 'inline-block' }}
           >
             <img 
               src="/image/footer1.png" 
-              alt="중소벤처기업부 로고" 
+              alt="고용노동부 로고" 
               style={{ height: '40px', width: 'auto', cursor: 'pointer' }}
             />
           </a>
           <a 
-            href="https://www.kosmes.or.kr/" 
+            href="https://www.semas.or.kr/web/main/index.kmdc" 
             target="_blank"
             style={{ display: 'inline-block' }}
           >
             <img 
               src="/image/footer2.png" 
-              alt="중소기업중앙회 로고" 
+              alt="소상공인시장 진흥공단 로고" 
               style={{ height: '40px', width: 'auto', cursor: 'pointer' }}
             />
           </a>
           <a 
-            href="https://www.k-startup.go.kr/" 
+            href="https://www.mss.go.kr/site/smba/main.do" 
             target="_blank"
             style={{ display: 'inline-block' }}
           >
             <img 
               src="/image/footer3.png" 
-              alt="창업진흥원 로고" 
+              alt="중소벤처기업부 로고" 
               style={{ height: '40px', width: 'auto', cursor: 'pointer' }}
             />
           </a>
           <a 
-            href="https://www.sba.kr/" 
+            href="https://www.kised.or.kr/" 
             target="_blank"
             style={{ display: 'inline-block' }}
           >
             <img 
               src="/image/footer4.png" 
-              alt="서울산업진흥원 로고" 
+              alt="창업진흥원 로고" 
               style={{ height: '40px', width: 'auto', cursor: 'pointer' }}
             />
           </a>

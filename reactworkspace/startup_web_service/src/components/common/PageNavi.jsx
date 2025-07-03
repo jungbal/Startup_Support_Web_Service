@@ -1,5 +1,10 @@
 import "../../styles/pageNavi.css";
 
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import LastPageIcon from '@mui/icons-material/LastPage';
+
 //목록 하단 페이지 네비게이션 제작 컴포넌트
 export default function PageNavi(props){
     
@@ -9,27 +14,26 @@ export default function PageNavi(props){
 
     const pageArr = new Array();            //페이지 네비게이션 JSX를 저장할 배열
     
+
     // << 제일 앞 페이지로 이동
     pageArr.push(
         <li key="first-page">
-            <span className="material-icons page-item" onClick={function(){
+            <FirstPageIcon className="page-item page-button" onClick={function(){
                 setReqPage(1);
-            }}>
-                first_page
-            </span>
+            }}
+            />
         </li>
     );
     
     // < 이전 페이지로 이동
     pageArr.push(
         <li key="prev-page">
-            <span className="material-icons page-item" onClick={function(){
+            <NavigateBeforeIcon className="page-item page-button" onClick={function(){
                 if(reqPage > 1){
                     setReqPage(reqPage-1);
                 }
-            }}>
-                navigate_before
-            </span>
+            }}
+            />
         </li>
     );
 
@@ -56,13 +60,12 @@ export default function PageNavi(props){
     // > 다음 페이지로 이동
     pageArr.push(
         <li key="next-page">
-            <span className="material-icons page-item" onClick={function(){
+            <NavigateNextIcon className="page-item page-button" onClick={function(){
                 if(reqPage < pageInfo.totalPage){
                     setReqPage(reqPage+1);
                 }
-            }}>
-                navigate_next
-            </span>
+            }}
+            />
         </li>
     );
 
@@ -70,11 +73,10 @@ export default function PageNavi(props){
 
     pageArr.push(
         <li key="last-page">
-            <span className="material-icons page-item" onClick={function(){
+            <LastPageIcon className="page-item page-button" onClick={function(){
                 setReqPage(pageInfo.totalPage);
-            }}>
-                last_page
-            </span>
+            }}
+            />
         </li>
     );
 

@@ -12,4 +12,5 @@ public class MarketFile {
 	private int marketNo;	
 	private String fileName;	//m_file_name //파일 이름
 	private String filePath;	//m_file_path //파일 경로
+	private String isMainFile;	//메인 이미지
 }

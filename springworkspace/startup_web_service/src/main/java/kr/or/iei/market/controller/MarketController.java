@@ -3,11 +3,13 @@ package kr.or.iei.market.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,15 +37,16 @@ public class MarketController {
 	private FileUtil fileUtil;
 	
 	
-	//마켓글 조회
+	//마켓글 전체 조회
 	@GetMapping("/list/{reqPage}")
 	@NoTokenCheck
 	public ResponseEntity<ResponseDTO> selectMarketList(@PathVariable int reqPage){
-		ResponseDTO res= new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR,"마켓글 조회 중 오류가 발생하였습니다",null,"error");
+		ResponseDTO res= new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR,"마켓글 전체조회 중 오류가 발생하였습니다",null,"error");
 		
 		try {
 			HashMap<String, Object> marketList=service.selectMarketList(reqPage);
 			res = new ResponseDTO(HttpStatus.OK,"", marketList, "");
+			
 			
 		}catch(Exception e) {
 			e.printStackTrace();
@@ -86,6 +89,40 @@ public class MarketController {
 			e.printStackTrace();
 		}
 		return new ResponseEntity<ResponseDTO>(res, res.getHttpStatus());
+	}
+	
+	//마켓글 1개 상세조회
+	@GetMapping("/{marketNo}")
+	@NoTokenCheck
+	public ResponseEntity<ResponseDTO> selectOneMarket(@PathVariable int marketNo){
+		ResponseDTO res= new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR,"게시글 상세정보 조회 중 오류가 발생하였습니다",null,"error");
+		try {
+			Map<String, Object> marketData =service.selectOneMarket(marketNo);
+			
+			res= new ResponseDTO(HttpStatus.OK,"",marketData ,"");
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return new ResponseEntity<ResponseDTO>(res, res.getHttpStatus());
+	}
+	
+	@DeleteMapping("/{marketNo}")
+	public ResponseEntity<ResponseDTO> deleteMarket(@PathVariable int marketNo){
+		ResponseDTO res= new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR,"게시글 정보 조회 중 오류가 발생하였습니다",null,"error");
+		try {
+			//서버에서 삭제
+			Market market=service.deleteMarket(marketNo);
+			
+			if(market!=null) {
+				
+			}
+			
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return new ResponseEntity<ResponseDTO>(res, res.getHttpStatus());
+		
 	}
 	
 	
