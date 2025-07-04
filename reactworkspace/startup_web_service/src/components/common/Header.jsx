@@ -156,22 +156,16 @@ function MainNavi() {
 function HeaderLink() {
   const { 
     isLogined, 
-    setIsLogined, 
     loginMember, 
-    setLoginMember, 
-    setAccessToken, 
-    setRefreshToken 
+    logout
   } = useAuthStore();
   
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
 
   // 로그아웃 처리 함수
-  function logout() {
-    setIsLogined(false);
-    setLoginMember(null);
-    setAccessToken(null);
-    setRefreshToken(null);
+  function handleLogout() {
+    logout(); // authStore의 완전한 로그아웃 함수 호출
     setAnchorEl(null);
     navigate('/');
   }
@@ -247,7 +241,7 @@ function HeaderLink() {
               마이페이지
             </MenuItem>
             <MenuItem 
-              onClick={logout}
+              onClick={handleLogout}
               sx={{ 
                 fontFamily: '"Noto Sans KR", "Apple SD Gothic Neo", sans-serif',
                 color: '#333',

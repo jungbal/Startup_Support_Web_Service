@@ -92,7 +92,7 @@ function clearOldCookies() {
   document.cookie = 'rememberedUserId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 }
 
-// 보호된 라우트 컴포넌트 (팀원이 배운 방식)
+// 보호된 라우트 컴포넌트
 const ProtectedRoute = ({ children }) => {
   const isLogined = useAuthStore((state) => state.isLogined);
   
@@ -118,16 +118,14 @@ const AuthRoute = ({ children }) => {
 function AppWithHeaderFooter() {
   const location = useLocation();
   
-  // Header를 숨길 페이지들
-  const hideHeaderPaths = ['/login', '/signup', '/find-account'];
-  const shouldHideHeader = hideHeaderPaths.includes(location.pathname);
+  // 공통 페이지 경로들
+  const authPaths = ['/login', '/signup', '/find-account'];
+  const commercialPaths = ['/commercial'];
   
-  // Footer를 숨길 페이지들
-  const hideFooterPaths = ['/login', '/signup', '/find-account', '/commercial'];
-  const shouldHideFooter = hideFooterPaths.includes(location.pathname);
-  
-  // FloatingButtons를 숨길 페이지들 (Footer와 동일하게 처리)
-  const shouldHideFloatingButtons = hideFooterPaths.includes(location.pathname);
+  // 각 UI 요소를 숨길 페이지들
+  const shouldHideHeader = authPaths.includes(location.pathname);
+  const shouldHideFooter = [...authPaths, ...commercialPaths].includes(location.pathname);
+  const shouldHideFloatingButtons = shouldHideFooter;
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -170,6 +168,22 @@ function App() {
   useEffect(() => {
     // 앱 시작 시 기존 쿠키 토큰 삭제 (한 번만 실행)
     clearOldCookies();
+    
+    // 상태 동기화 (기존 상태와 새로운 상태 동기화)
+    const authStore = useAuthStore.getState();
+    if (authStore.syncStates) {
+      authStore.syncStates();
+    }
+    
+    // 개발자 도구에서 강제 로그아웃 함수 전역 등록
+    window.forceLogout = function() {
+      const authStore = useAuthStore.getState();
+      if (authStore.forceLogout) {
+        authStore.forceLogout();
+        console.log('강제 로그아웃 완료');
+        window.location.reload();
+      }
+    };
   }, []);
 
   return (
