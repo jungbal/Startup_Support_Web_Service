@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
@@ -53,6 +53,10 @@ export default function CommercialDetail() {
   const [relatedStores, setRelatedStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [gridApi, setGridApi] = useState(null);
+  const [hoverLabel, setHoverLabel] = useState('');
+  const mapRef = useRef(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
   
   // 이전 검색 조건 저장 (상세 페이지에서 돌아갈 때 사용)
   const previousSearchConditions = location.state?.searchConditions;
@@ -122,6 +126,13 @@ export default function CommercialDetail() {
     }
   ]);
 
+  // 차트 색상 (공통으로 사용)
+  const colors = [
+    '#42a5f5', '#66bb6a', '#ffa726', '#ab47bc', '#26a69a', '#ef5350',
+    '#ec407a', '#7e57c2', '#ffee58', '#8d6e63', '#789262'
+  ];
+
+
   // 전역 함수로 등록 (ag-grid 셀 렌더러에서 사용) - ag-Grid와 React 간의 브릿지 역할(React 컴포넌트의 기능을 ag-Grid에서 사용할 수 있게 해주는 우회 방법)
   useEffect(function() {
     window.viewStore = function(id) {
@@ -139,6 +150,13 @@ export default function CommercialDetail() {
       fetchStoreDetail();
     }
   }, [storeId]);
+
+  useEffect(function () {
+    if (storeDetail && mapReady) {
+      var address = storeDetail.roadAddr || storeDetail.landAddr;
+      loadKakaoMap(address);
+    }
+  }, [storeDetail, mapReady]);
 
   function fetchStoreDetail() {
     setLoading(true);
@@ -325,7 +343,49 @@ export default function CommercialDetail() {
     );
   }
 
-  // 1. 중복 없는 중분류 목록 만들기 (Set, map 금지)
+function loadKakaoMap(address) {
+  if (window.kakao && window.kakao.maps) {
+    renderMiniMap(address);
+    console.log("mapRef.current:", mapRef.current);
+  } else {
+    var script = document.createElement('script');
+    script.src = "//dapi.kakao.com/v2/maps/sdk.js?appkey=" + import.meta.env.VITE_KAKAO_MAP_KEY + "&autoload=false&libraries=services";
+    script.async = true;
+    script.onload = function () {
+      window.kakao.maps.load(function () {
+        renderMiniMap(address);
+      });
+    };
+    document.head.appendChild(script);
+  }
+}
+
+function renderMiniMap(address) {
+  var container = mapRef.current;
+  if (!container) return;
+
+  var geocoder = new window.kakao.maps.services.Geocoder();
+  geocoder.addressSearch(address, function (result, status) {
+    if (status === window.kakao.maps.services.Status.OK && result.length > 0) {
+      var coords = new window.kakao.maps.LatLng(result[0].y, result[0].x);
+      var mapOption = {
+        center: coords,
+        level: 4
+      };
+
+      var map = new window.kakao.maps.Map(container, mapOption);
+
+      new window.kakao.maps.Marker({
+        map: map,
+        position: coords
+      });
+
+      setMapLoaded(true);
+    }
+  });
+}
+
+// 1. 중복 없는 소분류 목록 추출
 function getUniqueCategorySmalls(relatedStores) {
   var smalls = [];
   for (var i = 0; i < relatedStores.length; i++) {
@@ -346,7 +406,7 @@ function getUniqueCategorySmalls(relatedStores) {
   return smalls;
 }
 
-// 2. 각 중분류별 상가 수 계산
+// 2. 각 소분류별 상가 수 계산
 function countStoresBySmall(relatedStores, smalls) {
   var counts = [];
   for (var i = 0; i < smalls.length; i++) {
@@ -365,7 +425,7 @@ function countStoresBySmall(relatedStores, smalls) {
   return counts;
 }
 
-// 3. chart.js용 데이터 구성
+// 3. 세로 막대 Bar Chart용 데이터 생성
 function createChartData(relatedStores) {
   var smalls = getUniqueCategorySmalls(relatedStores);
   var counts = countStoresBySmall(relatedStores, smalls);
@@ -373,46 +433,90 @@ function createChartData(relatedStores) {
   return {
     labels: smalls,
     datasets: [{
-      label: '중분류별 상가 수',
+      label: '소분류별 상가 수',
       data: counts,
-      backgroundColor: '#42a5f5'
+      backgroundColor: colors.slice(0, smalls.length) // 소분류 수만큼 색상 적용
     }]
   };
 }
 
-// 4. chart.js 옵션 (기본)
+// Doughnut 차트 데이터 생성 시 label 포함
+function createDoughnutData(relatedStores) {
+  const smalls = getUniqueCategorySmalls(relatedStores);
+  const counts = countStoresBySmall(relatedStores, smalls);
+
+  return {
+    labels: smalls,
+    datasets: [{
+      data: counts,
+      backgroundColor: colors.slice(0, smalls.length),
+      borderWidth: 1
+    }]
+  };
+}
+
 function getChartOptions() {
   return {
     indexAxis: 'y',
     responsive: true,
     plugins: {
       legend: {
-        position: 'top'
+        display: false
       },
       title: {
         display: true,
-        text: '중분류별 상가 수 비교'
+        text: '소분류별 상가 수'
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          stepSize: 5000
+        }
       }
     }
   };
 }
-// 5. doughnut 차트용 데이터 구성
-function createDoughnutData(relatedStores) {
-  var smalls = getUniqueCategorySmalls(relatedStores);
-  var counts = countStoresBySmall(relatedStores, smalls);
 
+// 도넛 중앙 텍스트용 커스텀 플러그인
+const doughnutCenterText = {
+  id: 'doughnutCenterText',
+  beforeDraw: (chart) => {
+    const { width, height, ctx } = chart;
+    ctx.save();
+    const fontSize = 16;
+    ctx.font = `bold ${fontSize}px sans-serif`;
+    ctx.fillStyle = '#333';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const total = chart.config.data.datasets[0].data.reduce((a, b) => a + b, 0);
+    ctx.fillText(`총 ${total}개`, width / 2, height / 2);
+    ctx.restore();
+  }
+};
+
+function getDoughnutOptions() {
   return {
-    labels: smalls,
-    datasets: [{
-      data: counts,
-      backgroundColor: [
-        '#42a5f5', '#66bb6a', '#ffa726', '#ab47bc', '#26a69a', '#ef5350',
-        '#ec407a', '#7e57c2', '#ffee58', '#8d6e63', '#789262'
-      ],
-      borderWidth: 1
-    }]
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            const dataset = context.dataset;
+            const total = dataset.data.reduce((prev, curr) => prev + curr, 0);
+            const value = context.parsed;
+            const percentage = ((value / total) * 100).toFixed(1);
+            return `${percentage}%`;
+          }
+        }
+      }
+    }
   };
 }
+
   // 상가 정보 표시
   return (
     <Box sx={{ padding: 3, maxWidth: '1200px', margin: '0 auto' }}>
@@ -431,40 +535,84 @@ function createDoughnutData(relatedStores) {
       </Box>
 
       {/* 상가 기본 정보 */}
-      <Card sx={{ mb: 4 }}>
-        <CardContent>
-          <Typography variant="h5" component="h2" sx={{ mb: 2, fontWeight: 'bold', color: '#1976d2' }}>
-            {storeDetail.storeName}
-          </Typography>
-          
-          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-            <Chip label={storeDetail.categoryLarge} color="primary" size="small" />
-            <Chip label={storeDetail.categoryMedium} color="secondary" size="small" />
-            <Chip label={storeDetail.categorySmall} color="default" size="small" />
-          </Box>
+      <Box sx ={{display: 'flex', gap : 2}}>
+        <Card sx={{ mb: 4, flex : 1}}>
+          <CardContent>
+            <Typography variant="h5" component="h2" sx={{ mb: 2, fontWeight: 'bold', color: '#1976d2' }}>
+              {storeDetail.storeName}
+            </Typography>
+            
+            <Box sx={{ display: 'flex', gap: 3, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+              <Box sx={{ flexGrow: 1 }}>
+                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                  <Chip label={storeDetail.categoryLarge} color="primary" size="small" />
+                  <Chip label={storeDetail.categoryMedium} color="secondary" size="small" />
+                  <Chip label={storeDetail.categorySmall} color="default" size="small" />
+                </Box>
 
-          <Typography variant="body1" sx={{ mb: 1 }}>
-            <strong>📍 주소:</strong> {storeDetail.roadAddr || storeDetail.landAddr}
-          </Typography>
-          
-          <Typography variant="body1" sx={{ mb: 1 }}>
-            <strong>🏢 지역:</strong> {storeDetail.provinceName} {storeDetail.districtName} {storeDetail.townName}
-          </Typography>
-        </CardContent>
-      </Card>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                  <strong>📍 주소:</strong> {storeDetail.roadAddr || storeDetail.landAddr}
+                </Typography>
+                
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                  <strong>🏢 지역:</strong> {storeDetail.provinceName} {storeDetail.districtName} {storeDetail.townName}
+                </Typography>
+
+              {/* 지도 삽입 영역 */}
+              </Box>
+            </Box>
+          </CardContent>
+        </Card>
+          <Box
+            ref={function(el) {
+              mapRef.current = el;
+              if (el && !mapReady) {
+                setMapReady(true); // DOM이 준비된 순간 상태 true로
+              }
+            }}
+            sx={{
+              width: 320, 
+              height: 200,
+              mb : 4,
+              marginLeft: '8px', 
+              borderRadius: '8px',
+              backgroundColor: '#f9f9f9',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+              border: '1px solid #ccc',
+              flexShrink: 0
+            }}
+          />
+        </Box>
+
 
       {/* 차트 시각화 영역 */}
       <Box sx={{ mb: 4, display: 'flex', gap: 4, justifyContent: 'space-between' }}>
-        {/* Bar 차트 (왼쪽) */}
+        {/* Bar 차트 */}
         <Box sx={{ flex: 1 }}>
-          <Typography variant="h6" sx={{ mb: 1 }}>중분류별 상가 수</Typography>
+          <Typography variant="h6" sx={{ mb: 1 }}>소분류별 상가 수</Typography>
           <Bar options={getChartOptions()} data={createChartData(relatedStores)} />
         </Box>
 
-        {/* Doughnut 차트 (오른쪽) */}
+        {/* Doughnut 차트 */}
         <Box sx={{ width: 300 }}>
-          <Typography variant="h6" sx={{ mb: 1 }}>중분류 비율</Typography>
-          <Doughnut data={createDoughnutData(relatedStores)} />
+          <Typography variant="h6" sx={{ mb: 10 }}>소분류 비율</Typography>
+          <Doughnut
+            data={createDoughnutData(relatedStores)}
+            options={getDoughnutOptions()}
+            plugins={[doughnutCenterText]}
+            onHover={(event, elements) => {
+              if (elements.length > 0) {
+                const index = elements[0].index;
+                const label = createDoughnutData(relatedStores).labels[index];
+                setHoverLabel(label);
+              } else {
+                setHoverLabel('');
+              }
+            }}
+          />
+          <Typography align="center" sx={{ mt: 1, color: 'gray' }}>
+            {hoverLabel && `📌 ${hoverLabel}`}
+          </Typography>
         </Box>
       </Box>
 
