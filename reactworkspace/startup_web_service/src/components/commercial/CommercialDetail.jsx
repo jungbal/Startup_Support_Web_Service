@@ -28,6 +28,7 @@ import {
 import { Bar, Doughnut } from 'react-chartjs-2';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-material.css';
+import Swal from 'sweetalert2';
 
 {/*
     작성자 : 이정원
@@ -57,6 +58,16 @@ export default function CommercialDetail() {
   const previousSearchConditions = location.state?.searchConditions;
 
   const serverUrl = import.meta.env.VITE_BACK_SERVER;
+
+  // SweetAlert2 공통 함수
+  const showAlert = function(type, text) {
+    Swal.fire({
+      title: '알림',
+      text: text,
+      icon: type,
+      confirmButtonText: '확인'
+    });
+  };
 
   // ag-Grid 컬럼 정의
   const [colDefs] = useState([
@@ -205,15 +216,56 @@ export default function CommercialDetail() {
     }
   }
 
-  // 엑셀 내보내기 (XLSX 형식)
+    // 엑셀 내보내기 (XLSX 형식) - 선택된 항목 또는 필터링된 항목만 저장
   function handleExportToExcel() {
-    if (!relatedStores.length) {
-      alert('내보낼 데이터가 없습니다.');
+    if (!gridApi) {
+      showAlert('error', '그리드가 준비되지 않았습니다.');
+      return;
+    }
+
+    let dataToExport = [];
+    let exportType = '';
+
+    // 1. 선택된 행들이 있는지 확인
+    const selectedRows = gridApi.getSelectedRows();
+    if (selectedRows && selectedRows.length > 0) {
+      dataToExport = selectedRows;
+      exportType = '선택된';
+    } else {
+      // 2. 선택된 행이 없으면 필터가 적용되었는지 확인
+      const filterModel = gridApi.getFilterModel();
+      const hasFilter = filterModel && Object.keys(filterModel).length > 0;
+      
+      if (!hasFilter) {
+        // 필터도 적용되지 않은 상태에서는 저장 불가
+        showAlert('warning', '데이터를 저장하려면 행을 선택하거나 필터를 적용해주세요.');
+        return;
+      }
+      
+      // 3. 필터가 적용된 경우 현재 표시된 데이터 가져오기
+      const displayedRowCount = gridApi.getDisplayedRowCount();
+      if (displayedRowCount === 0) {
+        showAlert('error', '필터링된 데이터가 없습니다.');
+        return;
+      }
+      
+      // 필터링된 모든 행 가져오기
+      for (let i = 0; i < displayedRowCount; i++) {
+        const rowNode = gridApi.getDisplayedRowAtIndex(i);
+        if (rowNode) {
+          dataToExport.push(rowNode.data);
+        }
+      }
+      exportType = '필터링된';
+    }
+
+    if (dataToExport.length === 0) {
+      showAlert('error', '내보낼 데이터가 없습니다.');
       return;
     }
 
     // 엑셀용 데이터 변환 - json 형식의 데이터를 엑셀 형식으로 변환
-    const excelData = relatedStores.map(function(store) {
+    const excelData = dataToExport.map(function(store) {
       return {
         '상호명': store.storeName || '',
         '지번주소': store.zibunAddr || store.landAddr || '',
@@ -245,11 +297,14 @@ export default function CommercialDetail() {
     // 워크시트를 워크북에 추가 - 워크시트를 워크북에 추가하기 위해 생성
     XLSX.utils.book_append_sheet(workbook, worksheet, '관련상가목록');
 
-    // 파일명 생성
-    const fileName = `관련상가목록_${storeDetail?.categoryMedium || '상가정보'}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    // 파일명 생성 (선택된 항목인지 필터링된 항목인지 구분)
+    const fileName = `${exportType}상가목록_${storeDetail?.categoryMedium || '상가정보'}_${new Date().toISOString().slice(0, 10)}.xlsx`;
 
     // 파일 다운로드
     XLSX.writeFile(workbook, fileName);
+    
+          // 사용자에게 알림
+      showAlert('success', `${exportType} 상가 ${dataToExport.length}개가 엑셀로 저장되었습니다.`);
   }
 
   // 로딩 중일 때
