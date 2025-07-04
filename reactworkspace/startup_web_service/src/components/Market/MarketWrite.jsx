@@ -8,11 +8,11 @@ import { useNavigate } from "react-router-dom";
 export default function MarketWrite(){
 
     const {loginMember}=useAuthStore();
-    const[marketTitle, setMarketTitle]= useState("");     //게시글 제목
-    const[marketContent, setMarketContent]= useState(""); //본문 내용
-    const[marketFile, setMarketFile]= useState([]);       //첨부 파일
-    const [marketPrice, setMarketPrice] = useState("");
-    const [marketCategory, setMarketCategory] = useState("sale");
+    const[marketTitle, setMarketTitle]= useState("");               //게시글 제목
+    const[marketContent, setMarketContent]= useState("");           //본문 내용
+    const[marketFile, setMarketFile]= useState([]);                 //첨부 파일
+    const [marketPrice, setMarketPrice] = useState("");             //가격
+    const [marketType, setMarketType] = useState("sale");   //분류
 
     
 
@@ -29,7 +29,7 @@ export default function MarketWrite(){
             form.append("marketContent",marketContent);
             form.append("userId",loginMember.userId);
             form.append("price", marketPrice);
-            form.append("marketType", marketCategory);
+            form.append("marketType", marketType);
 
             console.log(loginMember);
             console.log(loginMember.memberId);
@@ -68,8 +68,8 @@ export default function MarketWrite(){
                             setMarketFile={setMarketFile}
                             marketPrice={marketPrice}
                             setMarketPrice={setMarketPrice}
-                            marketCategory={marketCategory}
-                            setMarketCategory={setMarketCategory}>
+                            marketType={marketType}
+                            setMarketType={setMarketType}>
                 </MarketFrm>
                 <div>
                     <ToastEditor marketContent={marketContent}

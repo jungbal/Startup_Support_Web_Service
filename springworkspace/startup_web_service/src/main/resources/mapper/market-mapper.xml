@@ -51,17 +51,17 @@
 	<insert id="insertMarket"
 	parameterType="kr.or.iei.member.model.dto.Market">
 	insert into t_market
-		(market_no as marketNo,
-		 user_id as userId,
-		 market_type as marketType,
-		 market_title as marketTitle,
-		 market_Content as marketContent,
-		 market_date as marketDate,
-		 market_status as marketStatus,
-		 price,
-		 report_count as reportCount,
-		 read_count as readCount
-		)
+	 	(market_no,
+	     user_id,
+	     market_type,
+	     market_title,
+	     market_Content,
+	     market_date,
+	     market_status,
+	     price,
+	     report_count,
+	     read_count
+	    )
 		values(
 			#{marketNo},
 			#{userId},
@@ -99,33 +99,33 @@
 	<!-- 마켓글 1개 상세조회 -->
 	<select id="selectOneMarket"
 	parameterType="_int"
-	resultType="kr.or.iei.member.model.dto.Market">
-	select market_no as marketNo,
- 	 		user_id as userId,
- 	 		market_type as marketType,
- 	 		market_title as marketTitle,
- 	 		market_content as marketContent,
- 	 		market_date as marketDate,
- 	 		market_status as marketStatus,
+	resultMap="marketMap">
+	select market_no,
+ 	 		user_id,
+ 	 		market_type,
+ 	 		market_title,
+ 	 		market_content,
+ 	 		market_date,
+ 	 		market_status,
  	 		price,
- 	 		report_count as reportCount,
- 	 		read_count as readCount
+ 	 		report_count,
+ 	 		read_count
  	 	from t_market
 		where market_no=#{marketNo}
 	</select>
 	
-	<!-- selectMarketFileList에 대한 resultMap. 파일 리스트 불러오기 위함 -->
+	<!-- selectMarketFileList에 대한 resultMap // 마켓글 1개에 대한 파일 리스트 불러오기 위함 -->
 	<resultMap type="kr.or.iei.member.model.dto.Market" id="marketMap">
-		<result column="market_no" property="marketNo"/>
-		<result column="user_id" property="userId"/>
-		<result column="market_type" property="marketType"/>
-		<result column="market_title" property="marketTitle"/>
-		<result column="market_content" property="marketContent"/>
-		<result column="market_date" property="marketDate"/>
-		<result column="market_status" property="marketStatus"/>
-		<result column="price" property="price"/>
-		<result column="report_count" property="reportCount"/>
-		<result column="read_count" property="readCount"/>
+		<result column="MARKET_NO" property="marketNo"/>
+		<result column="USER_ID" property="userId"/>
+		<result column="MARKET_TYPE" property="marketType"/>
+		<result column="MARKET_TITLE" property="marketTitle"/>
+		<result column="MARKET_CONTENT" property="marketContent"/>
+		<result column="MARKET_DATE" property="marketDate"/>
+		<result column="MARKET_STATUS" property="marketStatus"/>
+		<result column="PRICE" property="price"/>
+		<result column="REPORT_COUNT" property="reportCount"/>
+		<result column="READ_COUNT" property="readCount"/>
 		
 		<!-- 
 			property : 수행 결과를 바인딩할 DTO 클래스 변수명

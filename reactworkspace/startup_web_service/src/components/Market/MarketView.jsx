@@ -28,7 +28,6 @@ export default function MarketView(){
 
         axiosInstance(options)
         .then(function(res){
-            console.log(res.data.resData.files);
             setMarket(res.data.resData.market);
             setMarketFile(res.data.resData.files);
         });
@@ -129,12 +128,14 @@ export default function MarketView(){
                                 <td style={{width:"20%"}}>{market.marketType}</td>
                             </tr>
                             <tr>
-                                <div className="board-content-wrap">
-                                    {   market.marketContent
-                                        ? <Viewer initialValue={market.marketContent} />
-                                        : ''
-                                    }
-                                </div>
+                                <td>
+                                    <div className="board-content-wrap">
+                                        {   market.marketContent
+                                            ? <Viewer initialValue={market.marketContent} />
+                                            : ''
+                                        }
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

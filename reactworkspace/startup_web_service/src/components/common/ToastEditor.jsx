@@ -6,15 +6,28 @@ import createInstance from '../../api/Interceptor';
 
 //게시글 본문 작성을 위한 에디터 
 export default function ToastEditor(props){
+    /*
     const marketContent=props.marketContent;
     const setMarketContent=props.setMarketContent;
     const type= props.type; //등록 : 0, 수정 : 1
+    */
+    const{marketContent, setMarketContent, type}=props;
+
+    
+    useEffect(function(){
+        if (editorRef.current && type === 1 && typeof marketContent === 'string') {
+            editorRef.current.getInstance().setHTML(marketContent);
+        }
+
+    },[marketContent]);
+    
+
     
     const editorRef=useRef(null); //에디터와 연결할 ref 변수
 
-    function changeContent(e){
+    function changeContent(){
         //에디터 본문에 작성한 내용 state변수에 세팅
-        const editorText=editorRef.current.getInstance().getHTML(); 
+        const editorText=editorRef.current.getInstance().getHTML();
         setMarketContent(editorText);
     }
     

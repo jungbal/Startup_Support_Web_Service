@@ -1,11 +1,14 @@
 package kr.or.iei.market.controller;
 
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -35,6 +38,9 @@ public class MarketController {
 	
 	@Autowired
 	private FileUtil fileUtil;
+	
+	@Value("${file.uploadPath}")
+	private String uploadPath; //C:/Start_Support_Img/market
 	
 	
 	//마켓글 전체 조회
@@ -108,16 +114,27 @@ public class MarketController {
 	
 	@DeleteMapping("/{marketNo}")
 	public ResponseEntity<ResponseDTO> deleteMarket(@PathVariable int marketNo){
-		ResponseDTO res= new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR,"게시글 정보 조회 중 오류가 발생하였습니다",null,"error");
+		ResponseDTO res= new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR,"게시글 삭제 중 오류가 발생하였습니다",null,"error");
 		try {
 			//서버에서 삭제
 			Market market=service.deleteMarket(marketNo);
 			
+			//파일 삭제
 			if(market!=null) {
-				
+				List<MarketFile> delFileList = market.getFileList();
+				if(delFileList != null) {
+					String savePath= uploadPath +"/postFile/";
+					for(MarketFile m : delFileList) {
+						File file = new File(savePath + m.getFilePath().substring(0,8) + File.separator + m.getFilePath());
+		
+						if(file.exists()) {
+							file.delete();
+						}
+					}
+				}
+				res= new ResponseDTO(HttpStatus.OK,"게시글이 삭제되었습니다",true,"success");
 			}
-			
-			
+
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
