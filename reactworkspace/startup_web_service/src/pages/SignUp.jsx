@@ -140,7 +140,7 @@ function SignUp() {
   const emailValid = watchEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(watchEmail);
   const emailFormatCorrect = watchEmail && watchEmail.includes('@') && watchEmail.includes('.');
 
-  // 아이디 중복 체크 - 팀원들이 배운 방식
+  // 아이디 중복 체크
   function handleCheckUserId() {
     if (!watchUserId) {
       toast.error('아이디를 입력해주세요');
@@ -152,7 +152,7 @@ function SignUp() {
     
     checkUserId(watchUserId)
       .then(function(response) {
-        // 팀원들이 배운 방식: response.data에서 확인
+        // response.data에서 확인
         if (response.data && response.data.resData === 0) {
           setIdCheckStatus('available');
           setCheckedId(watchUserId);
@@ -169,7 +169,7 @@ function SignUp() {
       });
   }
 
-  // 이메일 중복 체크 - 팀원들이 배운 방식
+  // 이메일 중복 체크
   function handleCheckUserEmail() {
     if (!watchEmail) {
       toast.error('이메일을 입력해주세요');
@@ -181,7 +181,7 @@ function SignUp() {
     
     checkUserEmail(watchEmail)
       .then(function(response) {
-        // 팀원들이 배운 방식: response.data에서 확인
+        // response.data에서 확인
         if (response.data && response.data.resData === 0) {
           setEmailCheckStatus('available');
           setCheckedEmail(watchEmail);
@@ -198,7 +198,7 @@ function SignUp() {
       });
   }
 
-  // 회원가입 처리 - 팀원들이 배운 방식
+  // 회원가입 처리
   function onSubmit(data) {
     // 아이디 중복 체크 확인
     if (idCheckStatus !== 'available' || checkedId !== data.userId) {
@@ -218,7 +218,7 @@ function SignUp() {
     
     signUp(signUpData)
       .then(function(response) {
-        // 팀원들이 배운 방식: response.data에서 확인
+        // response.data에서 확인
         if (response.data && response.data.alertIcon === 'success') {
           toast.success('회원가입이 완료되었습니다');
           navigate('/login');
@@ -237,11 +237,16 @@ function SignUp() {
 
   return (
     <div className="signup-container">
+      <div className="signup-header-logo">
+        <div 
+          className="signup-logo-clickable"
+          onClick={function() { navigate('/home'); }}
+        >
+          <Logo />
+        </div>
+      </div>
       <div className="signup-paper">
         <div className="signup-header">
-          <div className="signup-logo">
-            <Logo size="large" />
-          </div>
           <h1 className="signup-title">회원가입</h1>
         </div>
 

@@ -125,7 +125,7 @@ function ProfileEdit() {
     }
   }, [loginMember?.userId, reset]); // setLoginMember 제거하여 무한 루프 방지
 
-  // 팀원들이 배운 방식: function 선언문 + .then/.catch
+  // function 선언문 + .then/.catch
   function fetchUserInfo() {
     if (!loginMember?.userId) {
       return;
@@ -133,7 +133,7 @@ function ProfileEdit() {
     
     getMemberInfo(loginMember.userId)
       .then(function(response) {
-        // 팀원들이 배운 방식: response.data에서 직접 확인
+        // response.data에서 직접 확인
         if (response.data && response.data.alertIcon === 'success' && response.data.resData) {
           const userData = response.data.resData;
           

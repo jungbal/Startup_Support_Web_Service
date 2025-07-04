@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 
 const Home = () => {
-  const { loginMember, logout, isLogined } = useAuthStore();
+  const { loginMember, isLogined } = useAuthStore();
   const navigate = useNavigate();
   
   const handleMyPageClick = () => {

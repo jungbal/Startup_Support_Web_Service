@@ -1,4 +1,31 @@
 /* 회원가입 페이지 스타일 */
+
+/* 회원가입 페이지 헤더 로고 - 좌측 상단 고정 위치 */
+.signup-header-logo {
+  position: fixed;                      /* 고정 위치 */
+  top: 20px;                           /* 상단에서 20px */
+  left: 20px;                          /* 좌측에서 20px */
+  z-index: 1000;                       /* 다른 요소 위에 표시 */
+}
+
+/* 클릭 가능한 로고 컨테이너 */
+.signup-logo-clickable {
+  cursor: pointer;                      /* 마우스 포인터 */
+  transition: all var(--transition-fast); /* 부드러운 전환 */
+  padding: 8px;                        /* 클릭 영역 확보 */
+  border-radius: var(--border-radius); /* 둥근 모서리 */
+  background-color: rgba(255, 255, 255, 0.9); /* 반투명 흰색 배경 */
+  backdrop-filter: blur(10px);         /* 배경 블러 효과 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 가벼운 그림자 */
+}
+
+/* 로고 hover 효과 */
+.signup-logo-clickable:hover {
+  transform: scale(1.05);              /* 약간 확대 */
+  background-color: rgba(255, 255, 255, 1); /* 불투명 흰색 배경 */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15); /* 진한 그림자 */
+}
+
 .signup-container {
   min-height: 100vh;
   display: flex;
@@ -283,4 +310,36 @@
 .signup-cancel-button:hover:not(:disabled) {
   background-color: var(--primary-color);
   color: white;
+}
+
+/* 모바일 반응형 스타일 */
+@media (max-width: 768px) {
+  .signup-container {
+    padding: 15px;
+  }
+  
+  .signup-paper {
+    padding: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .signup-container {
+    padding: 10px;
+  }
+  
+  .signup-paper {
+    padding: 20px;
+    margin: 10px 0;
+  }
+
+  /* 모바일에서 로고 위치 및 크기 조정 */
+  .signup-header-logo {
+    top: 15px;
+    left: 15px;
+  }
+
+  .signup-logo-clickable {
+    padding: 6px;
+  }
 } 
