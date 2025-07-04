@@ -13,6 +13,7 @@ import useAuthStore from '../store/authStore';
 import '../styles/common.css';
 import '../styles/login.css';
 
+
 // 유효성 검사 스키마
 const schema = yup.object({
   userId: yup.string().required('아이디를 입력해주세요'),
@@ -86,11 +87,16 @@ function Login() {
 
   return (
     <div className="login-container">
+      <div className="login-header-logo">
+        <div 
+          className="login-logo-clickable"
+          onClick={function() { navigate('/home'); }}
+        >
+          <Logo />
+        </div>
+      </div>
       <div className="login-paper">
         <div className="login-header">
-          <div className="login-logo">
-            <Logo size="large" />
-          </div>
           <h1 className="login-title">로그인</h1>
         </div>
 

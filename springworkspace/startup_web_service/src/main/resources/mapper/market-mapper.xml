@@ -155,13 +155,167 @@
 		where market_no = #{market_no}
 	</select>
 
-	
-	
-	<!-- marketNo으로 File 조회 -->
-	<select id="selectFileByMarketNo"
-	parameterType="_int"
-	resultType="kr.or.iei.market.model.dto.MarketFile">
-	select 
+   <!-- 게시글 목록 조회 -->
+   <select id="selectMarketList"
+   parameterType="kr.or.iei.common.dto.PageInfo"
+   resultType="kr.or.iei.member.model.dto.Market">
+   select a.market_no as marketNo,
+         a.user_id as userId,
+         a.market_type as marketType,
+         a.market_title as marketTitle,
+         a.market_content as marketContent,
+         a.market_date as marketDate,
+         a.market_status as marketStatus,
+         a.report_count as reportCount,
+         a.read_count as readCount,
+         a.price as price,
+         a.m_file_path as filePath
+      from (
+          select rownum rnum, a.*
+          from(
+              select m.market_no,
+                    user_id,
+                    market_type,
+                    market_title,
+                    market_content,
+                    market_date,
+                    market_status,
+                    report_count,
+                    read_count,
+                    price,
+                    m_file_path
+                 from t_market m
+                 left join t_market_post_file f
+                  on m.market_no = f.market_no AND f.is_MainFile = 'Y'
+                 where market_status='public'
+                 order by market_date desc
+              )a
+          )a
+      where rnum between #{start} and #{end}
+   </select>
+
+   <!-- 게시글 수 조회 -->
+   <select id="selectBoardCount"
+   resultType="_int">
+   select count(*) 
+      from t_market
+   </select>
+
+   <!-- 마켓글 등록 -->
+   <insert id="insertMarket"
+   parameterType="kr.or.iei.member.model.dto.Market">
+   insert into t_market
+      (market_no,
+       user_id,
+       market_type,
+       market_title,
+       market_Content,
+       market_date,
+       market_status,
+       price,
+       report_count,
+       read_count
+      )
+      values(
+         #{marketNo},
+         #{userId},
+         #{marketType},
+         #{marketTitle},
+         #{marketContent},
+         sysdate,
+         default,
+         #{price},
+         default,
+         default
+      )
+   </insert>
+
+   <!-- 마켓글 번호 조회 -->
+   <select id="selectMarketNo"
+   parameterType="kr.or.iei.member.model.dto.Market"
+   resultType="_int">
+   select seq_market.nextval from dual
+   </select>
+
+   <!-- 마켓글 첨부파일 정보 등록-->
+   <insert id="insertMarketFile"
+   parameterType="kr.or.iei.market.model.dto.MarketFile">
+   insert into t_market_post_file
+      values(
+            seq_market_post_file.nextval,
+            #{marketNo},
+            #{fileName},
+            #{filePath},
+            #{isMainFile}
+            )
+   </insert>
+
+   <!-- 마켓글 1개 상세조회 -->
+   <select id="selectOneMarket"
+   parameterType="_int"
+   resultType="kr.or.iei.member.model.dto.Market">
+   select market_no as marketNo,
+           user_id as userId,
+           market_type as marketType,
+           market_title as marketTitle,
+           market_content as marketContent,
+           market_date as marketDate,
+           market_status as marketStatus,
+           price,
+           report_count as reportCount,
+           read_count as readCount
+        from t_market
+      where market_no=#{marketNo}
+   </select>
+
+   <!-- selectMarketFileList에 대한 resultMap. 파일 리스트 불러오기 위함 -->
+   <resultMap type="kr.or.iei.member.model.dto.Market" id="marketMap">
+      <result column="market_no" property="marketNo"/>
+      <result column="user_id" property="userId"/>
+      <result column="market_type" property="marketType"/>
+      <result column="market_title" property="marketTitle"/>
+      <result column="market_content" property="marketContent"/>
+      <result column="market_date" property="marketDate"/>
+      <result column="market_status" property="marketStatus"/>
+      <result column="price" property="price"/>
+      <result column="report_count" property="reportCount"/>
+      <result column="read_count" property="readCount"/>
+
+      <!-- 
+         property : 수행 결과를 바인딩할 DTO 클래스 변수명
+         select : 실행할 SQL ID
+         column : 실행할 SQL에 필요한 파라미터
+         javaType : 실행 결과를 담을 Java 객체 타입
+         ofType : javaType의 제네릭 타입
+       -->
+      <collection property="fileList"
+               select="selectMarketFileList" 
+               column="market_no"
+               javaType="java.util.List"
+               ofType="MarketFile">
+      </collection>
+   </resultMap>
+
+   <!-- 마켓글 1개에 대한 파일리스트 조회 -->
+   <select id="selectMarketFileList"
+   parameterType="_int"
+   resultType="kr.or.iei.market.model.dto.MarketFile">
+   select m_file_no as fileNo,
+         market_no as marketNo,
+         m_file_name as fileName,
+         m_file_path as filePath,
+         is_mainfile as isMainFile
+      from t_market_post_file
+      where market_no = #{market_no}
+   </select>
+
+
+
+   <!-- marketNo으로 File 조회 -->
+   <select id="selectFileByMarketNo"
+   parameterType="_int"
+   resultType="kr.or.iei.market.model.dto.MarketFile">
+   select 
         m_file_no as fileNo,
         market_no as marketNo,
         m_file_name as fileName,
@@ -169,15 +323,15 @@
         is_mainfile as isMainFile
     from t_market_post_file
     where market_no = #{marketNo}
-	</select>
-	
-	<!-- 마켓글 1개 삭제 -->
-	<delete id="deleteMarket"
-	parameterType="_int">
-	delete from t_market 
-		where market_no = #{marketNo}
-	</delete>
-	
+   </select>
 
-	
+   <!-- 마켓글 1개 삭제 -->
+   <delete id="deleteMarket"
+   parameterType="_int">
+   delete from t_market 
+      where market_no = #{marketNo}
+   </delete>
+
+
+
 </mapper>

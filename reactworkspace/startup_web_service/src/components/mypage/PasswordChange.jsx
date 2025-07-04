@@ -44,7 +44,7 @@ const schema = yup.object({
 });
 
 function PasswordChange() {
-  const { loginMember, setIsLogined, setLoginMember, setAccessToken, setRefreshToken } = useAuthStore();
+  const { loginMember, logout } = useAuthStore();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showPasswords, setShowPasswords] = useState({
@@ -117,7 +117,7 @@ function PasswordChange() {
       userPw: data.currentPassword,
     })
     .then(function(checkResponse) {
-      // 팀원들이 배운 방식: response.data에서 확인
+      // response.data에서 확인
       if (checkResponse.data && checkResponse.data.alertIcon !== 'success' || !checkResponse.data?.resData) {
         toast.error('현재 비밀번호가 일치하지 않습니다.');
         setLoading(false);
@@ -132,7 +132,7 @@ function PasswordChange() {
     })
     .then(function(updateResponse) {
       if (updateResponse) {
-        // 팀원들이 배운 방식: response.data에서 확인
+        // response.data에서 확인
         if (updateResponse.data && updateResponse.data.alertIcon === 'success') {
           // 비밀번호 변경 성공 시 알림 후 로그인 정보 초기화
           Swal.fire({
@@ -141,11 +141,8 @@ function PasswordChange() {
             icon: 'success',
             confirmButtonText: '확인',
           }).then(() => {
-            // 로그인 정보를 초기화
-            setIsLogined(false);
-            setLoginMember(null);
-            setAccessToken(null);
-            setRefreshToken(null);
+            // 완전한 로그아웃 처리
+            logout();
             
             // 로그인 페이지로 이동
             navigate('/login');

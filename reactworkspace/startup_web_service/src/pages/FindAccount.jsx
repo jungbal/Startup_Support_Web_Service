@@ -54,14 +54,14 @@ const FindAccount = () => {
     resolver: yupResolver(findPwSchema),
   });
 
-  // 아이디 찾기 처리 - 팀원들이 배운 방식
+  // 아이디 찾기 처리
   const onSubmitFindId = (data) => {
     setIsLoading(true);
     setEmailSent('');
     
     findUserId(data.userEmail)
       .then(function(response) {
-        // 팀원들이 배운 방식: response.data에서 확인
+        // response.data에서 확인
         if (response.data && response.data.alertIcon === 'success' && response.data.resData) {
           setEmailSent(response.data.clientMsg);
           toast.success(response.data.clientMsg);
@@ -78,14 +78,14 @@ const FindAccount = () => {
       });
   };
 
-  // 비밀번호 찾기 처리 - 팀원들이 배운 방식
+  // 비밀번호 찾기 처리
   const onSubmitFindPw = (data) => {
     setIsLoading(true);
     setTempPasswordSent('');
     
     findUserPw(data.userId, data.userEmail)
       .then(function(response) {
-        // 팀원들이 배운 방식: response.data에서 확인
+        // response.data에서 확인
         if (response.data && response.data.alertIcon === 'success' && response.data.resData) {
           setTempPasswordSent(response.data.clientMsg);
           toast.success(response.data.clientMsg);
@@ -104,11 +104,16 @@ const FindAccount = () => {
 
   return (
     <div className="findaccount-container">
+      <div className="findaccount-header-logo">
+        <div 
+          className="findaccount-logo-clickable"
+          onClick={function() { navigate('/home'); }}
+        >
+          <Logo />
+        </div>
+      </div>
       <div className="findaccount-paper">
         <div className="findaccount-header">
-          <div className="findaccount-logo">
-            <Logo size="large" />
-          </div>
           <h1 className="findaccount-title">아이디/비밀번호 찾기</h1>
         </div>
 
