@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.or.iei.publicservice.model.dao.PublicServiceDao">
+
+	<resultMap id="publicserviceResultMap" type="kr.or.iei.publicservice.model.dto.PublicService">
+	     <result property="serviceId" column="service_id" />
+	     <result property="userType" column="user_type" />
+	     <result property="serviceName" column="service_name" />
+	     <result property="serviceSummary" column="service_summary" />
+	     <result property="serviceUrl" column="service_url" />
+	</resultMap>
+
+	<!-- 전체 조회 -->
+    <select id="selectAll" resultMap="publicserviceResultMap">
+        SELECT * FROM m_public_services
+    </select>
+    
+    
+
+</mapper>
