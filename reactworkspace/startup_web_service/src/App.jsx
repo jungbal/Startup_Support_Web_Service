@@ -25,6 +25,7 @@ import Home from './pages/Home';
 import MarketMain from './components/Market/MarketMain';
 import CommercialMain from './components/commercial/CommercialMain';
 import CommercialDetail from './components/commercial/CommercialDetail';
+import ServiceList from './components/service/ServiceList';
 
 // MUI 테마 설정
 const theme = createTheme({
@@ -142,6 +143,8 @@ function AppWithHeaderFooter() {
           <Route path="/market/*" element={<MarketMain />} />
           <Route path="/commercial/*" element={<CommercialMain />} />
           <Route path="/commercial/detail/:storeId" element={<CommercialDetail />} />
+
+          <Route path="/service/*" element={<ServiceList />} />
           
           {/* 보호된 라우트 (로그인 필요) */}
           <Route
