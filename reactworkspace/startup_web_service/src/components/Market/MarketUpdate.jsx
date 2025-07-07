@@ -48,7 +48,55 @@ export default function MarketUpdate(){
 
     //수정하기 버튼 클릭시 
     function updateMarket(){
+        if(marketTitle != null && marketContent != null){
+            const form= new FormData(); //서버에 보낼 폼 
 
+            form.append('marketNo', marketNo);
+            form.append('marketTitle',marketTitle);
+            form.append('marketContent', marketContent);
+            form.append('price',marketPrice);
+            form.append('marketType', marketType);
+
+            
+
+            for(let i=0; i<marketFile.length;i++){ //추가할 첨부파일
+                
+                form.append('isMainFile', marketFile[i].isMainFile ? 'Y' : 'N'); //대표 이미지 여부
+                form.append('fileOrder', marketFile[i].fileOrder); //파일 순서 
+                form.append('fileType', marketFile[i].file ? 'new' : 'old'); // 새 파일이면 new, 아니면 old
+                if (marketFile[i].type =='old') {
+                    // 기존 파일이면 marketFileNo도 같이 넘겨줘야 update 가능.
+                    form.append('marketFileNo', marketFile[i].marketFileNo);
+                }else{
+                    //새 파일만 파일 객체주면됨 
+                    form.append('marketFile',marketFile[i].file);
+                }
+            }
+
+
+
+            for(let i=0; i<delFileList.length;i++){ //지울 첨부파일
+                form.append('delFileList',delFileList[i]);
+            }
+
+            let options={};
+            options.url=serverUrl+'/market';
+            options.method='patch';
+            options.data=form;
+            options.headers={};
+            options.headers.contentType="multipart/form-data";
+            options.headers.processData=false;//쿼리 스트링 변환x
+
+            console.log(1);
+
+            axiosInstance(options)
+            .then(function(res){
+                if(res.data.resData){
+                    navigate('/market/list/'+marketNo);
+                }
+            });
+
+        }
     }
 
     return(

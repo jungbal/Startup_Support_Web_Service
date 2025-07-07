@@ -34,9 +34,12 @@ export default function MarketWrite(){
             console.log(loginMember);
             console.log(loginMember.memberId);
 
-
             for(let i=0; i<marketFile.length; i++){//첨부파일 업로드 한 경우에만
-                form.append("marketFile", marketFile[i]);//모두 동일한 이름으로 append
+                form.append("marketFile", marketFile[i].file); // 파일 객체
+
+                // 대표 이미지 여부 및 순서 정보 같이 전송
+                form.append("isMainFile", marketFile[i].isMainFile ? 'Y' : 'N');
+                form.append("fileOrder", marketFile[i].fileOrder);
             }
 
             let options={};

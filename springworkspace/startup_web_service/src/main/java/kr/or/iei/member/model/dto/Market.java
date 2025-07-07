@@ -25,6 +25,7 @@ public class Market {
 	
 	private String filePath; // 썸네일 표기를 위한 join 해오기 위함
 	private List<MarketFile> fileList; // 게시글에 대한 파일 정보
+	private int [] delMarketFileNo; //삭제 파일 번호 배열 저장 변수
 	
 	
 } 

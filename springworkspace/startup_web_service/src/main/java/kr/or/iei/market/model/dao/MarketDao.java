@@ -27,6 +27,14 @@ public interface MarketDao {
 
 	int deleteMarket(int marketNo);
 
+	int updateMarket(Market market);
+
+	ArrayList<MarketFile> selectMarketDelFile(int[] delMarketFileNo);
+
+	void deleteMarketFile(int[] delMarketFileNo);
+
+	void updateMarketFile(MarketFile file);
+
 	
 
 }

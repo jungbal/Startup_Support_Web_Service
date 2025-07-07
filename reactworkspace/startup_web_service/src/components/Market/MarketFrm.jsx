@@ -53,16 +53,17 @@ export default function MarketFrm(props){
                 serverImgs.push({
                                     url: imgUrl,
                                     type: "old",
-                                    filePath: filePath
+                                    filePath: filePath,
+                                    marketFileNo : prevFileList[i].marketFileNo
                                 });
             }
 
-            setMarketImg(serverImgs);
+            setMarketImg(serverImgs); //미리보기 세팅
+            updateFilesFromImgs(serverImgs); // 서버에 보낼 파일 세팅
         }
     }, [prevFileList]);
 
-    //현재 보고 있는 이미지 인덱스
-    //const [currentImgIndex, setCurrentImgIndex] = useState(0); 
+
 
     //input type=file인 썸네일 업로드 요소와 연결하여 사용
     const thumbFileEl=useRef(null);
@@ -87,7 +88,6 @@ export default function MarketFrm(props){
         }
 
         /* 새 파일과 미리보기 배열 준비 */
-        const newFileArr  = [];            // 서버 전송용 새 파일
         const newImgArr   = [];            // 미리보기용 새 객체
 
         const fileArr=new Array(); // 파일 업로드를 위한 배열 //map 등등 배열에 쓸 수 있는 함수들 쓰기 위함
@@ -106,18 +106,16 @@ export default function MarketFrm(props){
                     newImgArr.push({
                         url: reader.result,
                         file: files[i],
-                        type: "new", // 새로 추가된 파일 표시
-                        index : i
+                        type: "new" // 새로 추가된 파일 표시
                     });
                     loadedCount++;
 
                     //모든 이미지 로딩 끝났을 때 한 번만 set
                     if(loadedCount == files.length){
-                        setMarketImg(function(prev) {      // 기존 + 새 이미지
-                            return prev.concat(newImgArr);
-                        });
-                        setMarketFile(function(prev) {     // 기존 + 새 파일
-                            return prev.concat(newFileArr);
+                        setMarketFile(function(prev) {
+                            const combinedImgs = imgArr.concat(newImgArr);
+                            setMarketImg(combinedImgs);
+                            updateFilesFromImgs(combinedImgs);
                         });
                     }
                 };
@@ -132,46 +130,55 @@ export default function MarketFrm(props){
         /* 기존(old) delFileList에 추가 */
         if (target.type === "old") {
             setDelFileList(function(prev) {
-                return prev.concat(target.filePath);
+                return prev.concat(target.marketFileNo);
             });
         }
 
-        /* 새(new) 이미지 – 업로드용 marketFile에서도 제거 */
-        if (target.type === "new") {
-            setMarketFile(function(prev) {
-                return prev.filter(function(f) {
-                    return f !== target.file;          // 같은 File 객체 제거
-                });
-            });
-        }
-
-        /* 미리보기 목록에서 제거 */
-        setMarketImg(function(prev) {
-            return prev.filter(function(_, i) {
-                return i !== index;
-            });
+        const updatedImgs = marketImg.filter(function (_, i) {
+            return i !== index;
         });
+
+
+        setMarketImg(updatedImgs); //미리보기 세팅
+        updateFilesFromImgs(updatedImgs); //서버에 보낼 파일 세팅
     }
 
     const dragItem = useRef();
     const dragOverItem = useRef();
     //드래그해서 사진 순서 바꾸기 
     function handleSortEnd() {
-        const files = [...marketFile];
         const imgs = [...marketImg];
+        const draggedIndex = dragItem.current;
+        const overIndex = dragOverItem.current;
 
-        const draggedItem = dragItem.current;
-        const overItem = dragOverItem.current;
+        const temp = imgs[draggedIndex];
+        imgs[draggedIndex] = imgs[overIndex];
+        imgs[overIndex] = temp;
 
-        const tempFile = files[draggedItem];
-        const tempImg = imgs[draggedItem];
-        files[draggedItem] = files[overItem];
-        imgs[draggedItem] = imgs[overItem];
-        files[overItem] = tempFile;
-        imgs[overItem] = tempImg;
+        setMarketImg(imgs); //미리보기 세팅
+        updateFilesFromImgs(imgs);//서버에 보낼 파일 세팅
+    }
 
-        setMarketFile(files);
-        setMarketImg(imgs);
+    
+    //이미지 순서와 대표 이미지 갱신 + marketFile set해주는 함수
+    function updateFilesFromImgs(imgList) {
+        const updatedFiles = imgList.map(function(img, index) {
+            if (img.type == 'new') {
+                return {
+                    file: img.file,
+                    fileOrder: index,
+                    isMainFile: index == 0
+                };
+            } else {
+                return {
+                    marketFileNo: img.marketFileNo,
+                    fileOrder: index,
+                    isMainFile: index == 0
+                };
+            }
+        });
+
+        setMarketFile(updatedFiles);
     }
 
 
@@ -308,3 +315,5 @@ export default function MarketFrm(props){
         </div>
     )
 }
+
+
