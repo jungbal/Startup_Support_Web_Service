@@ -11,4 +11,6 @@ public interface PublicServiceDao {
     ArrayList<PublicService> selectAll();
 
     int insertPublicService(PublicService ps);
+    
+    PublicService selectServiceById(String serviceId);
 }
