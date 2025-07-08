@@ -15,6 +15,9 @@
         SELECT * FROM m_public_services
     </select>
     
-    
+    <!-- 상세 정보 조회 -->
+    <select id="selectServiceById" parameterType="string" resultMap="publicserviceResultMap">
+        SELECT * FROM m_public_services WHERE service_id = #{serviceId}
+    </select>
 
 </mapper>
