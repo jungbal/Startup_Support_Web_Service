@@ -39,11 +39,13 @@ export default function MarketList(){
 
     return(
         <div className="market-list-container">
-            <h1>Market</h1>
-            {isLogined
-            ?
-            <Link to="/market/write" className="btn-primary">판매글 쓰기</Link>
-            :''}
+            <div className="market-header">
+                <h1 className="marketTypo">Market</h1>
+                {isLogined
+                ?
+                <Link to="/market/write" className="btn-primary">판매글 쓰기</Link>
+                :''}
+            </div>
             <div>
                 <ul className="market-list">
                     {marketList.map(function(market, index){

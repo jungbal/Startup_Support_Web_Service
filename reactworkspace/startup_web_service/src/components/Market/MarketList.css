@@ -1,3 +1,12 @@
+/* 컨테이너 전체 여백 */
+.market-list-container {
+    padding: 20px 80px; /* 좌우 여백 */
+    padding: 20px; /* 내부 여백 설정 */
+    max-width: 1200px; /* 최대 너비 설정 */
+    margin: 0 auto; /* 가운데 정렬 */
+    color: #333; /* 기본 글자 색상 */
+}
+
 /* list 4개씩 정렬*/
 .market-list {
     display: grid;
@@ -8,10 +17,10 @@
 }
 
 /* 버튼 css */
+
 .btn-primary {
     display: inline-block;
-    padding: 8px 16px;
-    margin-bottom: 16px;
+    padding: 10px 20px;
     background-color: #ff8c00;
     color: white;
     font-weight: bold;
@@ -22,4 +31,27 @@
 
 .btn-primary:hover {
     background-color: #ff8c00c4;
+}
+
+
+/* MARKET 제목 + 버튼 묶음 */
+.market-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0;
+    padding-bottom: 15px; 
+    border-bottom: 2px solid #eee;
+    gap: 20px;
+}
+
+/* MARKET 제목 스타일 */
+.marketTypo  {
+    font-size: 32px;
+    font-weight: bold;
+    background-image: linear-gradient(45deg, #FF8C00, #FFA500, #ffc170);
+    background-clip: text;
+    color: transparent; /* 텍스트 색상을 투명하게 */
+    
 }

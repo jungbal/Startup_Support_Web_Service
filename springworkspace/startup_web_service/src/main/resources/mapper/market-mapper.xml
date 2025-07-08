@@ -152,7 +152,8 @@
 			market_no as marketNo,
 			m_file_name as fileName,
 			m_file_path as filePath,
-			is_mainfile as isMainFile
+			is_mainfile as isMainFile,
+			file_order as fileOrder
 		from t_market_post_file
 		where market_no = #{market_no}
 	</select>
@@ -168,7 +169,8 @@
         market_no as marketNo,
         m_file_name as fileName,
         m_file_path as filePath,
-        is_mainfile as isMainFile
+        is_mainfile as isMainFile,
+        file_order as fileOrder
     from t_market_post_file
     where market_no = #{marketNo}
    </select>
@@ -206,11 +208,11 @@
 		from t_market_post_file
 		where m_file_no in
 		<foreach collection="array"
-				 item="marketFileNo"
+				 item="delMarketFileNo"
 				 open="("
 				 separator=","
 				 close=")">
-		#{fileNo}
+		#{delMarketFileNo, jdbcType=INTEGER}  <!-- 정확한 타입 명시안할시 오류 -->
 		</foreach>
    	
     </select>
@@ -222,12 +224,12 @@
 	delete from t_market_post_file
 		where m_file_no in
 		<foreach collection="array"
-				 item="marketFileNo"
+				 item="delMarketFileNo"
 				 open="("
 				 separator=","
 				 close=")">
-		#{fileNo}
-		</foreach>
+		#{delMarketFileNo, jdbcType=INTEGER} <!-- 정확한 타입 명시안할시 오류 -->
+		</foreach> 
 	
 	</delete>
 	
@@ -235,7 +237,7 @@
 	<update id="updateMarketFile"
 	parameterType="MarketFile">
 	update t_market_post_file
-		set is_main_file=#{isMainFile},
+		set is_mainfile=#{isMainFile},
 			file_order = #{fileOrder}
 		where m_file_no =#{fileNo}
 	</update>

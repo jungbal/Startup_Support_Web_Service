@@ -41,7 +41,12 @@ export default function MarketUpdate(){
             setMarketContent(market.marketContent);
             setMarketPrice(market.price);
             setMarketType(market.marketType);
-            setPrevFileList(market.fileList);
+            
+            //fileOrder 기준 정렬 후 PrevFileList세팅
+            const sortedPrevFiles = market.fileList.sort(function(a, b) {
+                return a.fileOrder - b.fileOrder;
+            });
+            setPrevFileList(sortedPrevFiles);
 
         });
     },[]);
@@ -64,20 +69,27 @@ export default function MarketUpdate(){
                 form.append('isMainFile', marketFile[i].isMainFile ? 'Y' : 'N'); //대표 이미지 여부
                 form.append('fileOrder', marketFile[i].fileOrder); //파일 순서 
                 form.append('fileType', marketFile[i].file ? 'new' : 'old'); // 새 파일이면 new, 아니면 old
+
+                //console.log("fileOrder:", form.getAll("fileOrder"));
+
                 if (marketFile[i].type =='old') {
-                    // 기존 파일이면 marketFileNo도 같이 넘겨줘야 update 가능.
-                    form.append('marketFileNo', marketFile[i].marketFileNo);
-                }else{
+                    // 기존 파일이면 FileNo도 같이 넘겨줘야 update 가능.
+                    form.append('fileNo[]', marketFile[i].fileNo);
+                }else if (marketFile[i].type =='new'){
                     //새 파일만 파일 객체주면됨 
                     form.append('marketFile',marketFile[i].file);
                 }
             }
 
-
-
             for(let i=0; i<delFileList.length;i++){ //지울 첨부파일
-                form.append('delFileList',delFileList[i]);
+                form.append('delMarketFileNo',delFileList[i]);
             }
+
+            /*
+            for (let pair of form.entries()) {
+                console.log(pair[0]+ ': ' + pair[1]);
+            }
+            */
 
             let options={};
             options.url=serverUrl+'/market';
@@ -86,8 +98,6 @@ export default function MarketUpdate(){
             options.headers={};
             options.headers.contentType="multipart/form-data";
             options.headers.processData=false;//쿼리 스트링 변환x
-
-            console.log(1);
 
             axiosInstance(options)
             .then(function(res){

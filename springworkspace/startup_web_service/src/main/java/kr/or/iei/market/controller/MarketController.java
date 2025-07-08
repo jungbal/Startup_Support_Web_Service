@@ -116,10 +116,13 @@ public class MarketController {
 		try {
 			Map<String, Object> marketData =service.selectOneMarket(marketNo);
 			
+			
+			System.out.println("marketData = " + marketData);
 			res= new ResponseDTO(HttpStatus.OK,"",marketData ,"");
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
+		
 		return new ResponseEntity<ResponseDTO>(res, res.getHttpStatus());
 	}
 	
@@ -160,18 +163,24 @@ public class MarketController {
 													@ModelAttribute Market market,	//수정된 게시글 정보 + 삭제할 파일 번호 리스트
 													@RequestParam(required = false) String[] isMainFile, //메인파일 여부
 												    @RequestParam(required = false) Integer[] fileOrder,//파일순서
-												    @RequestParam(required = false) Integer[] marketFileNo, //수정할 파일 넘버 리스트
-												    @RequestParam String[] fileType //이미지 타입(old, new)
+												    @RequestParam(required = false) Integer[] fileNo, //수정할 파일 넘버 리스트
+												    @RequestParam String[] fileType, //이미지 타입(old, new)
+												    @RequestParam(required = false) int[] delMarketFileNo //명시적으로 지울 파일 리스트 받아옴
 													){	
 		ResponseDTO res= new ResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR,"게시글 수정 중 오류가 발생하였습니다",false,"error");
+		
+		
+		market.setDelMarketFileNo(delMarketFileNo);
 		
 		try {
 			
 			int newFileIndex = 0; //파일들 들어있는 객체 인덱스값 // fileType와 marketFile의 길이가 맞지 않기 때문
-			
+			int fileNoIndex = 0;
 			ArrayList<MarketFile> allFileList= new ArrayList<MarketFile>();
 			
-			for(int i=0; i<fileType.length;i++) {					
+			for(int i=0; i<fileType.length;i++) {	
+				
+				
 				MarketFile file = new MarketFile();
 				
 				file.setMarketNo(market.getMarketNo());			//게시글 번호
@@ -180,13 +189,14 @@ public class MarketController {
 				file.setFileType(fileType[i]);					//new old 이미지 여부
 				
                 if(fileType[i].equals("new")) {//새롭게 추가하는 이미지 일때 
-                	String filePath=fileUtil.uploadFile(marketFile[i], "/postFile/"); //파일 업로드
+                	String filePath=fileUtil.uploadFile(marketFile[newFileIndex], "/postFile/"); //파일 업로드
                 	file.setFilePath(filePath);	//서버 저장 파일명
                 	file.setFileName(marketFile[newFileIndex].getOriginalFilename()); //사용자가 업로드한 실제 파일명
                 	newFileIndex++;
                 	
-                }else if(fileType[i].equals("old")) {//기존 이미지 순서 업데이트
-                	file.setFileNo(marketFileNo[i]);
+                }else if(fileType[i].equals("old")) {//기존 이미지 순서 업데이트            	
+                	file.setFileNo(fileNo[fileNoIndex]);
+                	fileNoIndex++;
                 }
 
 				allFileList.add(file);
