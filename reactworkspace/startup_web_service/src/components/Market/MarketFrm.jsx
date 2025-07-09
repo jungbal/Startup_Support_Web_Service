@@ -1,6 +1,7 @@
-import { style } from "@mui/system";
 import { useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
+
+import "./MarketFrm.css";
 
 export default function MarketFrm(props){
 
@@ -187,14 +188,29 @@ export default function MarketFrm(props){
 
 
     return (
-        <div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+        <div className="market-form-wrapper">
+
+                {marketImg.length < 10 ? // 이미지 파일이 10장 이하 일시 input태그 보여줌 
+                <div className="file-upload-zone">
+                    <img src="/image/default_img.png" onClick={function(e){
+                                //e.target == img 요소 객체
+                                //e.target의 속성을 이용해서 다음 요소인input을 동적으로 click하는게 가능하지만 react에서 권장되지 않음.
+                                //useRef 라는 훅을 이용해 자바스크립트 변수와 input 요소를 연결시키고 해당 변수를 이용해서 컨트롤이 가능하다
+                                thumbFileEl.current.click();
+                    }}></img>
+
+                    
+                    <input type="file" accept="image/*" style={{display :"none"}} ref={thumbFileEl} multiple onChange={chgThumbFile}/>
+                </div>
+                : "" }
+
                 {marketImg.length > 0 
                 ? 
                     //첨부 파일이 존재하는 경우 
                     marketImg.map(function (img, index) {
                         return (
-                            <div key={index} style={{ position: "relative" }} draggable
+                            <div key={index} className="file-preview-item"
+                                draggable
                                 onDragStart={function(){ dragItem.current = index; }}
                                 onDragEnter={function(){ dragOverItem.current = index; }}
                                 onDragEnd={handleSortEnd}>
@@ -203,47 +219,16 @@ export default function MarketFrm(props){
                                     onClick={function () {
                                         thumbFileEl.current.click();
                                     }}
-                                    style={{
-                                        width: "100px",
-                                        height: "100px",
-                                        objectFit: "cover",
-                                        border: "1px solid #ccc",
-                                        cursor: "pointer",
-                                    }}
                                 />
                                 {index == 0 && (
-                                    <span
-                                        style={{
-                                        position: "absolute",
-                                        top: "5px",
-                                        left: "5px",
-                                        background: "#007bff",
-                                        color: "white",
-                                        padding: "2px 6px",
-                                        borderRadius: "4px",
-                                        fontSize: "12px",
-                                        }}
-                                    >
+                                    <span className="main-image-badge">
                                         대표
                                     </span>
                                 )}
                                 <button type="button"
+                                        className="file-delete-btn-old-style"
                                         onClick={function () {
                                         removeImage(index);
-                                    }}
-                                    style={{
-                                        position: "absolute",
-                                        top: "-5px",
-                                        right: "-5px",
-                                        background: "red",
-                                        color: "white",
-                                        border: "none",
-                                        borderRadius: "50%",
-                                        width: "20px",
-                                        height: "20px",
-                                        cursor: "pointer",
-                                        fontSize: "14px",
-                                        lineHeight: "20px",
                                     }}
                                 >
                                     ×
@@ -253,27 +238,13 @@ export default function MarketFrm(props){
                     })
                 
                 : "" }
-                {marketImg.length < 10 ? // 이미지 파일이 10장 이하 일시 input태그 보여줌 
-                <div>
-                    <img src="/image/default_img.png" onClick={function(e){
-                                //e.target == img 요소 객체
-                                //e.target의 속성을 이용해서 다음 요소인input을 동적으로 click하는게 가능하지만 react에서 권장되지 않음.
-                                //useRef 라는 훅을 이용해 자바스크립트 변수와 input 요소를 연결시키고 해당 변수를 이용해서 컨트롤이 가능하다
-                                thumbFileEl.current.click();
-                    }} style={{ width: "100px", height: "100px"}} ></img>
 
-                    
-                    <input type="file" accept="image/*" style={{display :"none"}} ref={thumbFileEl} multiple onChange={chgThumbFile}/>
-                </div>
-                : "" }
-                
-            </div>
 
             <div>
-                <table>
+                <table className="market-form-table">
                     <tbody>
                         <tr>
-                            <th style={{width : "30%"}}>
+                            <th>
                                 <label htmlFor="marketTitle">제목</label>
                             </th>
                             <td>
@@ -288,7 +259,7 @@ export default function MarketFrm(props){
                         </tr>
                         <tr>
                             <th>작성자</th>
-                            <td className="left">{loginMember.userId}</td>
+                            <td>{loginMember.userId}</td>
                         </tr>
                         <tr>
                             <th>가격</th>
