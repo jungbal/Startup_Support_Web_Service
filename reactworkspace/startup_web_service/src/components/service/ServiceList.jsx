@@ -1,4 +1,3 @@
-// ServiceList.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchServiceList } from '../../api/subsidyApi';
@@ -18,7 +17,7 @@ import {
   Button,
 } from '@mui/material';
 
-const CACHE_EXPIRATION_TIME = 60 * 60 * 1000; 
+const CACHE_EXPIRATION_TIME = 60 * 60 * 1000;
 
 function ServiceList() {
   const navigate = useNavigate();
@@ -38,7 +37,8 @@ function ServiceList() {
   const [itemsPerPage] = useState(9);
   const [totalItems, setTotalItems] = useState(0);
 
-  const applyFilter = useCallback(function () {
+  // 필터 적용 함수
+  const applyFilter = useCallback(function applyFilterCallback() {
     const filteredResults = allServices.filter(function (item) {
       const keyword = searchTrigger.toLowerCase();
       const keywordMatch =
@@ -61,7 +61,8 @@ function ServiceList() {
     setTotalItems(totalFilteredItems);
   }, [searchTrigger, supportType, userType, serviceField, allServices, currentPage, itemsPerPage]);
 
-  useEffect(function () {
+  // 전체 서비스 목록 불러오기
+  useEffect(function loadAllServicesEffect() {
     async function loadAllServices() {
       setLoading(true);
       try {
@@ -74,10 +75,8 @@ function ServiceList() {
             setUserTypeList(parsedData.userTypes);
             setServiceFieldList(parsedData.serviceFields);
             setLoading(false);
-            console.log("서비스 목록을 캐시에서 불러왔습니다.");
             return;
           } else {
-            console.log("캐시가 만료되어 새로운 데이터를 불러옵니다.");
             localStorage.removeItem('cachedServiceList');
           }
         }
@@ -142,7 +141,6 @@ function ServiceList() {
         setUserTypeList(sortedUserTypes);
         setServiceFieldList(sortedServiceFields);
         setLoading(false);
-        console.log("서비스 목록을 API에서 새로 불러왔습니다.");
       } catch (err) {
         console.error('서비스 목록 가져오기 실패:', err);
         setError('데이터를 불러오는 중 오류가 발생했습니다.');
@@ -153,48 +151,48 @@ function ServiceList() {
     loadAllServices();
   }, []);
 
-  useEffect(function () {
+  useEffect(function applyFilterEffect() {
     applyFilter();
   }, [allServices, currentPage, supportType, userType, serviceField, searchTrigger, applyFilter]);
 
-  const handleInputChange = function (e) {
+  // 검색/필터/페이지 핸들링 함수들
+  function handleInputChange(e) {
     const { name, value } = e.target;
     if (name === 'searchKeyword') setSearchKeyword(value);
     else if (name === 'supportType') setSupportType(value);
     else if (name === 'userType') setUserType(value);
     else if (name === 'serviceField') setServiceField(value);
-  };
+  }
 
-  const handleSearch = function () {
+  function handleSearch() {
     setSearchTrigger(searchKeyword);
     setCurrentPage(1);
-  };
+  }
 
-  const handleKeyDown = function (e) {
+  function handleKeyDown(e) {
     if (e.key === 'Enter') {
       handleSearch();
     }
-  };
+  }
 
-  const handleReset = function () {
+  function handleReset() {
     setSearchKeyword('');
     setSearchTrigger('');
     setSupportType('');
     setUserType('');
     setServiceField('');
     setCurrentPage(1);
-  };
+  }
 
-  const handlePageChange = function (event, value) {
+  function handlePageChange(event, value) {
     setCurrentPage(value);
-  };
+  }
 
-  const renderCard = function (service) {
+  function renderCard(service) {
     return (
       <Grid item xs={12} sm={6} md={4} key={service.servId}>
         <Card
           onClick={function () {
-            console.log("✅ 상세페이지로 보낼 데이터:", service); // ✅ 위치 1
             navigate(`/service/detail/${service.servId}`, { state: service });
           }}
           variant="outlined"
@@ -223,15 +221,17 @@ function ServiceList() {
         </Card>
       </Grid>
     );
-  };
+  }
 
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
+  // 화면 렌더링
   return (
     <Box p={3}>
       <Typography variant="h4" gutterBottom>공공서비스 목록</Typography>
 
+      {/* 검색/필터 영역 */}
       <Box display="flex" flexWrap="wrap" gap={2} mb={3} alignItems="center">
         <TextField
           name="searchKeyword"
@@ -280,10 +280,12 @@ function ServiceList() {
         </Button>
       </Box>
 
+      {/* 카드 목록 */}
       <Grid container spacing={2}>
         {services.map(renderCard)}
       </Grid>
 
+      {/* 페이지네이션 */}
       <Box display="flex" justifyContent="center" mt={4}>
         <Pagination
           count={Math.ceil(totalItems / itemsPerPage)}

@@ -9,8 +9,6 @@ import kr.or.iei.publicservice.model.dto.PublicService;
 @Mapper
 public interface PublicServiceDao {
     ArrayList<PublicService> selectAll();
-
-    int insertPublicService(PublicService ps);
     
     PublicService selectServiceById(String serviceId);
 }
