@@ -12,4 +12,6 @@ public class Chatroom {
 	private String chatUser1;	//채팅하고있는 유저ID 1
 	private String chatUser2;	//채팅하고있는 유저ID 2
 	private String lastMessage;	//마지막 메시지 보낸 시간
+	
+	private String lastMessageContent; //마지막 메시지 내용
 }

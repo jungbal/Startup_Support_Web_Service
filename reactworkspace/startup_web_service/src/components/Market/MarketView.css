@@ -1,3 +1,21 @@
+/* 전체 컨테이너 */
+.market-view-container {
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* 게시글 제목 */
+.market-view-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #eee;
+}
+
 /* 이미지 크기 조정*/
 .file-img {
   width: 300px;
@@ -12,14 +30,21 @@
     justify-content: center;
     gap: 20px;
     margin-bottom: 20px;
+    
 }
 
 .arrow-btn {
     background-color: transparent;
     border: none;
     font-size: 2rem;
+    color: #555;
     cursor: pointer;
     user-select: none;
+    transition: color 0.3s ease;
+}
+
+.arrow-btn:hover {
+    color: #bbb;
 }
 
 .file-img {
@@ -34,15 +59,130 @@
 .indicator-wrap {
     text-align: center;
     margin-top: 5px;
+    margin-bottom: 40px;
 }
 
 .dot {
     font-size: 1.2rem;
-    color: #aaa;
+    color: #ccc;
     cursor: pointer;
     margin: 0 4px;
+    transition: color 0.3s ease;
 }
 
 .dot.active {
     color: #333;
 }
+
+
+/* 테이블 스타일 */
+.tbl {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+
+.tbl tbody tr {
+    border-bottom: 1px solid #eee;
+}
+
+
+.tbl tbody tr:last-child {
+    border-bottom: none;
+}
+
+.tbl th {
+    padding: 12px 15px;
+
+    font-weight: bold;
+    color: #555;
+    text-align: left;
+    
+}
+
+.tbl td {
+    padding: 12px 15px;
+    color: #666;
+    word-break: break-word;
+    background-color: #fff; 
+}
+
+/* 버튼 스타일 */
+.view-btn-zone {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 10px;
+    padding-top: 10px;
+}
+
+.btn-secondary { /* link 와 동일한 크기로 css 부여 */
+    background-color: #6c757d; 
+    color: white;
+
+    height: 44px; 
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: 16px; 
+    line-height: 24px; 
+    font-weight: 700; 
+    
+    border: none;
+    border-radius: 6px; 
+    cursor: pointer;
+    display: inline-block; 
+    text-decoration: none; 
+    text-align: center;
+
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn-chat {
+    background-color: #ff8c00;; 
+    color: white;
+
+    height: 44px; 
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: 16px; 
+    line-height: 24px; 
+    font-weight: 700; 
+    
+    border: none;
+    border-radius: 6px; 
+    cursor: pointer;
+    display: inline-block; 
+    text-decoration: none; 
+    text-align: center;
+
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-chat:hover {
+    background-color: #ff8c00c4;
+}
+
+
+/* 게시글 내용 Viewer */
+.board-content-wrap {
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background-color: #fdfdfd;
+    min-height: 200px;
+}
+
+

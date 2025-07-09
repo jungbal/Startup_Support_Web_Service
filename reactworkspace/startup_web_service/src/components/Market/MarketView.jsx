@@ -29,7 +29,6 @@ export default function MarketView(){
         axiosInstance(options)
         .then(function(res){
             setMarket(res.data.resData.market);
-            
 
             //파일 순서인 fileOrder에 따라 배열을 정렬해주고 marketFile에 set해줌
             const sortedFiles = res.data.resData.files.sort(function(a, b) {
@@ -55,8 +54,8 @@ export default function MarketView(){
     }
 
     return(
-        <div>
-            <div>게시글 상세보기</div>
+        <div className="market-view-container">
+            <div className="market-view-title">{market.marketTitle}</div>
             <div>
                 <div>
                     {   
@@ -116,26 +115,21 @@ export default function MarketView(){
                     <table className="tbl">
                         <tbody>
                             <tr>
-                                <td className="left" colSpan={4}>
-                                    {market.marketTitle}
-                                </td>
+                                <th>작성자</th>
+                                <td>{market.userId}</td>
+                                <th>작성일</th>
+                                <td>{market.marketDate}</td>
+                                <th>조회수</th>
+                                <td>{market.readCount}</td>
                             </tr>
                             <tr>
-                                <th style={{width:"20%"}}>작성자</th>
-                                <td style={{width:"20%"}}>{market.userId}</td>
-                                <th style={{width:"20%"}}>작성일</th>
-                                <td style={{width:"20%"}}>{market.marketDate}</td>
-                                <th style={{width:"20%"}}>조회수</th>
-                                <td style={{width:"20%"}}>{market.readCount}</td>
+                                <th>구분</th>
+                                <td colSpan={2}>{market.marketType}</td>
+                                <th >가격</th>
+                                <td colSpan={2}>{market.price}</td>
                             </tr>
                             <tr>
-                                <th style={{width:"20%"}}>가격</th>
-                                <td style={{width:"20%"}}>{market.price}</td>
-                                <th style={{width:"20%"}}>구분</th>
-                                <td style={{width:"20%"}}>{market.marketType}</td>
-                            </tr>
-                            <tr>
-                                <td>
+                                <td colSpan={6}>
                                     <div className="board-content-wrap">
                                         {   market.marketContent
                                             ? <Viewer initialValue={market.marketContent} />
@@ -150,12 +144,19 @@ export default function MarketView(){
 
                 
                 <div className="view-btn-zone">
+
+                    {/* 판매자에게 채팅하기 버튼 추가 */}
+                    {loginMember && loginMember.userId !== market.userId && (
+                        <button type="button" className="btn-chat">
+                            작성자에게 채팅하기
+                        </button>
+                    )}
                 {
                     loginMember != null && loginMember.userId == market.userId
                     ?
                     <div className="view-btn-zone">
                         <Link to={'/market/update/'+market.marketNo} className="btn-primary lb">수정</Link>
-                        <button type="button" className="btn-cecondary lg" onClick={deleteMarket}>삭제</button>
+                        <button type="button" className="btn-secondary lg" onClick={deleteMarket}>삭제</button>
                     </div>
                     : ''    
                 }
