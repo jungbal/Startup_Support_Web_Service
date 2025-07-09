@@ -30,9 +30,9 @@ public class PublicServiceController {
         return service.selectAll();
     }
 	
-	 // 상세 조회 (GET) - /{serviceId} 경로로 요청을 받습니다.
+	 // 상세 조회 (GET)
     @NoTokenCheck
-    @GetMapping("/{serviceId}") // 이 엔드포인트를 추가
+    @GetMapping("/{serviceId}")
     public PublicService getServiceDetail(@PathVariable String serviceId) {
         return service.selectServiceDetail(serviceId);
     }
