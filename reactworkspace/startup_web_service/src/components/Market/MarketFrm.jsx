@@ -54,9 +54,11 @@ export default function MarketFrm(props){
                                     url: imgUrl,
                                     type: "old",
                                     filePath: filePath,
-                                    marketFileNo : prevFileList[i].marketFileNo
+                                    fileNo : prevFileList[i].fileNo
                                 });
             }
+            
+            console.log(serverImgs);
 
             setMarketImg(serverImgs); //미리보기 세팅
             updateFilesFromImgs(serverImgs); // 서버에 보낼 파일 세팅
@@ -130,7 +132,7 @@ export default function MarketFrm(props){
         /* 기존(old) delFileList에 추가 */
         if (target.type === "old") {
             setDelFileList(function(prev) {
-                return prev.concat(target.marketFileNo);
+                return prev.concat(target.fileNo);
             });
         }
 
@@ -165,13 +167,15 @@ export default function MarketFrm(props){
         const updatedFiles = imgList.map(function(img, index) {
             if (img.type == 'new') {
                 return {
+                    type: 'new',
                     file: img.file,
                     fileOrder: index,
                     isMainFile: index == 0
                 };
             } else {
                 return {
-                    marketFileNo: img.marketFileNo,
+                    type: 'old',
+                    fileNo: img.fileNo,
                     fileOrder: index,
                     isMainFile: index == 0
                 };
