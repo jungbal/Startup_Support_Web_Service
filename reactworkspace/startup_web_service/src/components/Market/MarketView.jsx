@@ -30,6 +30,7 @@ export default function MarketView(){
         .then(function(res){
             setMarket(res.data.resData.market);
             
+
             //파일 순서인 fileOrder에 따라 배열을 정렬해주고 marketFile에 set해줌
             const sortedFiles = res.data.resData.files.sort(function(a, b) {
                 return a.fileOrder - b.fileOrder;

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.or.iei.chat.model.dao.ChatDao">
+	<!-- 채팅 메시지 삽입 -->
+    <insert id="insertChatMessage" parameterType="kr.or.iei.chat.model.dto.Chatmessage">
+        INSERT INTO t_chatmessages (message_id, user_id, chat_id, message_content, send_at, message_state)
+        VALUES (seq_chatmessages.NEXTVAL, #{userId}, #{chatId}, #{messageContent}, SYSDATE, 'send')
+        <!-- send_at과 message_state는 DB 기본값/트리거로 처리되므로 DTO에서 필수로 넘기지 않아도 됨 -->
+    </insert>
+
+    <!-- 특정 채팅방 메시지 조회 -->
+    <select id="selectChatMessagesByRoomId" parameterType="int" resultType="kr.or.iei.chat.model.dto.Chatmessage">
+        SELECT
+            message_id AS messageId,
+            user_id AS userId,
+            chat_id AS chatId,
+            message_content AS messageContent,
+            send_at AS sendAt,
+            message_state AS messageState
+        FROM t_chatmessages
+        WHERE chat_id = #{chatId}
+        ORDER BY send_at ASC
+    </select>
+
+    <!-- 두 사용자 간 채팅방 조회 (user1, user2 순서 무관) -->
+    <select id="selectChatRoomByUsers" resultType="kr.or.iei.chat.model.dto.Chatroom">
+        SELECT
+            chat_id AS chatId,
+            chat_user1 AS chatUser1,
+            chat_user2 AS chatUser2,
+            last_message AS lastMessage
+        FROM t_chatrooms
+        WHERE (chat_user1 = #{user1Id} AND chat_user2 = #{user2Id})
+           OR (chat_user1 = #{user2Id} AND chat_user2 = #{user1Id})
+    </select>
+
+    <!-- 새로운 채팅방 삽입 -->
+    <insert id="insertChatRoom" parameterType="kr.or.iei.chat.model.dto.Chatroom" useGeneratedKeys="true" keyProperty="chatId">
+        INSERT INTO t_chatrooms (chat_id, chat_user1, chat_user2, last_message)
+        VALUES (seq_chatrooms.NEXTVAL, #{chatUser1}, #{chatUser2}, SYSDATE)
+        <!-- last_message는 초기 생성 시 SYSDATE로 설정하거나 null로 두고 트리거로 갱신 -->
+    </insert>
+
+    <!-- 특정 사용자가 참여하고 있는 채팅방 목록 조회 -->
+    <select id="selectChatRoomsByUserId" parameterType="string" resultType="kr.or.iei.chat.model.dto.Chatroom">
+        SELECT
+            chat_id AS chatId,
+            chat_user1 AS chatUser1,
+            chat_user2 AS chatUser2,
+            last_message AS lastMessage
+        FROM t_chatrooms
+        WHERE chat_user1 = #{userId} OR chat_user2 = #{userId}
+        ORDER BY last_message DESC NULLS LAST
+    </select>
+</mapper>
