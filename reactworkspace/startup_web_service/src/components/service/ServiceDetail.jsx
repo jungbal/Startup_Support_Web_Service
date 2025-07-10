@@ -16,65 +16,69 @@ import {
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
+function normalize(value) {
+  if (!value) return '';
+  return value.toLowerCase().replace(/\s/g, '');
+}
+
 function ServiceDetail() {
   const location = useLocation();
   const navigate = useNavigate();
   const { serviceId } = useParams();
-  const stateData = location.state;
 
-  const [service, setService] = useState(stateData || null);
-  const [loading, setLoading] = useState(!stateData);
+  const [service, setService] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [relatedServices, setRelatedServices] = useState([]);
   const [fallbackServices, setFallbackServices] = useState([]);
 
-  // 상세 서비스 데이터 로드
-  useEffect(function loadServiceDetailEffect() {
-    if (!stateData) {
-      setLoading(true);
-      fetchServiceDetail(serviceId)
-        .then(function (res) {
-          setService(res);
-        })
-        .catch(function (err) {
-          console.error('❌ 상세 데이터 로드 실패:', err);
-          setError('서비스 정보를 불러오는 데 실패했습니다.');
-        })
-        .finally(function () {
-          setLoading(false);
-        });
-    }
-  }, [serviceId]);
+  useEffect(function () {
+    setService(null);
+    setLoading(true);
+    setError(null);
 
-  // 관련 보조금 추천 및 인기 서비스 대체 데이터 로드
-  useEffect(function loadRelatedServices() {
+    fetchServiceDetail(serviceId)
+      .then(function (res) {
+        setService(res);
+      })
+      .catch(function (err) {
+        console.error('❌ 상세 데이터 로드 실패:', err);
+        setError('서비스 정보를 불러오는 데 실패했습니다.');
+      })
+      .finally(function () {
+        setLoading(false);
+      });
+  }, [serviceId, location.key]);
+
+  useEffect(function () {
+    setRelatedServices([]);
+    setFallbackServices([]);
+
     if (service) {
       const cached = localStorage.getItem('cachedServiceList');
       if (cached) {
         const parsed = JSON.parse(cached);
-
-        // 추천 서비스 필터링
         const filtered = parsed.services.filter(function (item) {
           return (
             item.servId !== service.servId &&
-            (item.serviceField === service.serviceField || item.userType === service.userType)
+            (
+              normalize(item.serviceField).includes(normalize(service.serviceField)) ||
+              normalize(item.userType).includes(normalize(service.userType))
+            )
           );
-        }).slice(0, 5);
+        });
 
-        setRelatedServices(filtered);
-
-        // 추천 서비스가 없으면 인기 서비스(처음 5개) 보여주기
-        if (filtered.length === 0) {
-          const popular = parsed.services
-            .filter(function (item) { return item.servId !== service.servId; })
-            .slice(0, 5);
-          setFallbackServices(popular);
+        if (filtered.length > 0) {
+          setRelatedServices(filtered.slice(0, 5));
         } else {
-          setFallbackServices([]);
+          const fallback = parsed.services.filter(function (item) {
+            return item.servId !== service.servId;
+          }).slice(0, 5);
+          setFallbackServices(fallback);
         }
       }
     }
-  }, [service]);
+  }, [service, location.key]);
 
   if (loading) {
     return (
@@ -90,7 +94,6 @@ function ServiceDetail() {
   return (
     <Box maxWidth="md" mx="auto" mt={4}>
       <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-        {/* 뒤로가기 버튼 */}
         <Button
           variant="text"
           startIcon={<ArrowBackIcon />}
@@ -109,21 +112,18 @@ function ServiceDetail() {
 
         <Divider sx={{ my: 2 }} />
 
-        {/* 서비스 요약 */}
         <Box mb={3}>
           <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>{service.servDgst}</Typography>
         </Box>
 
-        {/* 필터 정보 Chip 표시 */}
         <Stack direction="row" spacing={1} mb={3}>
-          <Chip label={`지원유형: ${service.supportType || '-'}`} color="primary" variant="outlined" />
-          <Chip label={`사용자구분: ${service.userType || '-'}`} color="secondary" variant="outlined" />
-          <Chip label={`서비스분야: ${service.serviceField || '-'}`} color="success" variant="outlined" />
+          <Chip label={'지원유형: ' + (service.supportType || '-')} color="primary" variant="outlined" />
+          <Chip label={'사용자구분: ' + (service.userType || '-')} color="secondary" variant="outlined" />
+          <Chip label={'서비스분야: ' + (service.serviceField || '-')} color="success" variant="outlined" />
         </Stack>
 
         <Divider sx={{ my: 3 }} />
 
-        {/* 상세 정보 */}
         <Box mb={2}>
           <Typography variant="h6">지원 내용</Typography>
           <Typography>{service.supportContent || '-'}</Typography>
@@ -155,7 +155,6 @@ function ServiceDetail() {
           <Typography>{service.organization || '-'}</Typography>
         </Box>
 
-        {/* 상세 페이지 바로가기 버튼 */}
         <Box mt={4}>
           <Button
             variant="contained"
@@ -169,12 +168,9 @@ function ServiceDetail() {
         </Box>
       </Paper>
 
-      {/* 관련 보조금 추천 섹션 */}
       <Box mt={6}>
         <Typography variant="h5" fontWeight="bold" gutterBottom>
-          {relatedServices.length > 0
-            ? '📌 관련 보조금 더 보기'
-            : '🔥 인기 보조금 추천'}
+          {relatedServices.length > 0 ? '📌 관련 보조금 더 보기' : '🔥 인기 보조금 추천'}
         </Typography>
 
         <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -214,7 +210,7 @@ function ServiceDetail() {
                   '&:hover': { boxShadow: 4 },
                 }}
                 onClick={function () {
-                  window.open(`/service/detail/${item.servId}`, '_blank');
+                  window.open('/service/detail/' + item.servId, '_blank');
                 }}
               >
                 <CardContent sx={{ p: 0 }}>

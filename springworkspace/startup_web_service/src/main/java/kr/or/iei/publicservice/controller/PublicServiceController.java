@@ -29,12 +29,5 @@ public class PublicServiceController {
     public ArrayList<PublicService> getAll() {
         return service.selectAll();
     }
-	
-	 // 상세 조회 (GET)
-    @NoTokenCheck
-    @GetMapping("/{serviceId}")
-    public PublicService getServiceDetail(@PathVariable String serviceId) {
-        return service.selectServiceDetail(serviceId);
-    }
 
 }

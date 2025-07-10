@@ -10,5 +10,4 @@ import kr.or.iei.publicservice.model.dto.PublicService;
 public interface PublicServiceDao {
     ArrayList<PublicService> selectAll();
     
-    PublicService selectServiceById(String serviceId);
 }

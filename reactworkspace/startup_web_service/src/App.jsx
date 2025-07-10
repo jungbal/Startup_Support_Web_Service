@@ -146,7 +146,7 @@ function AppWithHeaderFooter() {
           <Route path="/commercial/detail/:storeId" element={<CommercialDetail />} />
 
           <Route path="/service/*" element={<ServiceList />} /> 
-          <Route path="/service/detail/:servId" element={<ServiceDetail />} />
+          <Route path="/service/detail/:serviceId" element={<ServiceDetail />} />
           
           {/* 보호된 라우트 (로그인 필요) */}
           <Route

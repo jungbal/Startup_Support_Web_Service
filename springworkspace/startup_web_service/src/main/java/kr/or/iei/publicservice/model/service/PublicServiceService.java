@@ -22,9 +22,4 @@ public class PublicServiceService {
     public ArrayList<PublicService> selectAll() {
         return dao.selectAll();
     }
-    
- // 특정 서비스 상세 조회
-    public PublicService selectServiceDetail(String serviceId) { // 이 메소드를 추가
-        return dao.selectServiceById(serviceId);
-    }
 }

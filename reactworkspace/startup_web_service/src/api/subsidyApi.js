@@ -1,18 +1,15 @@
 import axios from 'axios';
 
-// Vite 프록시와 일치하는 기본 API URL 설정
 var BASE_URL = '/api';
 
-// axios 인스턴스 생성 및 인증 파라미터 기본 설정
 var api = axios.create({
   baseURL: BASE_URL,
   params: {
-    serviceKey: import.meta.env.VITE_PUBLIC_SERVICE_KEY, // 인증키
-    returnType: 'json', // JSON 형태로 응답 받음
+    serviceKey: import.meta.env.VITE_PUBLIC_SERVICE_KEY,
+    returnType: 'json',
   },
 });
 
-// 서비스 목록 조회 (page와 rows를 이용한 페이징 처리)
 export function fetchServiceList(page, rows) {
   if (page === undefined) page = 1;
   if (rows === undefined) rows = 10;
@@ -39,37 +36,69 @@ export function fetchServiceList(page, rows) {
     });
 }
 
-// 서비스 상세 조회 (serviceId 기반 단일 항목 요청)
-export function fetchServiceDetail(serviceId) {
-  return api.get(`/publicservice/${serviceId}`)
-    .then(function (res) {
-      const item = res.data; // 백엔드가 단일 객체 반환한다고 가정
+export async function fetchServiceDetail(serviceId) {
+const perPage = 1000;
+  let foundItem = null;
+  let totalCount = 0;
 
-      // 응답 필드명을 프론트에 맞게 변환
-      return {
-        servId: item.serviceId,
-        servNm: item.serviceName,
-        servDgst: item.serviceSummary,
-        servDtlLink: item.serviceUrl,
-
-        supportContent: item.supportContent,
-        target: item.targetAudience,
-        criteria: item.selectionCriteria,
-        period: item.applicationPeriod,
-        contact: item.contactInfo,
-        organization: item.organizationName,
-
-        supportType: item.supportType,
-        userType: item.userType,
-        serviceField: item.serviceField,
-      };
-    })
-    .catch(function (err) {
-      console.error('❌ [fetchServiceDetail] API 호출 실패:', err);
-      if (err.response) {
-        console.error('❌ 서버 응답 상태:', err.response.status);
-        console.error('❌ 서버 응답 데이터:', err.response.data);
-      }
-      throw err;
+  try {
+    const initialRes = await api.get('/gov24/v3/serviceList', {
+      params: {
+        page: 1,
+        perPage: perPage,
+      },
     });
+    totalCount = initialRes.data.totalCount;
+    
+    const maxPages = Math.ceil(totalCount / perPage);
+    
+    for (let currentPageNum = 1; currentPageNum <= maxPages; currentPageNum++) {
+      const res = await api.get('/gov24/v3/serviceList', {
+        params: {
+          page: currentPageNum,
+          perPage: perPage,
+        },
+      });
+      
+      const data = res.data.data;
+
+      if (data && data.length > 0) {
+        foundItem = data.find(function (d) {
+          return String(d.서비스ID) === String(serviceId);
+        });
+
+        if (foundItem) {
+          break;
+        }
+      }
+    }
+
+    if (!foundItem) {
+      throw new Error('상세 데이터를 찾을 수 없습니다.');
+    }
+
+    return {
+      servId: foundItem.서비스ID,
+      servNm: foundItem.서비스명,
+      servDgst: foundItem.서비스목적요약,
+      servDtlLink: foundItem.상세조회URL,
+
+      supportContent: foundItem.지원내용,
+      target: foundItem.지원대상,
+      criteria: foundItem.선정기준,
+      period: foundItem.신청기한,
+      contact: foundItem.전화문의,
+      organization: foundItem.소관기관명,
+      supportType: foundItem.지원유형,
+      userType: foundItem.사용자구분,
+      serviceField: foundItem.서비스분야,
+    };
+  } catch (err) {
+    console.error('❌ 상세 데이터 로드 실패:', err);
+    if (err.response) {
+      console.error('❌ 서버 응답 상태:', err.response.status);
+      console.error('❌ 서버 응답 데이터:', err.response.data);
+    }
+    throw err;
+  }
 }
