@@ -27,6 +27,9 @@ import CommercialMain from './components/commercial/CommercialMain';
 import CommercialDetail from './components/commercial/CommercialDetail';
 import ServiceList from './components/service/ServiceList';
 import ServiceDetail from './components/service/ServiceDetail';
+import CommunityMain from './components/community/CommunityMain';
+import PostList from './components/community/PostList';
+import PostView from './components/community/PostView';
 
 // MUI 테마 설정
 const theme = createTheme({
@@ -147,6 +150,13 @@ function AppWithHeaderFooter() {
 
           <Route path="/service/*" element={<ServiceList />} /> 
           <Route path="/service/detail/:servId" element={<ServiceDetail />} />
+          
+          {/* 커뮤니티 라우트 */}
+          <Route path="/community" element={<CommunityMain />}>
+            <Route index element={<Navigate to="/community/common" replace />} />
+            <Route path=":postType" element={<PostList />} />
+            <Route path=":postType/view/:postNo" element={<PostView />} />
+          </Route>
           
           {/* 보호된 라우트 (로그인 필요) */}
           <Route

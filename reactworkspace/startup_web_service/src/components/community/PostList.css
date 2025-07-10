@@ -1,0 +1,144 @@
+.post-list-wrap {
+  width: 100%;
+}
+
+.post-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.post-list-header h3 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.write-btn {
+  padding: 10px 20px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.write-btn:hover {
+  background-color: #357abd;
+}
+
+.post-list-table {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  background-color: #f8f9fa;
+  padding: 15px 20px;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.table-row {
+  display: flex;
+  padding: 15px 20px;
+  border-bottom: 1px solid #f1f3f5;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.table-row:hover {
+  background-color: #f8f9fa;
+}
+
+.col-no {
+  width: 80px;
+  text-align: center;
+}
+
+.col-title {
+  flex: 1;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.col-writer {
+  width: 120px;
+  text-align: center;
+}
+
+.col-date {
+  width: 120px;
+  text-align: center;
+  color: #868e96;
+}
+
+.col-read {
+  width: 80px;
+  text-align: center;
+  color: #868e96;
+}
+
+.notice-badge {
+  padding: 2px 8px;
+  background-color: #ff6b6b;
+  color: white;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 2px 8px;
+  background-color: #868e96;
+  color: white;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.no-data {
+  padding: 60px 20px;
+  text-align: center;
+  color: #868e96;
+  font-size: 16px;
+}
+
+.loading {
+  padding: 60px 20px;
+  text-align: center;
+  color: #4a90e2;
+  font-size: 16px;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .table-header,
+  .table-row {
+    font-size: 14px;
+  }
+  
+  .col-no,
+  .col-read {
+    display: none;
+  }
+  
+  .col-writer {
+    width: 80px;
+  }
+  
+  .col-date {
+    width: 80px;
+    font-size: 12px;
+  }
+} 

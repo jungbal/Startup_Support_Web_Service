@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="kr.or.iei.post.model.dao.PostDao">
+
+    <!-- 게시글 목록 조회 -->
+    <select id="selectPostList" resultType="post">
+        SELECT * FROM (
+            SELECT ROWNUM AS RNUM, P.* FROM (
+                SELECT 
+                    p.post_no as postNo,
+                    p.user_id as userId,
+                    p.post_type as postType,
+                    p.post_title as postTitle,
+                    p.post_content as postContent,
+                    p.post_date as postDate,
+                    p.read_count as readCount,
+                    p.post_status as postStatus,
+                    p.report_count as reportCount,
+                    u.user_name as userName
+                FROM t_posts p
+                JOIN t_users u ON p.user_id = u.user_id
+                WHERE p.post_type = #{param2}
+                  AND p.post_status = 'public'
+                ORDER BY p.post_no DESC
+            ) P
+        ) WHERE RNUM BETWEEN #{param1.start} AND #{param1.end}
+    </select>
+    
+    <!-- 전체 게시글 수 조회 -->
+    <select id="selectPostCount" resultType="int">
+        SELECT COUNT(*) 
+        FROM t_posts 
+        WHERE post_type = #{postType}
+          AND post_status = 'public'
+    </select>
+    
+    <!-- 게시글 상세 조회 -->
+    <select id="selectOnePost" resultType="post">
+        SELECT 
+            p.post_no as postNo,
+            p.user_id as userId,
+            p.post_type as postType,
+            p.post_title as postTitle,
+            p.post_content as postContent,
+            p.post_date as postDate,
+            p.read_count as readCount,
+            p.post_status as postStatus,
+            p.report_count as reportCount,
+            u.user_name as userName
+        FROM t_posts p
+        JOIN t_users u ON p.user_id = u.user_id
+        WHERE p.post_no = #{postNo}
+    </select>
+    
+    <!-- 조회수 증가 -->
+    <update id="updateReadCount">
+        UPDATE t_posts 
+        SET read_count = read_count + 1 
+        WHERE post_no = #{postNo}
+    </update>
+    
+    <!-- 게시글 등록 -->
+    <insert id="insertPost">
+        INSERT INTO t_posts (
+            user_id, 
+            post_type, 
+            post_title, 
+            post_content, 
+            post_status
+        ) VALUES (
+            #{userId},
+            #{postType},
+            #{postTitle},
+            #{postContent},
+            #{postStatus}
+        )
+    </insert>
+    
+    <!-- 게시글 수정 -->
+    <update id="updatePost">
+        UPDATE t_posts 
+        SET 
+            post_title = #{postTitle},
+            post_content = #{postContent}
+        WHERE post_no = #{postNo}
+          AND user_id = #{userId}
+    </update>
+    
+    <!-- 게시글 삭제 -->
+    <delete id="deletePost">
+        DELETE FROM t_posts 
+        WHERE post_no = #{postNo}
+    </delete>
+    
+    <!-- 게시글 상태 변경 -->
+    <update id="updatePostStatus">
+        UPDATE t_posts 
+        SET post_status = #{param2} 
+        WHERE post_no = #{param1}
+    </update>
+    
+</mapper> 

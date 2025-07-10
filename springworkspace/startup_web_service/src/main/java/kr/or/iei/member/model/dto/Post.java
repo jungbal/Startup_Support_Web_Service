@@ -18,4 +18,6 @@ public class Post {
 	private Date postDate;
 	private int readCount;
 	private String postStatus;
+	private int reportCount;
+	private String userName;  // 조인해서 가져올 작성자 이름
 } 
