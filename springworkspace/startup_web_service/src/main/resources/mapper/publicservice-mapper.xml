@@ -28,11 +28,4 @@
     FROM TBL_PUBLIC_SERVICE
   </select>
 
-  <!-- 예시: ID로 상세 조회 -->
-  <select id="selectPublicServiceById" resultMap="publicServiceResultMap" parameterType="String">
-    SELECT *
-    FROM TBL_PUBLIC_SERVICE
-    WHERE SERVICE_ID = #{serviceId}
-  </select>
-
 </mapper>

@@ -149,7 +149,7 @@ function AppWithHeaderFooter() {
           <Route path="/commercial/detail/:storeId" element={<CommercialDetail />} />
 
           <Route path="/service/*" element={<ServiceList />} /> 
-          <Route path="/service/detail/:servId" element={<ServiceDetail />} />
+          <Route path="/service/detail/:serviceId" element={<ServiceDetail />} />
           
           {/* 커뮤니티 라우트 */}
           <Route path="/community" element={<CommunityMain />}>
