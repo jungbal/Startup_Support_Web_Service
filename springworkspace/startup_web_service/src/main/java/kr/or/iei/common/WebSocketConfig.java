@@ -39,8 +39,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     	// 엔드포인트 : 클라이언트가 서버와 통신을 시작하기 위해 접속하는 특정 네트워크 주소(URL)입니다.
         // 클라이언트는 이 경로를 통해 WebSocket 연결을 시도합니다. (예: ws://localhost:8080/ws-stomp)
         registry.addEndpoint("/ws-stomp")
-                // SockJS를 활성화하여 WebSocket을 지원하지 않는 브라우저에서도 폴백 옵션(HTTP 폴링 등)을 제공합니다.
+        		.setAllowedOriginPatterns("*") // WebSocket에 대해 CORS를 설정 // 다른 도메인 모두 허용
+                // SockJS를 활성화하여 WebSocket을 지원하지 않는 브라우저에서도 폴백 옵션(HTTP 폴링 등)을 제공.
                 .withSockJS(); 
+        
         
         // (선택 사항) 개발 환경에서만 CORS 허용:
         // .setAllowedOriginPatterns("*"); // 모든 Origin 허용. 실제 서비스에서는 특정 도메인만 허용

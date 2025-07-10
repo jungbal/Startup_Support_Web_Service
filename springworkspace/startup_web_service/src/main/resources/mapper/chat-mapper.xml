@@ -43,13 +43,24 @@
 
     <!-- 특정 사용자가 참여하고 있는 채팅방 목록 조회 -->
     <select id="selectChatRoomsByUserId" parameterType="string" resultType="kr.or.iei.chat.model.dto.Chatroom">
-        SELECT
-            chat_id AS chatId,
-            chat_user1 AS chatUser1,
-            chat_user2 AS chatUser2,
-            last_message AS lastMessage
-        FROM t_chatrooms
-        WHERE chat_user1 = #{userId} OR chat_user2 = #{userId}
-        ORDER BY last_message DESC NULLS LAST
+	    SELECT
+	        cr.chat_id AS chatId,
+	        cr.chat_user1 AS chatUser1,
+	        cr.chat_user2 AS chatUser2,
+	        cm.send_at AS lastMessage,
+	        cm.message_content AS lastMessageContent
+	    FROM
+	        t_chatrooms cr
+	    LEFT JOIN t_chatmessages cm
+	        ON cr.chat_id = cm.chat_id
+	        AND cm.send_at = (
+	            SELECT MAX(send_at) 
+	            FROM t_chatmessages 
+	            WHERE chat_id = cr.chat_id
+	        )
+	    WHERE
+	        cr.chat_user1 = #{userId} OR cr.chat_user2 = #{userId}
+	    ORDER BY
+	        cm.send_at DESC
     </select>
 </mapper>

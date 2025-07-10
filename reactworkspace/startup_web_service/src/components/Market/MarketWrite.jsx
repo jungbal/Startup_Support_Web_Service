@@ -5,6 +5,8 @@ import MarketFrm from "./MarketFrm";
 import ToastEditor from "../common/ToastEditor";
 import { useNavigate } from "react-router-dom";
 
+import "./MarketWrite.css";
+
 export default function MarketWrite(){
 
     const {loginMember}=useAuthStore();
@@ -58,30 +60,34 @@ export default function MarketWrite(){
     }
 
     return (
-        <div>
-            <div>게시글 작성</div>
+        <div className="market-write-container">
+            <div className="market-write-title">게시글 작성</div>
             <form onSubmit={function(e){
                 e.preventDefault();
                 MarketWrite();
             }}>
-                <MarketFrm loginMember={loginMember}
-                            marketTitle={marketTitle}
-                            setMarketTitle={setMarketTitle}
-                            marketFile={marketFile}
-                            setMarketFile={setMarketFile}
-                            marketPrice={marketPrice}
-                            setMarketPrice={setMarketPrice}
-                            marketType={marketType}
-                            setMarketType={setMarketType}>
-                </MarketFrm>
-                <div>
-                    <ToastEditor marketContent={marketContent}
-                                 setMarketContent={setMarketContent}
-                                 type={0}>
-                    </ToastEditor>
+                <div className="market-form-section">
+                    <MarketFrm loginMember={loginMember}
+                                marketTitle={marketTitle}
+                                setMarketTitle={setMarketTitle}
+                                marketFile={marketFile}
+                                setMarketFile={setMarketFile}
+                                marketPrice={marketPrice}
+                                setMarketPrice={setMarketPrice}
+                                marketType={marketType}
+                                setMarketType={setMarketType}>
+                    </MarketFrm>
                 </div>
                 <div>
-                    <button type="submit">등록하기</button>
+                    <div className="toast-editor-container">
+                        <ToastEditor marketContent={marketContent}
+                                    setMarketContent={setMarketContent}
+                                    type={0}>
+                        </ToastEditor>
+                    </div>
+                </div>
+                <div className="submit-button-zone">
+                    <button type="submit" className="submit-button">등록하기</button>
                 </div>
             </form>
         </div>

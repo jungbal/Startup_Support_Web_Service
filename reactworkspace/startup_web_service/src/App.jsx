@@ -157,7 +157,9 @@ function AppWithHeaderFooter() {
               </ProtectedRoute>
             }
           />
-          
+          {/*
+          <Route path="/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+           */}
           {/* 기본 경로를 홈으로 리다이렉트 */}
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="*" element={<Navigate to="/home" replace />} />
