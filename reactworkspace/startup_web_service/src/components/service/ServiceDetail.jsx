@@ -26,6 +26,7 @@ function ServiceDetail() {
   const [loading, setLoading] = useState(!stateData);
   const [error, setError] = useState(null);
   const [relatedServices, setRelatedServices] = useState([]);
+  const [fallbackServices, setFallbackServices] = useState([]);
 
   // 상세 서비스 데이터 로드
   useEffect(function loadServiceDetailEffect() {
@@ -45,19 +46,32 @@ function ServiceDetail() {
     }
   }, [serviceId]);
 
-  // 관련 보조금 추천 (서비스 분야 또는 사용자 구분 기준)
+  // 관련 보조금 추천 및 인기 서비스 대체 데이터 로드
   useEffect(function loadRelatedServices() {
     if (service) {
       const cached = localStorage.getItem('cachedServiceList');
       if (cached) {
         const parsed = JSON.parse(cached);
+
+        // 추천 서비스 필터링
         const filtered = parsed.services.filter(function (item) {
           return (
             item.servId !== service.servId &&
             (item.serviceField === service.serviceField || item.userType === service.userType)
           );
         }).slice(0, 5);
+
         setRelatedServices(filtered);
+
+        // 추천 서비스가 없으면 인기 서비스(처음 5개) 보여주기
+        if (filtered.length === 0) {
+          const popular = parsed.services
+            .filter(function (item) { return item.servId !== service.servId; })
+            .slice(0, 5);
+          setFallbackServices(popular);
+        } else {
+          setFallbackServices([]);
+        }
       }
     }
   }, [service]);
@@ -158,15 +172,20 @@ function ServiceDetail() {
       {/* 관련 보조금 추천 섹션 */}
       <Box mt={6}>
         <Typography variant="h5" fontWeight="bold" gutterBottom>
-          📌 관련 보조금 더 보기
-        </Typography>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          동일한 서비스 분야 또는 사용자 구분을 기반으로 추천됩니다.
+          {relatedServices.length > 0
+            ? '📌 관련 보조금 더 보기'
+            : '🔥 인기 보조금 추천'}
         </Typography>
 
-        {relatedServices.length === 0 && (
+        <Typography variant="body2" color="text.secondary" gutterBottom>
+          {relatedServices.length > 0
+            ? '동일한 서비스 분야 또는 사용자 구분을 기반으로 추천됩니다.'
+            : '인기 있는 서비스들을 소개합니다.'}
+        </Typography>
+
+        {(relatedServices.length === 0 && fallbackServices.length === 0) && (
           <Typography color="text.disabled" sx={{ p: 2 }}>
-            추천 보조금이 없습니다.
+            관련 서비스가 없습니다.
           </Typography>
         )}
 
@@ -176,13 +195,9 @@ function ServiceDetail() {
             overflowX: 'auto',
             gap: 2,
             pb: 1,
-            // 아래 스크롤바 숨기기 CSS는 필요하면 활성화하세요
-            // '&::-webkit-scrollbar': { display: 'none' },
-            // '-ms-overflow-style': 'none',
-            // 'scrollbar-width': 'none',
           }}
         >
-          {relatedServices.map(function (item) {
+          {(relatedServices.length > 0 ? relatedServices : fallbackServices).map(function (item) {
             return (
               <Card
                 key={item.servId}
@@ -191,7 +206,7 @@ function ServiceDetail() {
                   cursor: 'pointer',
                   flex: '0 0 auto',
                   minWidth: 280,
-                  height: 150,
+                  height: 180,
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
@@ -220,6 +235,20 @@ function ServiceDetail() {
                     {item.servDgst}
                   </Typography>
                 </CardContent>
+                <Box mt={1} display="flex" gap={1} flexWrap="wrap">
+                  <Chip
+                    label={item.supportType || '-'}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                  />
+                  <Chip
+                    label={item.userType || '-'}
+                    size="small"
+                    color="secondary"
+                    variant="outlined"
+                  />
+                </Box>
               </Card>
             );
           })}
