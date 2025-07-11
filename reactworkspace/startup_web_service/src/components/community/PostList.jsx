@@ -3,12 +3,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getPostList } from '../../api/postApi';
 import PageNavi from '../common/PageNavi';
 import useAuthStore from '../../store/authStore';
+import Swal from 'sweetalert2';
 import './PostList.css';
 
 const PostList = function() {
   const { postType } = useParams();
   const navigate = useNavigate();
-  const { isLogin, user } = useAuthStore();
+  const { isLogined, user } = useAuthStore();
   
   const [posts, setPosts] = useState([]);
   const [pageInfo, setPageInfo] = useState(null);
@@ -54,15 +55,26 @@ const PostList = function() {
   
   // 글쓰기 버튼 클릭
   const handleWriteClick = function() {
-    if (!isLogin) {
-      alert('로그인이 필요한 서비스입니다.');
-      navigate('/login');
+    if (!isLogined) {
+      Swal.fire({
+        icon: 'warning',
+        title: '로그인 필요',
+        text: '로그인이 필요한 서비스입니다.',
+        confirmButtonText: '확인'
+      }).then(function() {
+        navigate('/login');
+      });
       return;
     }
     
     // 공지사항은 슈퍼관리자만 작성 가능
     if (postType === 'notice' && user?.userLevel !== 1) {
-      alert('공지사항은 관리자만 작성할 수 있습니다.');
+      Swal.fire({
+        icon: 'error',
+        title: '권한 없음',
+        text: '공지사항은 관리자만 작성할 수 있습니다.',
+        confirmButtonText: '확인'
+      });
       return;
     }
     

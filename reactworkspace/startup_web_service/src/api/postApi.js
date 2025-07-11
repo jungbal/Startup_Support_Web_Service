@@ -31,6 +31,8 @@ export function createPost(postData) {
   options.method = 'post';
   options.data = postData;
   
+  // FormData인 경우 Content-Type 헤더를 설정하지 않음 (브라우저가 자동으로 boundary 포함하여 설정)
+  
   return axiosInstance(options);
 }
 
@@ -40,6 +42,8 @@ export function updatePost(postNo, postData) {
   options.url = serverUrl + `/api/post/${postNo}`;
   options.method = 'patch';
   options.data = postData;
+  
+  // FormData인 경우 Content-Type 헤더를 설정하지 않음 (브라우저가 자동으로 boundary 포함하여 설정)
   
   return axiosInstance(options);
 }
@@ -51,4 +55,24 @@ export function deletePost(postNo) {
   options.method = 'delete';
   
   return axiosInstance(options);
-} 
+}
+
+// 파일 다운로드
+export function downloadFile(fileNo, fileName) {
+  let options = {};
+  options.url = serverUrl + `/api/post/download/${fileNo}`;
+  options.method = 'get';
+  options.responseType = 'blob';
+  
+  return axiosInstance(options);
+}
+
+// 신고 등록
+export function reportPost(reportData) {
+  let options = {};
+  options.url = serverUrl + '/api/post/report';
+  options.method = 'post';
+  options.data = reportData;
+  
+  return axiosInstance(options);
+}

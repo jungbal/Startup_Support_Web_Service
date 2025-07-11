@@ -19,8 +19,36 @@ function setInterceptors(instance) {
     instance.interceptors.request.use(
         function(config) { // 요청이 정상적으로 구성된 경우
            //스토리지에 저장된 accessToken 추출.
-           const accessToken = useAuthStore.getState().accessToken; //인터셉터는 컴포넌트가 아니므로, 추출하는 코드 상이.
-
+           let accessToken = useAuthStore.getState().accessToken; //인터셉터는 컴포넌트가 아니므로, 추출하는 코드 상이.
+           
+           // Zustand store에 토큰이 없으면 localStorage에서 직접 가져오기
+           if(!accessToken) {
+               const storageData = localStorage.getItem('auth-storage');
+               if (storageData) {
+                   try {
+                       const parsed = JSON.parse(storageData);
+                       if (parsed.state && parsed.state.accessToken) {
+                           accessToken = parsed.state.accessToken;
+                           
+                           // Zustand store도 업데이트
+                           const state = useAuthStore.getState();
+                           state.setAccessToken(accessToken);
+                           if (parsed.state.isLogined !== undefined) {
+                               state.setIsLogined(parsed.state.isLogined);
+                           }
+                           if (parsed.state.loginMember) {
+                               state.setLoginMember(parsed.state.loginMember);
+                           }
+                           if (parsed.state.refreshToken) {
+                               state.setRefreshToken(parsed.state.refreshToken);
+                           }
+                       }
+                   } catch (error) {
+                       // localStorage 파싱 오류 처리
+                   }
+               }
+           }
+           
            //스토리지에 저장된 accessToken 요청 헤더에 포함시키기.
            if(accessToken != null){
                 config.headers['Authorization'] = `Bearer ${accessToken}`;

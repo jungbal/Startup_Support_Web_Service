@@ -30,6 +30,8 @@ import ServiceDetail from './components/service/ServiceDetail';
 import CommunityMain from './components/community/CommunityMain';
 import PostList from './components/community/PostList';
 import PostView from './components/community/PostView';
+import PostWrite from './components/community/PostWrite';
+import PostEdit from './components/community/PostEdit';
 
 // MUI 테마 설정
 const theme = createTheme({
@@ -156,6 +158,8 @@ function AppWithHeaderFooter() {
             <Route index element={<Navigate to="/community/common" replace />} />
             <Route path=":postType" element={<PostList />} />
             <Route path=":postType/view/:postNo" element={<PostView />} />
+            <Route path=":postType/write" element={<PostWrite />} />
+            <Route path=":postType/edit/:postNo" element={<PostEdit />} />
           </Route>
           
           {/* 보호된 라우트 (로그인 필요) */}

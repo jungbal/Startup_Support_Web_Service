@@ -71,8 +71,8 @@ public class SecurityConfig {
                 //
                 .requestMatchers("/ws-stomp/**").permitAll()
                 
-                //커뮤니티 게시판 조회 관련 (비회원도 접근 가능)
-                .requestMatchers("/api/post/list/**", "/api/post/view/**").permitAll()
+                //커뮤니티 게시판 관련 (임시로 전체 허용)
+                .requestMatchers("/api/post/**").permitAll()
                 
                 // 기타 모든 요청은 인증 필요 (JWT 토큰이 있어야 접근 가능)
                 .anyRequest().authenticated()

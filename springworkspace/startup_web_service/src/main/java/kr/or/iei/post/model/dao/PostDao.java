@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import kr.or.iei.member.model.dto.Post;
+import kr.or.iei.member.model.dto.PostFile;
+import kr.or.iei.member.model.dto.Report;
 import kr.or.iei.common.dto.PageInfo;
 
 @Mapper
@@ -33,4 +35,22 @@ public interface PostDao {
     
     // 게시글 상태 변경 (공개/비공개)
     int updatePostStatus(@Param("param1") int postNo, @Param("param2") String postStatus);
+    
+    // 게시글 첨부파일 등록
+    int insertPostFile(PostFile postFile);
+    
+    // 게시글 첨부파일 목록 조회
+    List<PostFile> selectPostFileList(@Param("postNo") int postNo);
+    
+    // 게시글 첨부파일 삭제
+    int deletePostFile(@Param("fileNo") int fileNo);
+    
+    // 첨부파일 단건 조회
+    PostFile selectPostFile(@Param("fileNo") int fileNo);
+    
+    // 신고 등록
+    int insertReport(Report report);
+    
+    // 중복 신고 확인 (같은 사용자가 같은 게시글을 이미 신고했는지 확인)
+    int checkDuplicateReport(@Param("reporterId") String reporterId, @Param("postType") String postType, @Param("postId") int postId);
 } 
