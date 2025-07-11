@@ -17,7 +17,7 @@ public class PublicServiceService {
 
     @Autowired
     private PublicServiceDao dao;
-
+ 
     // DB 전체 조회
     public ArrayList<PublicService> selectAll() {
         return dao.selectAll();
