@@ -17,30 +17,38 @@ import {
   Button,
 } from '@mui/material';
 
+// 캐시 만료 시간 (1시간)
 const CACHE_EXPIRATION_TIME = 60 * 60 * 1000;
 
 function ServiceList() {
   const navigate = useNavigate();
+
+  // 상태 정의
   const [services, setServices] = useState([]);
   const [allServices, setAllServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const [searchKeyword, setSearchKeyword] = useState('');
   const [searchTrigger, setSearchTrigger] = useState('');
+
   const [supportType, setSupportType] = useState('');
   const [userType, setUserType] = useState('');
   const [serviceField, setServiceField] = useState('');
+
   const [supportTypeList, setSupportTypeList] = useState([]);
   const [userTypeList, setUserTypeList] = useState([]);
   const [serviceFieldList, setServiceFieldList] = useState([]);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(9);
   const [totalItems, setTotalItems] = useState(0);
 
-  // 필터 적용 함수
-  const applyFilter = useCallback(function applyFilterCallback() {
+  // 서비스 필터링 및 페이지네이션 처리
+  const applyFilter = useCallback(function () {
     const filteredResults = allServices.filter(function (item) {
       const keyword = searchTrigger.toLowerCase();
+
       const keywordMatch =
         !searchTrigger ||
         (item.servNm && item.servNm.toLowerCase().includes(keyword)) ||
@@ -61,14 +69,18 @@ function ServiceList() {
     setTotalItems(totalFilteredItems);
   }, [searchTrigger, supportType, userType, serviceField, allServices, currentPage, itemsPerPage]);
 
-  // 전체 서비스 목록 불러오기
-  useEffect(function loadAllServicesEffect() {
+  // 전체 서비스 목록을 API에서 불러오고 캐시 처리
+  useEffect(function () {
     async function loadAllServices() {
       setLoading(true);
+
       try {
         const cachedData = localStorage.getItem('cachedServiceList');
+
         if (cachedData) {
           const parsedData = JSON.parse(cachedData);
+
+          // 캐시가 유효하면 캐시 데이터 사용
           if (Date.now() - parsedData.timestamp < CACHE_EXPIRATION_TIME) {
             setAllServices(parsedData.services);
             setSupportTypeList(parsedData.supportTypes);
@@ -81,6 +93,7 @@ function ServiceList() {
           }
         }
 
+        // 새로 전체 데이터 요청
         let allFetchedData = [];
         let page = 1;
         let apiTotalCount = 0;
@@ -104,16 +117,14 @@ function ServiceList() {
             allFetchedData = allFetchedData.concat(cleanedData);
             apiTotalCount = response.totalCount;
           } else {
-            console.error('API 응답 형식이 예상과 다릅니다:', response);
+            console.error('API 응답 형식 오류:', response);
             break;
           }
+
           page++;
         } while (allFetchedData.length < apiTotalCount);
 
-        allFetchedData.sort(function (a, b) {
-          return a.servNm.localeCompare(b.servNm, 'ko');
-        });
-
+        // 카테고리 목록 구성
         const supportTypeSet = new Set();
         const userTypeSet = new Set();
         const serviceFieldSet = new Set();
@@ -124,25 +135,22 @@ function ServiceList() {
           if (item.serviceField) serviceFieldSet.add(item.serviceField);
         });
 
-        const sortedSupportTypes = Array.from(supportTypeSet).sort();
-        const sortedUserTypes = Array.from(userTypeSet).sort();
-        const sortedServiceFields = Array.from(serviceFieldSet).sort();
-
+        // 캐시 저장 (랜덤 정렬은 원할 경우 이 시점에서 섞기 가능)
         localStorage.setItem('cachedServiceList', JSON.stringify({
           services: allFetchedData,
-          supportTypes: sortedSupportTypes,
-          userTypes: sortedUserTypes,
-          serviceFields: sortedServiceFields,
+          supportTypes: Array.from(supportTypeSet).sort(),
+          userTypes: Array.from(userTypeSet).sort(),
+          serviceFields: Array.from(serviceFieldSet).sort(),
           timestamp: Date.now(),
         }));
 
         setAllServices(allFetchedData);
-        setSupportTypeList(sortedSupportTypes);
-        setUserTypeList(sortedUserTypes);
-        setServiceFieldList(sortedServiceFields);
+        setSupportTypeList(Array.from(supportTypeSet).sort());
+        setUserTypeList(Array.from(userTypeSet).sort());
+        setServiceFieldList(Array.from(serviceFieldSet).sort());
         setLoading(false);
       } catch (err) {
-        console.error('서비스 목록 가져오기 실패:', err);
+        console.error('서비스 목록 불러오기 실패:', err);
         setError('데이터를 불러오는 중 오류가 발생했습니다.');
         setLoading(false);
       }
@@ -151,11 +159,12 @@ function ServiceList() {
     loadAllServices();
   }, []);
 
-  useEffect(function applyFilterEffect() {
+  // 필터가 변경될 때마다 재적용
+  useEffect(function () {
     applyFilter();
   }, [allServices, currentPage, supportType, userType, serviceField, searchTrigger, applyFilter]);
 
-  // 검색/필터/페이지 핸들링 함수들
+  // 사용자 입력 핸들러들
   function handleInputChange(e) {
     const { name, value } = e.target;
     if (name === 'searchKeyword') setSearchKeyword(value);
@@ -210,12 +219,32 @@ function ServiceList() {
           }}
         >
           <CardContent sx={{ flexGrow: 1, overflow: 'hidden' }}>
-            <Typography variant="h6" gutterBottom noWrap>{service.servNm}</Typography>
-            <Typography variant="body2" gutterBottom sx={{ overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>{service.servDgst}</Typography>
+            <Typography variant="h6" gutterBottom noWrap>
+              {service.servNm}
+            </Typography>
+            <Typography
+              variant="body2"
+              gutterBottom
+              sx={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical',
+              }}
+            >
+              {service.servDgst}
+            </Typography>
             <Box mt={2}>
-              <Typography variant="caption" display="block" sx={{ color: 'primary.main', fontWeight: 'bold' }}>지원유형: {service.supportType || '-'}</Typography>
-              <Typography variant="caption" display="block" sx={{ color: 'secondary.main', fontWeight: 'bold' }}>사용자구분: {service.userType || '-'}</Typography>
-              <Typography variant="caption" display="block" sx={{ color: 'success.main', fontWeight: 'bold' }}>서비스분야: {service.serviceField || '-'}</Typography>
+              <Typography variant="caption" display="block" sx={{ color: 'primary.main', fontWeight: 'bold' }}>
+                지원유형: {service.supportType || '-'}
+              </Typography>
+              <Typography variant="caption" display="block" sx={{ color: 'secondary.main', fontWeight: 'bold' }}>
+                사용자구분: {service.userType || '-'}
+              </Typography>
+              <Typography variant="caption" display="block" sx={{ color: 'success.main', fontWeight: 'bold' }}>
+                서비스분야: {service.serviceField || '-'}
+              </Typography>
             </Box>
           </CardContent>
         </Card>
@@ -226,12 +255,13 @@ function ServiceList() {
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
-  // 화면 렌더링
   return (
     <Box p={3}>
-      <Typography variant="h4" gutterBottom>공공서비스 목록</Typography>
+      <Typography variant="h4" gutterBottom>
+        공공서비스 목록
+      </Typography>
 
-      {/* 검색/필터 영역 */}
+      {/* 필터 영역 */}
       <Box display="flex" flexWrap="wrap" gap={2} mb={3} alignItems="center">
         <TextField
           name="searchKeyword"
@@ -245,9 +275,15 @@ function ServiceList() {
         <FormControl variant="outlined" style={{ minWidth: 160 }}>
           <InputLabel>지원유형</InputLabel>
           <Select name="supportType" value={supportType} onChange={handleInputChange} label="지원유형">
-            <MenuItem value=""><em>전체</em></MenuItem>
+            <MenuItem value="">
+              <em>전체</em>
+            </MenuItem>
             {supportTypeList.map(function (type, idx) {
-              return <MenuItem key={idx} value={type}>{type}</MenuItem>;
+              return (
+                <MenuItem key={idx} value={type}>
+                  {type}
+                </MenuItem>
+              );
             })}
           </Select>
         </FormControl>
@@ -255,9 +291,15 @@ function ServiceList() {
         <FormControl variant="outlined" style={{ minWidth: 160 }}>
           <InputLabel>사용자 구분</InputLabel>
           <Select name="userType" value={userType} onChange={handleInputChange} label="사용자 구분">
-            <MenuItem value=""><em>전체</em></MenuItem>
+            <MenuItem value="">
+              <em>전체</em>
+            </MenuItem>
             {userTypeList.map(function (type, idx) {
-              return <MenuItem key={idx} value={type}>{type}</MenuItem>;
+              return (
+                <MenuItem key={idx} value={type}>
+                  {type}
+                </MenuItem>
+              );
             })}
           </Select>
         </FormControl>
@@ -265,9 +307,15 @@ function ServiceList() {
         <FormControl variant="outlined" style={{ minWidth: 160 }}>
           <InputLabel>서비스 분야</InputLabel>
           <Select name="serviceField" value={serviceField} onChange={handleInputChange} label="서비스 분야">
-            <MenuItem value=""><em>전체</em></MenuItem>
+            <MenuItem value="">
+              <em>전체</em>
+            </MenuItem>
             {serviceFieldList.map(function (field, idx) {
-              return <MenuItem key={idx} value={field}>{field}</MenuItem>;
+              return (
+                <MenuItem key={idx} value={field}>
+                  {field}
+                </MenuItem>
+              );
             })}
           </Select>
         </FormControl>
@@ -281,9 +329,7 @@ function ServiceList() {
       </Box>
 
       {/* 카드 목록 */}
-      <Grid container spacing={2}>
-        {services.map(renderCard)}
-      </Grid>
+      <Grid container spacing={2}>{services.map(renderCard)}</Grid>
 
       {/* 페이지네이션 */}
       <Box display="flex" justifyContent="center" mt={4}>
