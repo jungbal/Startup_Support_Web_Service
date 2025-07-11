@@ -9,7 +9,8 @@ import './PostList.css';
 const PostList = function() {
   const { postType } = useParams();
   const navigate = useNavigate();
-  const { isLogined, user } = useAuthStore();
+  const { isLogined, user, loginMember } = useAuthStore();
+  const currentUser = user || loginMember;
   
   const [posts, setPosts] = useState([]);
   const [pageInfo, setPageInfo] = useState(null);
@@ -68,7 +69,7 @@ const PostList = function() {
     }
     
     // 공지사항은 슈퍼관리자만 작성 가능
-    if (postType === 'notice' && user?.userLevel !== 1) {
+    if (postType === 'notice' && currentUser?.userLevel !== 1) {
       Swal.fire({
         icon: 'error',
         title: '권한 없음',
@@ -113,7 +114,7 @@ const PostList = function() {
     <div className="post-list-wrap">
       <div className="post-list-header">
         <h3>{getBoardTitle()}</h3>
-        {(postType !== 'notice' || (postType === 'notice' && user?.userLevel === 1)) && (
+        {(postType !== 'notice' || (postType === 'notice' && currentUser?.userLevel === 1)) && (
           <button className="write-btn" onClick={handleWriteClick}>
             글쓰기
           </button>

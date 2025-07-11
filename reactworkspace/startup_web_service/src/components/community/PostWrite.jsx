@@ -9,7 +9,8 @@ import './PostWrite.css';
 const PostWrite = function() {
   const { postType } = useParams();
   const navigate = useNavigate();
-  const { isLogined, user } = useAuthStore();
+  const { isLogined, user, loginMember } = useAuthStore();
+  const currentUser = user || loginMember;
   
   const [formData, setFormData] = useState({
     postTitle: '',
@@ -83,7 +84,7 @@ const PostWrite = function() {
   }
   
   // 공지사항 권한 체크
-  if (postType === 'notice' && user?.userLevel !== 1) {
+  if (postType === 'notice' && currentUser?.userLevel !== 1) {
     Swal.fire({
       icon: 'error',
       title: '권한 없음',
