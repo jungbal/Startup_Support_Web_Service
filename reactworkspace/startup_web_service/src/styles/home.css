@@ -136,7 +136,7 @@
 /* 서비스 그리드 */
 .home-nav-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 2rem;
   margin-top: 2rem;
 }
@@ -196,5 +196,12 @@
   
   .home-subtitle {
     font-size: 1.5rem;
+  }
+}
+
+/* 태블릿 크기에서 2x2 그리드 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .home-nav-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 } 
