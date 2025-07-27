@@ -311,7 +311,7 @@ VITE_WS_URL=ws://localhost:9999/ws
 npm run lint
 
 # Backend Maven 테스트
-mvn test
+mvnw test
 ```
 
 ### API 문서
