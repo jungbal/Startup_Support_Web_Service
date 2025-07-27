@@ -204,10 +204,10 @@ cd springworkspace/startup_web_service
 
 # application.properties 설정 (DB 연결 정보 등)
 # Maven 의존성 설치
-mvn clean install
+mvnw clean install
 
 # Spring Boot 애플리케이션 실행
-mvn spring-boot:run
+mvnw spring-boot:run
 
 # 또는 IDE에서 StartupWebServiceApplication.java 실행
 # 서버 실행 확인: http://localhost:9999
